@@ -1,5 +1,4 @@
 import type { NextPage } from "next";
-import styles from "../styles/Home.module.css";
 import {
   ColumnDef,
   flexRender,
@@ -53,7 +52,7 @@ const Home: NextPage = () => {
 
   if (!table || isLoading) return <></>;
   return (
-    <main className={styles.main}>
+    <main>
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
