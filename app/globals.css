@@ -32,9 +32,13 @@ body {
   }
 }
 
+html {
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
 table {
   border: 1px solid lightgray;
-  padding: 1px;
 }
 
 tbody {
@@ -43,11 +47,8 @@ tbody {
 
 th {
   border-bottom: 1px solid lightgray;
-  padding: 4px;
-}
-
-td {
-  padding: 4px;
+  border-right: 1px solid lightgray;
+  padding: 2px 4px;
 }
 
 tfoot {
