@@ -31,3 +31,29 @@ body {
     text-wrap: balance;
   }
 }
+
+table {
+  border: 1px solid lightgray;
+  padding: 1px;
+}
+
+tbody {
+  border-bottom: 1px solid lightgray;
+}
+
+th {
+  border-bottom: 1px solid lightgray;
+  padding: 4px;
+}
+
+td {
+  padding: 4px;
+}
+
+tfoot {
+  color: gray;
+}
+
+tfoot th {
+  font-weight: normal;
+}

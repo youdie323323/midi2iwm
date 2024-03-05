@@ -1,63 +1,143 @@
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import React from 'react';
+import type { NextPage } from "next";
+import styles from "../styles/Home.module.css";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { useMemo } from "react";
+import useSWR from "swr";
 
-type Book = {
+const fetcher = (args: string) => fetch(args).then((res) => res.json());
+
+type TData = {
+  userId: number;
+  id: number;
   title: string;
-  author: string;
+  body: string;
 };
 
-const books: Book[] = [
-  {
-    title: 'ハリー・ポッターと賢者の石',
-    author: 'J.K.ローリング',
-  },
-  {
-    title: 'こころ',
-    author: '夏目漱石',
-  },
-];
+const Home: NextPage = () => {
+  const { data, isLoading } = useSWR(
+    "https://jsonplaceholder.typicode.com/posts",
+    fetcher
+  );
 
-const columns: ColumnDef<Book, any>[] = [
-  {
-    accessorKey: 'title',
-    header: 'タイトル',
-  },
-  {
-    accessorKey: 'author',
-    header: '著者',
-  },
-];
+  const columns = useMemo<ColumnDef<TData>[]>(
+    () => [
+      {
+        header: "userId",
+        accessorKey: "userId",
+      },
+      {
+        header: "Id",
+        accessorKey: "id",
+      },
+      {
+        header: "Title",
+        accessorKey: "title",
+      },
+    ],
+    []
+  );
 
-export const BasicTable: React.FC = () => {
-  const table = useReactTable<Book>({
-    data: books,
-    columns,
+  const table = useReactTable({
+    data: data,
+    columns: columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    debugTable: true,
   });
+
+  if (!table || isLoading) return <></>;
   return (
-    <div>
+    <main className={styles.main}>
       <table>
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <th key={header.id}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                <th key={header.id} colSpan={header.colSpan}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                 </th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
-              ))}
-            </tr>
-          ))}
+          {table.getRowModel().rows.map((row) => {
+            return (
+              <tr key={row.id}>
+                {row.getVisibleCells().map((cell) => {
+                  return (
+                    <td key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-    </div>
+      <div style={{ margin: "5px" }}>
+        <span>Page</span>
+        <strong>
+          {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+        </strong>
+      </div>
+      <div>
+        <button
+          onClick={() => table.setPageIndex(0)}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<<"}
+        </button>
+        <button
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {"<"}
+        </button>
+        <button
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {">"}
+        </button>
+        <button
+          onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+          disabled={!table.getCanNextPage()}
+        >
+          {">>"}
+        </button>
+      </div>
+      <select
+        style={{ margin: "10px" }}
+        value={table.getState().pagination.pageSize}
+        onChange={(e) => {
+          table.setPageSize(Number(e.target.value));
+        }}
+      >
+        {[10, 20, 30, 40, 50].map((pageSize) => (
+          <option key={pageSize} value={pageSize}>
+            Show {pageSize}
+          </option>
+        ))}
+      </select>
+      <div>{table.getRowModel().rows.length} Rows</div>
+    </main>
   );
 };
+
+export default Home;
