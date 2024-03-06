@@ -1,11 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-    webpack: (config) => ({
-        ...config,
-        experiments: {
-            asyncWebAssembly: true,
-        },
-    }),
-};
+const nextConfig = {};
 
 export default nextConfig;
