@@ -13,8 +13,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
       <Script strategy='beforeInteractive' src='wasm_exec.js' />
+      <body>{children}</body>
     </html>
   );
 }
