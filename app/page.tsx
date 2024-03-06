@@ -1,5 +1,6 @@
 export default function App() {
-  return <main>
-
-  </main>
+  const go = new Go();
+  WebAssembly.instantiateStreaming(fetch('main.wasm'), go.importObject).then((res) => go.run(res.instance));
+  
+  return <main></main>
 }
