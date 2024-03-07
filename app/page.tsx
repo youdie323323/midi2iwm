@@ -147,7 +147,7 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".midi,.mid"
+                  accept=".mid"
                   onInput={function (e) {
                     const infoJson = prompt(`Please input your info with JSON (piano Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}] )`)
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
