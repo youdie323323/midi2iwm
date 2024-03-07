@@ -149,7 +149,9 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".midi,.mid"
                   onInput={function (e) {
-                    const infoJson = prompt(`Please input your mid index info with JSON (etc   [{"Index":0,"Volume":0.2,"PlayKey":1,"PlayKeyPitchStandard":1,"PlayKeyHighestPitch":1,"Offset":0}]  )`)
+                    const infoJson = prompt(`Please input your mid info with JSON (like: [{"Index":0,"Volume":0.2,"PlayKey":1,"PlayKeyPitchStandard":1,"PlayKeyHighestPitch":1,"Offset":0}]  )`)
+                    const AppendMapIdx = prompt(`Please specify map index you wanna append`)
+
                     function _arrayBufferToBase64(buffer: any): string {
                       var binary = '';
                       var bytes = new Uint8Array(buffer as ArrayBuffer);
@@ -164,7 +166,7 @@ export default function App() {
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, 1.2, false, 0, 0)
+                      const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, 1.2, false, 0, Number(AppendMapIdx))
                       if (aa.error) {
                         alert(aa.errorReason)
                         return
