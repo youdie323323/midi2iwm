@@ -41,11 +41,14 @@ func main() {
 		//args[1] - []packages.TrackInfo json data
 		//args[2] - speed
 		//args[3] - Append obj map index
-		var ee []packages.TrackInfo
-		json.Unmarshal([]byte(args[1].String()), &ee)
 		var aa basic.SfmMaps
 		xml.Unmarshal([]byte(fileStr), &aa)
+
 		dec, _ := base64.StdEncoding.DecodeString(args[0].String())
+
+		var ee []packages.TrackInfo
+		json.Unmarshal([]byte(args[1].String()), &ee)
+
 		obj, err := packages.Midi(dec, ee, args[2].Float())
 		if err != nil {
 			return map[string]interface{}{
