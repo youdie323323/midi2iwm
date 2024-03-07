@@ -149,7 +149,6 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".midi,.mid"
                   onInput={function (e) {
-                    
                     const infoJson = prompt(`Please input your info with JSON (piano Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}] )`)
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
                     const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string
@@ -159,7 +158,7 @@ export default function App() {
                       var len = bytes.byteLength;
                       for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[i]);
-                      }
+                      } 
                       return window.btoa(binary);
                     }
                     const file = e.target.files?.item(0)
@@ -167,7 +166,6 @@ export default function App() {
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      console.log(parseFloat(Speed))  
                       const aa = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         infoJson,
