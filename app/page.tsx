@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import Script from 'next/script'
 
+//go class
 declare const Go: any;
 
 export default function App() {
@@ -46,8 +47,26 @@ export default function App() {
           Welcome
         </h2>
         <p>
-          This is IWM tools dashboard. Make your IWM experience better.
+          This is IWM tools dashboard.
         </p>
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text">
+              Upload
+            </span>
+          </div>
+          <div className="custom-file">
+            <input
+              type="file"
+              className="custom-file-input"
+              id="inputGroupFile01"
+              aria-describedby="inputGroupFileAddon01"
+            />
+            <label className="custom-file-label" htmlFor="inputGroupFile01">
+              Choose file
+            </label>
+          </div>
+        </div>
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
             <div className="card widget">
@@ -77,6 +96,7 @@ export default function App() {
               </div>
             </div>
           </div>
+
           <div className="col-md-6">
             <div className="card widget">
               <div className="card-body">
@@ -105,6 +125,7 @@ export default function App() {
               </div>
             </div>
           </div>
+
           <div className="col-md-6">
             <div className="card widget">
               <div className="card-body">
@@ -128,7 +149,7 @@ export default function App() {
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert midi to IWM
+                  Convert midi to IWM.
                 </p>
               </div>
             </div>
