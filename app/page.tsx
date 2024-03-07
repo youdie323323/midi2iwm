@@ -149,7 +149,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".midi,.mid"
                   onInput={function (e) {
-                    const infoJson = prompt(`Please input your mid info with JSON (like: [{"Index":0,"Volume":0.2,"PlayKey":1,"PlayKeyPitchStandard":1,"PlayKeyHighestPitch":1,"Offset":0}]  )`)
+                    const infoJson = prompt(`Please input your info with JSON (duck Example (see the console table): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}]  )`)
                     const AppendMapIdx = prompt(`Please specify map index you wanna append`)
 
                     function _arrayBufferToBase64(buffer: any): string {
