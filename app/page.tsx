@@ -171,6 +171,8 @@ export default function App() {
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
+                      console.log(BaseMinus === "true")
+                      console.log(pitchForBaseMinus ? Number(pitchForBaseMinus) : 0)
                       const aa = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         infoJson,
