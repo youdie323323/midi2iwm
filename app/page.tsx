@@ -15,7 +15,7 @@ export default function App() {
   }, []);
 
   return (
-    <div style={{ backgroundColor: 'black', color: 'white' }}>
+    <div>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -105,7 +105,34 @@ export default function App() {
               </div>
             </div>
           </div>
-
+          <div className="col-md-6">
+            <div className="card widget">
+              <div className="card-body">
+                <h3
+                  className="card-title"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <i
+                    className="material-icons text-danger-emphasis"
+                    style={{
+                      fontSize: 24,
+                      marginRight: 10,
+                      verticalAlign: "middle"
+                    }}
+                  >
+                    music_note
+                  </i>{" "}
+                  Midi to IWM
+                  <span className="ms-auto" style={{ color: "#666" }}>
+                    Stable
+                  </span>
+                </h3>
+                <p className="card-text">
+                  Convert midi to IWM
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
