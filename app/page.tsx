@@ -121,8 +121,8 @@ export default function App() {
                       const aa = Image(
                         _arrayBufferToBase64(e.target?.result),
                         Scale,
-                        Width,
-                        Height,
+                        Number(Width),
+                        Number(Height),
                         Number(AppendMapIdx),
                       );
                       if (aa.error) {
@@ -134,6 +134,7 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
+                  <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
               </div>
             </div>
           </div>
