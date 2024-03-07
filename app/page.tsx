@@ -167,6 +167,7 @@ export default function App() {
                       const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, 1.2, false, 0, 0)
                       if (aa.error) {
                         alert(aa.errorReason)
+                        return
                       }
                       console.log(aa.newMap)
                     });
