@@ -149,9 +149,14 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".midi,.mid"
                   onInput={function (e) {
-                    const infoJson = prompt(`Please input your info with JSON (duck Example (see the console table): [{"Index":0,"Volume":1,"PlayKey":18,"PlayKeyPitchStandard":30,"PlayKeyHighestPitch":49,"Offset":0}] )`)
-                    const AppendMapIdx = prompt(`Please specify map index you wanna append`)
-
+                    const infoJson = prompt(`Please input your info with JSON (duck Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":18,"PlayKeyPitchStandard":30,"PlayKeyHighestPitch":49,"Offset":0}] )`)
+                    const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
+                    const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`)
+                    const BaseMinus = prompt(`Use baseMinus algorithm (same as MIDI to IWM) true / ...`)
+                    let pitchForBaseMinus: boolean | string = false
+                    if (BaseMinus === "true") {
+                      pitchForBaseMinus = prompt(`Please input HighestPitch for baseMinus (number)`) as string
+                    }
                     function _arrayBufferToBase64(buffer: any): string {
                       var binary = '';
                       var bytes = new Uint8Array(buffer as ArrayBuffer);
@@ -166,7 +171,7 @@ export default function App() {
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, 1.2, false, 0, Number(AppendMapIdx))
+                      const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, parseFloat(Speed!), (BaseMinus === "true"), pitchForBaseMinus ? Number(pitchForBaseMinus) : 0, Number(AppendMapIdx))
                       if (aa.error) {
                         alert(aa.errorReason)
                         return
