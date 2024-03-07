@@ -13,6 +13,7 @@ var (
 
 func main() {
 	window.Set("Image", js.FuncOf(func(this js.Value, args []js.Value) any {
+
 		return "a"
 	}))
 
