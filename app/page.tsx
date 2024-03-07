@@ -5,6 +5,7 @@ import Script from 'next/script'
 declare const Go: any;
 
 export default function App() {
+  //load wasm
   useEffect(() => {
     (async () => {
       const go = new Go();
@@ -18,7 +19,7 @@ export default function App() {
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
-            I Wanna Maker Tools
+            IWM Tools
           </a>
           <button
             className="navbar-toggler"
@@ -63,11 +64,11 @@ export default function App() {
                       verticalAlign: "middle"
                     }}
                   >
-                    group
+                    image
                   </i>{" "}
                   Image To IWM
                   <span className="ms-auto" style={{ color: "#666" }}>
-                  Stable
+                    Stable
                   </span>
                 </h3>
                 <p className="card-text">
