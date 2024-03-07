@@ -143,6 +143,12 @@ export default function App() {
                 <p className="card-text">
                   Convert midi to IWM.
                 </p>
+                <input
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
+                  aria-describedby="file_input_help"
+                  accept=".midi"
+                  id="mapfile"
+                  type="file" />
               </div>
             </div>
           </div>
