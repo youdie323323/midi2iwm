@@ -171,8 +171,7 @@ export default function App() {
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      console.log(BaseMinus === "true")
-                      console.log(pitchForBaseMinus ? Number(pitchForBaseMinus) : 0)
+                      console.log(parseFloat(Speed))  
                       const aa = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         infoJson,
@@ -180,7 +179,7 @@ export default function App() {
                         BaseMinus === "true",
                         pitchForBaseMinus ? Number(pitchForBaseMinus) : 0,
                         Number(AppendMapIdx),
-                      )
+                      );
                       if (aa.error) {
                         alert(aa.errorReason)
                         return
