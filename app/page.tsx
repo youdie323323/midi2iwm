@@ -169,7 +169,7 @@ export default function App() {
                       const aa = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         infoJson,
-                        parseFloat(Speed),
+                        1.2,
                         Number(AppendMapIdx),
                       );
                       if (aa.error) {
