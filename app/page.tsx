@@ -5,6 +5,7 @@ import Script from 'next/script'
 //declare
 declare const Go: any;
 declare const Midi: any;
+declare const Image: any;
 
 export default function App() {
   //load wasm
@@ -15,7 +16,14 @@ export default function App() {
       go.run(result.instance);
     })();
   }, []);
-
+  function downloadText(fileName: string, text: string) {
+    const aTag = document.createElement('a');
+    aTag.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    aTag.target = '_blank';
+    aTag.download = fileName;
+    aTag.click();
+    URL.revokeObjectURL(aTag.href);
+  }
   return (
     <div>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -86,6 +94,46 @@ export default function App() {
                 <p className="card-text">
                   Convert image to IWM using fruit.
                 </p>
+                <input
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
+                  aria-describedby="file_input_help"
+                  accept=".png,.jpg,.jpeg"
+                  onInput={function (e) {
+                    const Scale = parseFloat(prompt(`Please specify fruit scale(0.5 good)`) as string);
+                    const Width = prompt(`Please specify width (fullMap = 794)`);
+                    const Height = prompt(`Please specify height (fullMap = 608)`);
+                    const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
+
+                    function _arrayBufferToBase64(buffer: any): string {
+                      var binary = '';
+                      var bytes = new Uint8Array(buffer as ArrayBuffer);
+                      var len = bytes.byteLength;
+                      for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                      }
+                      return window.btoa(binary);
+                    }
+                    const file = e.target.files?.item(0)
+                    if (!file) return
+
+                    const reader = new FileReader()
+                    reader.addEventListener('load', function (e) {
+                      const aa = Image(
+                        _arrayBufferToBase64(e.target?.result),
+                        Scale,
+                        Width,
+                        Height,
+                        Number(AppendMapIdx),
+                      );
+                      if (aa.error) {
+                        alert(aa.errorReason)
+                        return
+                      }
+                      downloadText("downloaded.map", aa.newMap)
+                    });
+                    reader.readAsArrayBuffer(e.target.files![0]);
+                  } as React.ChangeEventHandler<HTMLInputElement>}
+                  type="file" />
               </div>
             </div>
           </div>
@@ -138,11 +186,11 @@ export default function App() {
                   </i>{" "}
                   Midi to IWM
                   <span className="ms-auto" style={{ color: "#666" }}>
-                    Stable
+                    UnStable
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert midi to IWM, this not said pitch error like Midi to iwm.
+                  Convert midi to IWM
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -151,14 +199,14 @@ export default function App() {
                   onInput={function (e) {
                     const infoJson = prompt(`Please input your info with JSON (piano Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}] )`)
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
-                    const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string
+                    const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string;
                     function _arrayBufferToBase64(buffer: any): string {
                       var binary = '';
                       var bytes = new Uint8Array(buffer as ArrayBuffer);
                       var len = bytes.byteLength;
                       for (var i = 0; i < len; i++) {
                         binary += String.fromCharCode(bytes[i]);
-                      } 
+                      }
                       return window.btoa(binary);
                     }
                     const file = e.target.files?.item(0)
@@ -176,7 +224,7 @@ export default function App() {
                         alert(aa.errorReason)
                         return
                       }
-                      console.log(aa.newMap)
+                      downloadText("downloaded.map", aa.newMap)
                     });
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}

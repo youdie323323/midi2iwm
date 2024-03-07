@@ -5,6 +5,7 @@ package main
 import (
 	"IWMmain/src/basic"
 	"IWMmain/src/packages"
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
@@ -34,7 +35,7 @@ func main() {
 		if fileSelected != true {
 			return map[string]interface{}{
 				"error":       true,
-				"errorReason": "Please select file before",
+				"errorReason": "Please select map file before",
 			}
 		}
 		//args[0] - Base64 encoded midi data uint8Array
@@ -60,6 +61,40 @@ func main() {
 		t.Event = append(t.Event, obj...)
 		aa.SfmMap[args[3].Int()].Objects.Object = append(aa.SfmMap[args[3].Int()].Objects.Object, t)
 		aa.SfmMap[args[3].Int()].Head.NumObjects += 1
+
+		return map[string]interface{}{
+			"error":  false,
+			"newMap": basic.BuildXMLObject(aa),
+		}
+	}))
+
+	window.Set("Image", js.FuncOf(func(this js.Value, args []js.Value) any {
+		if fileSelected != true {
+			return map[string]interface{}{
+				"error":       true,
+				"errorReason": "Please select map file before",
+			}
+		}
+		//args[0] - Base64 encoded image data
+		//args[1] - scale (should be 0.5)
+		//args[2] - width
+		//args[3] - height
+		//args[4] - Append obj map index
+		var aa basic.SfmMaps
+		xml.Unmarshal([]byte(fileStr), &aa)
+
+		dec, _ := base64.StdEncoding.DecodeString(args[0].String())
+
+		obj, num, err := packages.Image(bytes.NewReader(dec), args[2].Int(), args[3].Int(), args[1].Float())
+		if err != nil {
+			return map[string]interface{}{
+				"error":       true,
+				"errorReason": err.Error(),
+			}
+		}
+
+		aa.SfmMap[args[4].Int()].Objects.Object = append(aa.SfmMap[args[4].Int()].Objects.Object, obj...)
+		aa.SfmMap[args[4].Int()].Head.NumObjects += num
 
 		return map[string]interface{}{
 			"error":  false,
