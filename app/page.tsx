@@ -49,24 +49,30 @@ export default function App() {
         <p>
           This is IWM tools dashboard.
         </p>
+        
         <div className="input-group mb-3">
           <div className="input-group-prepend">
-            <span className="input-group-text">
-              Upload
-            </span>
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              id="inputGroupFileAddon03"
+            >
+              Button
+            </button>
           </div>
           <div className="custom-file">
             <input
               type="file"
               className="custom-file-input"
-              id="inputGroupFile01"
-              aria-describedby="inputGroupFileAddon01"
+              id="inputGroupFile03"
+              aria-describedby="inputGroupFileAddon03"
             />
-            <label className="custom-file-label" htmlFor="inputGroupFile01">
+            <label className="custom-file-label" htmlFor="inputGroupFile03">
               Choose file
             </label>
           </div>
         </div>
+
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
             <div className="card widget">
