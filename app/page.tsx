@@ -1,9 +1,10 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Script from 'next/script'
 
-//go class
+//declare
 declare const Go: any;
+declare const Midi: any;
 
 export default function App() {
   //load wasm
@@ -57,7 +58,7 @@ export default function App() {
           id="mapfile"
           type="file" />
 
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Please input your map file before, *.map file only</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
@@ -146,9 +147,33 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".midi"
-                  id="mapfile"
+                  accept=".midi,.mid"
+                  onInput={function (e) {
+                    const infoJson = prompt(`Please input your mid index info with JSON (etc   [{"Index":0,"Volume":0.2,"PlayKey":1,"PlayKeyPitchStandard":1,"PlayKeyHighestPitch":1,"Offset":0}]  )`)
+                    function _arrayBufferToBase64(buffer: any): string {
+                      var binary = '';
+                      var bytes = new Uint8Array(buffer as ArrayBuffer);
+                      var len = bytes.byteLength;
+                      for (var i = 0; i < len; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                      }
+                      return window.btoa(binary);
+                    }
+                    const file = e.target.files?.item(0)
+                    if (!file) return
+
+                    const reader = new FileReader()
+                    reader.addEventListener('load', function (e) {
+                      const aa = Midi(_arrayBufferToBase64(e.target?.result), infoJson, 1.2, false, 0, 0)
+                      if (aa.error) {
+                        alert(aa.errorReason)
+                      }
+                      console.log(aa.newMap)
+                    });
+                    reader.readAsArrayBuffer(e.target.files![0]);
+                  } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file, option are ask by alert.</p>
               </div>
             </div>
           </div>
