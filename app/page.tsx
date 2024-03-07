@@ -1,5 +1,6 @@
 'use client';
 import { useEffect } from 'react';
+import Script from 'next/script'
 
 declare const Go: any;
 
@@ -12,8 +13,8 @@ export default function App() {
     })();
   }, []);
 
-  return <div>
-    <>
+  return (
+    <div>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand" href="/{{.session}}/">
@@ -292,7 +293,8 @@ export default function App() {
           </div>
         </div>
       </div>
-    </>
-
-  </div>
+      <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
+      <Script src='https://cdn.jsdelivr.net/npm/apexcharts@3.26.3/dist/apexcharts.min.js' />
+    </div>
+  )
 }
