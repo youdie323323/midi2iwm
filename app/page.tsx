@@ -99,7 +99,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpg,.jpeg"
                   onInput={function (e) {
-                    const Scale = parseFloat(prompt(`Please specify fruit scale(0.5 good)`) as string);
+                    const Scale = parseFloat(prompt(`Please specify fruit scale(0.5 = good)`) as string);
                     const Width = prompt(`Please specify width (fullMap = 794)`);
                     const Height = prompt(`Please specify height (fullMap = 608)`);
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
