@@ -15,7 +15,7 @@ export default function App() {
   }, []);
 
   return (
-    <div>
+    <div style={{ backgroundColor: 'black', color: 'white' }}>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -72,12 +72,11 @@ export default function App() {
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert image to iwm objects using apple blend_color.
+                  Convert image to IWM using fruit.
                 </p>
               </div>
             </div>
           </div>
-
           <div className="col-md-6">
             <div className="card widget">
               <div className="card-body">
@@ -93,15 +92,15 @@ export default function App() {
                       verticalAlign: "middle"
                     }}
                   >
-                    rocket_launch
+                    light_mode
                   </i>{" "}
-                  Attacks
+                  Image to IWM Bright
                   <span className="ms-auto" style={{ color: "#666" }}>
                     Stable
                   </span>
                 </h3>
                 <p className="card-text">
-                  All the attacks which have been sent globally.
+                  Convert image to IWM using bright.
                 </p>
               </div>
             </div>
