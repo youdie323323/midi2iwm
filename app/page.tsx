@@ -51,7 +51,7 @@ export default function App() {
         </p>
 
         <input className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" type="file" />
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">.map file only</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">Please input your map file before, *.map file only</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
