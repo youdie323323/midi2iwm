@@ -102,6 +102,41 @@ func main() {
 		}
 	}))
 
+	window.Set("Bright", js.FuncOf(func(this js.Value, args []js.Value) any {
+		if fileSelected != true {
+			return map[string]interface{}{
+				"error":       true,
+				"errorReason": "Please select map file before",
+			}
+		}
+		//args[0] - Base64 encoded image data
+		//args[1] - width
+		//args[2] - height
+		//args[3] - lumMax
+		//args[4] - Append obj map index
+		var aa basic.SfmMaps
+		xml.Unmarshal([]byte(fileStr), &aa)
+
+		dec, _ := base64.StdEncoding.DecodeString(args[0].String())
+
+		obj, num, err := packages.Bright(bytes.NewReader(dec), args[1].Int(), args[2].Int(), args[3].Float())
+		if err != nil {
+			return map[string]interface{}{
+				"error":       true,
+				"errorReason": err.Error(),
+			}
+		}
+
+		aa.SfmMap[args[4].Int()].Objects.Object = append(aa.SfmMap[args[4].Int()].Objects.Object, obj...)
+		aa.SfmMap[args[4].Int()].Head.NumObjects += num
+
+		return map[string]interface{}{
+			"error":  false,
+			"newMap": basic.BuildXMLObject(aa),
+		}
+	}))
+
+
 	window.Get("console").Call("table", window.Get("JSON").Call("parse", string(ErrorSuteru(json.Marshal(
 		[]struct {
 			Name                 string `json:"Name"`
