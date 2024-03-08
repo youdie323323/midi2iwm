@@ -107,7 +107,7 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".png,.jpg,.jpeg"
+                  accept=".png,.jpeg"
                   onInput={function (e) {
                     const Scale = parseFloat(prompt(`Please specify fruit scale(0.5 = good)`) as string);
                     const Width = prompt(`Please specify width (fullMap = 794)`);
@@ -168,7 +168,7 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".png"
+                  accept=".png,.jpeg"
                   onInput={function (e) {
                     const Width = prompt(`Please specify width (fullMap = 794)`);
                     const Height = prompt(`Please specify height (fullMap = 608)`);
