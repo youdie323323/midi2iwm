@@ -25,6 +25,15 @@ export default function App() {
     aTag.click();
     URL.revokeObjectURL(aTag.href);
   }
+  function _arrayBufferToBase64(buffer: any): string {
+    var binary = '';
+    var bytes = new Uint8Array(buffer as ArrayBuffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
   return (
     <div>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -105,15 +114,6 @@ export default function App() {
                     const Height = prompt(`Please specify height (fullMap = 608)`);
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
 
-                    function _arrayBufferToBase64(buffer: any): string {
-                      var binary = '';
-                      var bytes = new Uint8Array(buffer as ArrayBuffer);
-                      var len = bytes.byteLength;
-                      for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                      }
-                      return window.btoa(binary);
-                    }
                     const file = e.target.files?.item(0)
                     if (!file) return
 
@@ -168,25 +168,14 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".png,.jpg,.jpeg"
+                  accept=".png"
                   onInput={function (e) {
                     const Width = prompt(`Please specify width (fullMap = 794)`);
                     const Height = prompt(`Please specify height (fullMap = 608)`);
                     const Max = parseFloat(prompt(`Please specify lum max (float, brightness reduction)`) as string);
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
-
-                    function _arrayBufferToBase64(buffer: any): string {
-                      var binary = '';
-                      var bytes = new Uint8Array(buffer as ArrayBuffer);
-                      var len = bytes.byteLength;
-                      for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                      }
-                      return window.btoa(binary);
-                    }
                     const file = e.target.files?.item(0)
                     if (!file) return
-
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
                       const aa = Bright(
@@ -205,7 +194,7 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file, use png instead</p>
               </div>
             </div>
           </div>
@@ -243,15 +232,6 @@ export default function App() {
                     const infoJson = prompt(`Please input your info with JSON (piano Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}] )`)
                     const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
                     const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string;
-                    function _arrayBufferToBase64(buffer: any): string {
-                      var binary = '';
-                      var bytes = new Uint8Array(buffer as ArrayBuffer);
-                      var len = bytes.byteLength;
-                      for (var i = 0; i < len; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                      }
-                      return window.btoa(binary);
-                    }
                     const file = e.target.files?.item(0)
                     if (!file) return
 
