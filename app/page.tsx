@@ -102,7 +102,7 @@ export default function App() {
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert image to IWM using fruit.
+                  Convert image to IWM using delicous fruit
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -163,7 +163,7 @@ export default function App() {
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert image to IWM using bright.
+                  Convert image to IWM using bright
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
