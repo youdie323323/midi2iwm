@@ -253,26 +253,26 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file</p>
-                <textarea rows={5} cols={66} placeholder='
-Example:
-[
-	{
-		"Index": 0,
-		"Volume": 1,
-		"PlayKey": 0,
-		"PlayKeyPitchStandard": 61,
-		"PlayKeyHighestPitch": 73,
-		"Offset": 0
-	},
-  {
-		"Index": 1,
-		"Volume": 1,
-		"PlayKey": 0,
-		"PlayKeyPitchStandard": 61,
-		"PlayKeyHighestPitch": 73,
-		"Offset": 0
-	},
-]
+                <textarea rows={20} cols={66} placeholder='
+Example:&#13;
+[&#13;
+	{&#13;
+		"Index": 0,&#13;
+		"Volume": 1,&#13;
+		"PlayKey": 0,&#13;
+		"PlayKeyPitchStandard": 61,&#13;
+		"PlayKeyHighestPitch": 73,&#13;
+		"Offset": 0&#13;
+	},&#13;
+  {&#13;
+		"Index": 1,&#13;
+		"Volume": 1,&#13;
+		"PlayKey": 0,&#13;
+		"PlayKeyPitchStandard": 61,&#13;
+		"PlayKeyHighestPitch": 73,&#13;
+		"Offset": 0&#13;
+	},&#13;
+]&#13;
 This 
                 '></textarea>
               </div>
