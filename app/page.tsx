@@ -254,8 +254,9 @@ export default function App() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your midi file<br></br>Please enter track info with JSON, see the placeholder</p>
                 <style jsx>
                   {`
-textarea {
+textarea#JSONtrackInfo {
   white-space: pre-line;
+  content: "a\nb";
 }
                   `}
                 </style>
