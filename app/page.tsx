@@ -252,8 +252,12 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file<br></br>Please input your midi tracks info with JSON, see the placeholder</p>
-                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your midi file<br></br>Please enter track info with JSON, see the placeholder</p>
+                <textarea
+                  id="JSONtrackInfo"
+                  rows={4}
+                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  placeholder="a\nb"></textarea>
               </div>
             </div>
           </div>
