@@ -76,8 +76,7 @@ export default function App() {
           id="mapfile"
           type="file" />
 
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only</p>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Map file path is &quot;C:\Users\yourUsername\AppData\Local\IWM\maps&quot;</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only<br></br>Map file path is &quot;C:\Users\yourUsername\AppData\Local\IWM\maps&quot;</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
