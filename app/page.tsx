@@ -253,28 +253,7 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file<br></br>Please input your midi tracks info with JSON, see the placeholder</p>
-                <textarea rows={20} cols={66} placeholder='
-Example:&#10;
-[&#10;
-	{&#10;
-		"Index": 0,&#10;
-		"Volume": 1,&#10;
-		"PlayKey": 0,&#10;
-		"PlayKeyPitchStandard": 61,&#10;
-		"PlayKeyHighestPitch": 73,&#10;
-		"Offset": 0&#10;
-	},&#10;
-  {&#10;
-		"Index": 1,&#10;
-		"Volume": 1,&#10;
-		"PlayKey": 0,&#10;
-		"PlayKeyPitchStandard": 61,&#10;
-		"PlayKeyHighestPitch": 73,&#10;
-		"Offset": 0&#10;
-	},&#10;
-]&#10;
-This 
-                '></textarea>
+                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
               </div>
             </div>
           </div>
