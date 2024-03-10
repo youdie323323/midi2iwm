@@ -77,7 +77,7 @@ export default function App() {
           type="file" />
 
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only</p>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Map file path is "C:\\Users\\yourUsername\\AppData\\Local\\IWM\\maps"</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Map file path is \"C:\\Users\\yourUsername\\AppData\\Local\\IWM\\maps\"</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
@@ -173,7 +173,7 @@ export default function App() {
                   onInput={function (e) {
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    const Max = parseFloat(prompt(`Please input lum max (float, brightness reduction)`) as string);
+                    const MaxLum = parseFloat(prompt(`Please input lum max (float, brightness reduction)`) as string);
                     const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
                     const file = e.target.files?.item(0)
                     if (!file) return
@@ -183,7 +183,7 @@ export default function App() {
                         _arrayBufferToBase64(e.target?.result),
                         Number(Width),
                         Number(Height),
-                        Max,
+                        MaxLum,
                         Number(AppendMapIdx),
                       );
                       if (aa.error) {
