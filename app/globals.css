@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#JSONtrackInfo::placeholder {
+    white-space: pre-line;
+    content: "a\nb";
+}

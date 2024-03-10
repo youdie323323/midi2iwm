@@ -26,10 +26,10 @@ export default function App() {
     URL.revokeObjectURL(aTag.href);
   }
   function _arrayBufferToBase64(buffer: any): string {
-    var binary = '';
-    var bytes = new Uint8Array(buffer as ArrayBuffer);
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
+    let binary = '';
+    let bytes = new Uint8Array(buffer as ArrayBuffer);
+    let len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
@@ -256,8 +256,7 @@ export default function App() {
                 <textarea
                   id="JSONtrackInfo"
                   rows={4}
-                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="a\nb"></textarea>
+                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"></textarea>
               </div>
             </div>
           </div>
