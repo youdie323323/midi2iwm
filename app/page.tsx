@@ -77,6 +77,7 @@ export default function App() {
           type="file" />
 
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Map file path is "C:\Users\yourUsername\AppData\Local\IWM\maps"</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
@@ -109,10 +110,10 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
-                    const Scale = parseFloat(prompt(`Please specify fruit scale(0.5 = good)`) as string);
-                    const Width = prompt(`Please specify width (fullMap = 794)`);
-                    const Height = prompt(`Please specify height (fullMap = 608)`);
-                    const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
+                    const Scale = parseFloat(prompt(`Please input fruit scale(0.5 = good)`) as string);
+                    const Width = prompt(`Please input width (fullMap = 794)`);
+                    const Height = prompt(`Please input height (fullMap = 608)`);
+                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
 
                     const file = e.target.files?.item(0)
                     if (!file) return
@@ -135,7 +136,7 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file, this not same as real one, if you need more good dm me in discord @nilptrs</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
               </div>
             </div>
           </div>
@@ -170,10 +171,10 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
-                    const Width = prompt(`Please specify width (fullMap = 794)`);
-                    const Height = prompt(`Please specify height (fullMap = 608)`);
-                    const Max = parseFloat(prompt(`Please specify lum max (float, brightness reduction)`) as string);
-                    const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`);
+                    const Width = prompt(`Please input width (fullMap = 794)`);
+                    const Height = prompt(`Please input height (fullMap = 608)`);
+                    const Max = parseFloat(prompt(`Please input lum max (float, brightness reduction)`) as string);
+                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
                     const file = e.target.files?.item(0)
                     if (!file) return
                     const reader = new FileReader()
@@ -229,8 +230,8 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid"
                   onInput={function (e) {
-                    const infoJson = prompt(`Please input your info with JSON (piano Example (see the console for more info): [{"Index":0,"Volume":1,"PlayKey":0,"PlayKeyPitchStandard":61,"PlayKeyHighestPitch":73,"Offset":0}] )`)
-                    const AppendMapIdx = prompt(`Please specify room index you wanna append (number)`)
+                    const infoJson = prompt(`Please input your tracks info with JSON`)
+                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`)
                     const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string;
                     const file = e.target.files?.item(0)
                     if (!file) return
@@ -252,7 +253,7 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file, this not same as real one, use MidiToIWM GUI or contact me in discord @nilptrs</p>
               </div>
             </div>
           </div>
