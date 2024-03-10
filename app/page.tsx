@@ -252,7 +252,29 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file, this not same as real one, use MidiToIWM GUI or contact me in discord @nilptrs</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file</p>
+                <textarea placeholder='
+Example:
+[
+	{
+		"Index": 0,
+		"Volume": 1,
+		"PlayKey": 0,
+		"PlayKeyPitchStandard": 61,
+		"PlayKeyHighestPitch": 73,
+		"Offset": 0
+	},
+  {
+		"Index": 1,
+		"Volume": 1,
+		"PlayKey": 0,
+		"PlayKeyPitchStandard": 61,
+		"PlayKeyHighestPitch": 73,
+		"Offset": 0
+	},
+]
+This 
+                '></textarea>
               </div>
             </div>
           </div>
