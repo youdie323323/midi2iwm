@@ -35,7 +35,7 @@ func main() {
 		if fileSelected != true {
 			return map[string]interface{}{
 				"error":       true,
-				"errorReason": "Please select map file before",
+				"errorReason": "Please select map file",
 			}
 		}
 		//args[0] - Base64 encoded midi data uint8Array
@@ -72,7 +72,7 @@ func main() {
 		if fileSelected != true {
 			return map[string]interface{}{
 				"error":       true,
-				"errorReason": "Please select map file before",
+				"errorReason": "Please select map file",
 			}
 		}
 		//args[0] - Base64 encoded image data
@@ -106,7 +106,7 @@ func main() {
 		if fileSelected != true {
 			return map[string]interface{}{
 				"error":       true,
-				"errorReason": "Please select map file before",
+				"errorReason": "Please select map file",
 			}
 		}
 		//args[0] - Base64 encoded image data
