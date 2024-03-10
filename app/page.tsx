@@ -253,7 +253,7 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file</p>
-                <textarea placeholder='
+                <textarea rows={5} cols={33} placeholder='
 Example:
 [
 	{
