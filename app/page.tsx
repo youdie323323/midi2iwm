@@ -194,7 +194,7 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file, use png instead</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
               </div>
             </div>
           </div>
