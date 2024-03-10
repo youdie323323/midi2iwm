@@ -252,27 +252,27 @@ export default function App() {
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your midi file<br></br>Please input your midi tracks info with JSON, see the placeholder</p>
                 <textarea rows={20} cols={66} placeholder='
-Example:&#13;
-[&#13;
-	{&#13;
-		"Index": 0,&#13;
-		"Volume": 1,&#13;
-		"PlayKey": 0,&#13;
-		"PlayKeyPitchStandard": 61,&#13;
-		"PlayKeyHighestPitch": 73,&#13;
-		"Offset": 0&#13;
-	},&#13;
-  {&#13;
-		"Index": 1,&#13;
-		"Volume": 1,&#13;
-		"PlayKey": 0,&#13;
-		"PlayKeyPitchStandard": 61,&#13;
-		"PlayKeyHighestPitch": 73,&#13;
-		"Offset": 0&#13;
-	},&#13;
-]&#13;
+Example:&#10;
+[&#10;
+	{&#10;
+		"Index": 0,&#10;
+		"Volume": 1,&#10;
+		"PlayKey": 0,&#10;
+		"PlayKeyPitchStandard": 61,&#10;
+		"PlayKeyHighestPitch": 73,&#10;
+		"Offset": 0&#10;
+	},&#10;
+  {&#10;
+		"Index": 1,&#10;
+		"Volume": 1,&#10;
+		"PlayKey": 0,&#10;
+		"PlayKeyPitchStandard": 61,&#10;
+		"PlayKeyHighestPitch": 73,&#10;
+		"Offset": 0&#10;
+	},&#10;
+]&#10;
 This 
                 '></textarea>
               </div>
