@@ -81,12 +81,13 @@ func main() {
 		//args[2] - width
 		//args[3] - height
 		//args[4] - Append obj map index
+		//args[5] - offsetXY
 		var aa basic.SfmMaps
 		xml.Unmarshal([]byte(fileStr), &aa)
 
 		dec, _ := base64.StdEncoding.DecodeString(args[0].String())
 
-		obj, num, err := packages.Image(bytes.NewReader(dec), args[2].Int(), args[3].Int(), args[1].Float())
+		obj, num, err := packages.Image(bytes.NewReader(dec), args[2].Int(), args[3].Int(), args[1].Float(), args[5].Int())
 		if err != nil {
 			return map[string]interface{}{
 				"error":       true,

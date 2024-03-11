@@ -116,6 +116,7 @@ export default function App() {
                     const Scale = prompt(`Please input fruit scale(0.5 = good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
+                    const Offset = prompt(`Please input offset (like 16, 32)`);
 
                     const file = e.target.files?.item(0)
                     if (!file) return
@@ -128,6 +129,7 @@ export default function App() {
                         Number(Width),
                         Number(Height),
                         Number(AppendMapIdx),
+                        Number(Offset)
                       );
                       if (imageObj.error) {
                         alert(imageObj.errorReason)
