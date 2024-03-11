@@ -113,7 +113,7 @@ export default function App() {
                   accept=".png,.jpeg"
                   onInput={function (e) {
                     const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
-                    const Scale = prompt(`Please input fruit scale(0.5 = good)`);
+                    const Scale = prompt(`Please input fruit scale(0.5 good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
                     const Offset = prompt(`Please input offset (like 8, 16)`);
@@ -179,7 +179,7 @@ export default function App() {
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
                     const MaxLum = prompt(`Please input brightness max (float)`);
-                    const Offset = prompt(`Please input offset (like 8, 16)`);
+                    const Offset = prompt(`Please input offset (8 good)`);
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
