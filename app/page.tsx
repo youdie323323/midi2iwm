@@ -109,28 +109,28 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
-                    const Scale = parseFloat(prompt(`Please input fruit scale(0.5 = good)`) as string);
+                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
+                    const Scale = prompt(`Please input fruit scale(0.5 = good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
-
+                    
                     const file = e.target.files?.item(0)
                     if (!file) return
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      const aa = Image(
+                      const imageObj = Image(
                         _arrayBufferToBase64(e.target?.result),
-                        Scale,
+                        parseFloat(Scale as string),
                         Number(Width),
                         Number(Height),
                         Number(AppendMapIdx),
                       );
-                      if (aa.error) {
-                        alert(aa.errorReason)
+                      if (imageObj.error) {
+                        alert(imageObj.errorReason)
                         return
                       }
-                      downloadText("downloaded.map", aa.newMap)
+                      downloadText("downloaded.map", imageObj.newMap)
                     });
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
@@ -170,26 +170,25 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
+                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    const MaxLum = parseFloat(prompt(`Please input lum max (float, brightness reduction)`) as string);
-                    const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
-                    const file = e.target.files?.item(0)
-                    if (!file) return
+                    const MaxLum = prompt(`Please input brightness max (float)`);
+                    
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      const aa = Bright(
+                      const brightObj = Bright(
                         _arrayBufferToBase64(e.target?.result),
                         Number(Width),
                         Number(Height),
-                        MaxLum,
+                        parseFloat(MaxLum as string),
                         Number(AppendMapIdx),
                       );
-                      if (aa.error) {
-                        alert(aa.errorReason)
+                      if (brightObj.error) {
+                        alert(brightObj.errorReason)
                         return
                       }
-                      downloadText("downloaded.map", aa.newMap)
+                      downloadText("downloaded.map", brightObj.newMap)
                     });
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
@@ -232,23 +231,21 @@ export default function App() {
                     const AppendMapIdx = prompt(`Please input room index you wanna append (number)`)
                     const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`);
                     const HighestPitch = prompt(`Please highest pitch (number)`);
-                    const file = e.target.files?.item(0)
-                    if (!file) return
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
-                      const aa = Midi(
+                      const midiObj = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         (document.getElementById("JSONtrackInfo") as HTMLInputElement).value,
                         parseFloat(Speed as string),
                         Number(AppendMapIdx),
                         Number(HighestPitch)
                       );
-                      if (aa.error) {
-                        alert(aa.errorReason)
+                      if (midiObj.error) {
+                        alert(midiObj.errorReason)
                         return
                       }
-                      downloadText("downloaded.map", aa.newMap)
+                      downloadText("downloaded.map", midiObj.newMap)
                     });
                     reader.readAsArrayBuffer(e.target.files![0]);
                   } as React.ChangeEventHandler<HTMLInputElement>}
@@ -258,7 +255,7 @@ export default function App() {
                   id="JSONtrackInfo"
                   rows={10}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="IMPLEMENT"
+                  placeholder="テキスト1&#10;テキスト2&#10;テキスト3"
                 ></textarea>
               </div>
             </div>
