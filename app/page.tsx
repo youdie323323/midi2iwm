@@ -17,6 +17,11 @@ export default function App() {
       go.run(result.instance);
     })();
   }, []);
+
+  Array.prototype.forEach.call(document.getElementById('JSONtrackInfo'), function (elem) {
+    elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
+  });
+
   function downloadText(fileName: string, text: string) {
     const aTag = document.createElement('a');
     aTag.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
@@ -113,7 +118,7 @@ export default function App() {
                     const Scale = prompt(`Please input fruit scale(0.5 = good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    
+
                     const file = e.target.files?.item(0)
                     if (!file) return
 
@@ -174,7 +179,7 @@ export default function App() {
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
                     const MaxLum = prompt(`Please input brightness max (float)`);
-                    
+
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
                       const brightObj = Bright(
@@ -255,8 +260,9 @@ export default function App() {
                   id="JSONtrackInfo"
                   rows={10}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="テキスト1&#13;&#10;asssa"
+                  placeholder="テキスト1\nasssa"
                 ></textarea>
+
               </div>
             </div>
           </div>
