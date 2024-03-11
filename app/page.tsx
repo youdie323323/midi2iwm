@@ -239,7 +239,7 @@ export default function App() {
                     reader.addEventListener('load', function (e) {
                       const midiObj = Midi(
                         _arrayBufferToBase64(e.target?.result),
-                        JSON.parse((document.getElementById("JSONtrackInfo") as HTMLInputElement).value),
+                        (document.getElementById("JSONtrackInfo") as HTMLInputElement).value,
                         parseFloat(Speed as string),
                         Number(AppendMapIdx),
                         Number(HighestPitch)
