@@ -256,7 +256,7 @@ export default function App() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your midi file<br></br>Please enter track info, see the placeholder</p>
                 <textarea
                   id="JSONtrackInfo"
-                  rows={22}
+                  rows={23}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   placeholder={`Example of convert midi track number 0, 1 with piano to IWM
 [
@@ -279,7 +279,8 @@ export default function App() {
 Index - track number (number)
 Volume - volume (0.2 ~ 1)
 Offset - set start point
-to know PlayKey, PitchStandard open the console (F12) then reload`}
+to know PlayKey, PitchStandard open the console (F12) then reload
+use signal.vercel.app to know track number`}
                 ></textarea>
               </div>
             </div>
