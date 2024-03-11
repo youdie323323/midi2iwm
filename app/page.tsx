@@ -116,7 +116,7 @@ export default function App() {
                     const Scale = prompt(`Please input fruit scale (0.5 good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    const Offset = prompt(`Please input offset (fruit scale 0.5 = 6)`);
+                    const Offset = prompt(`Please input offset (fruit scale 0.5 = 6 or 7)`);
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
