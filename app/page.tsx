@@ -230,7 +230,8 @@ export default function App() {
                   accept=".mid"
                   onInput={function (e) {
                     const AppendMapIdx = prompt(`Please input room index you wanna append (number)`)
-                    const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`) as string;
+                    const Speed = prompt(`Please input speed with float (1 ~ 2 good, float)`);
+                    const HighestPitch = prompt(`Please highest pitch (number)`);
                     const file = e.target.files?.item(0)
                     if (!file) return
 
@@ -239,8 +240,9 @@ export default function App() {
                       const aa = Midi(
                         _arrayBufferToBase64(e.target?.result),
                         (document.getElementById("JSONtrackInfo") as HTMLInputElement).value,
-                        parseFloat(Speed),
+                        parseFloat(Speed as string),
                         Number(AppendMapIdx),
+                        Number(HighestPitch)
                       );
                       if (aa.error) {
                         alert(aa.errorReason)
@@ -256,8 +258,7 @@ export default function App() {
                   id="JSONtrackInfo"
                   rows={10}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="a\nb"
-                  style={{ whiteSpace: 'pre-line' }}
+                  placeholder="IMPLEMENT"
                 ></textarea>
               </div>
             </div>
