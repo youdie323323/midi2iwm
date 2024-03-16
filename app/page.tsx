@@ -105,7 +105,7 @@ export default function App() {
                   </span>
                 </h3>
                 <p className="card-text">
-                  Convert image to IWM using delicous fruit
+                  Convert image to IWM using bullet
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -113,10 +113,10 @@ export default function App() {
                   accept=".png,.jpeg"
                   onInput={function (e) {
                     const AppendMapIdx = prompt(`Please input room index you wanna append (number)`);
-                    const Scale = prompt(`Please input fruit scale (0.5 good)`);
+                    const Scale = prompt(`Please input bullet scale (0.5 good)`);
                     const Width = prompt(`Please input width (fullMap = 794)`);
                     const Height = prompt(`Please input height (fullMap = 608)`);
-                    const Offset = prompt(`Please input offset (fruit scale 0.5 = 6 or 7)`);
+                    const Offset = prompt(`Please input offset (bullet scale 0.5 = 6 or 7)`);
 
                     const reader = new FileReader()
                     reader.addEventListener('load', function (e) {
