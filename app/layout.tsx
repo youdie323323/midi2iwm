@@ -26,8 +26,6 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <Analytics />
-        <input type="file" id="upload" />
-        <canvas id="canvas" width="800" height="608"></canvas>
       </body>
     </html>
   );

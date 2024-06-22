@@ -3,40 +3,39 @@ import { useEffect, useState } from 'react';
 import Script from 'next/script'
 
 export default function App() {
-  eval(`
-    function base64Encode(input) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(input);
-      });
-    }
-
-    document.getElementById('upload')?.addEventListener('change', async (event) => {
-      const file = event.target?.files[0];
-      if (file) {
-        const base64Str = await base64Encode(file);
-        drawObjects(window.__iwm_wasm_exports.image(base64Str, 800, 608, 0.6, 7));
-      }
+  function base64Encode(input) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(input);
     });
+  }
 
-    function drawObjects(objects) {
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas?.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function drawObjects(objects) {
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas?.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      objects.forEach((obj) => {
-        ctx.beginPath();
-        ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
-        ctx.fillStyle = "#" + obj.color.toString(16).padStart(6, '0');
-        ctx.fill();
-        ctx.closePath();
-      });
-    }
-  `)
+    objects.forEach((obj) => {
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
+      ctx.fillStyle = "#" + obj.color.toString(16).padStart(6, '0');
+      ctx.fill();
+      ctx.closePath();
+    });
+  }
+
   return (
     <div>
+      <input type="file" id="upload" onInput={async function (e) {
+        const file = e.target?.files[0];
+        if (file) {
+          const base64Str = await base64Encode(file);
+          drawObjects(window.__iwm_wasm_exports.image(base64Str, 800, 608, 0.6, 7));
+        }
+      }} />
+      <canvas id="canvas" width="800" height="608"></canvas>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -110,7 +109,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
-                   
+
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
@@ -148,7 +147,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg"
                   onInput={function (e) {
-                  
+
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
@@ -186,7 +185,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid"
                   onInput={function (e) {
-                  
+
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
               </div>
