@@ -601,7 +601,7 @@
                 }
             });
         const instance = WebAssembly.instantiateStreaming ? (await WebAssembly.instantiateStreaming(t, e.importObject)).instance : (await WebAssembly.instantiate(await (await t).arrayBuffer(), e.importObject)).instance
-        console.log(instance.exports);
+        window.__iwmwasm_exports = instance.exports;
         await e.run(instance);
     } catch (e) {
         console.log(e)
