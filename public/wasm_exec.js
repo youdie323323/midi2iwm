@@ -20,18 +20,18 @@
         this.tokens = [].slice.call(e), this.tokens.reverse()
     }
     o.prototype = {
-        endOfStream: function() {
+        endOfStream: function () {
             return !this.tokens.length
         },
-        read: function() {
+        read: function () {
             return this.tokens.length ? this.tokens.pop() : r
         },
-        prepend: function(e) {
+        prepend: function (e) {
             if (Array.isArray(e))
                 for (var t = e; t.length;) this.tokens.push(t.pop());
             else this.tokens.push(e)
         },
-        push: function(e) {
+        push: function (e) {
             if (Array.isArray(e))
                 for (var t = e; t.length;) this.tokens.unshift(t.shift());
             else this.tokens.unshift(e)
@@ -54,20 +54,20 @@
             name: "UTF-8"
         }],
         heading: "The Encoding"
-    }].forEach((function(e) {
-        e.encodings.forEach((function(e) {
-            e.labels.forEach((function(t) {
+    }].forEach((function (e) {
+        e.encodings.forEach((function (e) {
+            e.labels.forEach((function (t) {
                 f[t] = e
             }))
         }))
     }));
     var h = {
-            "UTF-8": function(e) {
-                return new y(e)
-            }
-        },
+        "UTF-8": function (e) {
+            return new y(e)
+        }
+    },
         u = {
-            "UTF-8": function(e) {
+            "UTF-8": function (e) {
                 return new _(e)
             }
         },
@@ -103,7 +103,7 @@
             l = 0,
             c = 128,
             f = 191;
-        this.handler = function(e, h) {
+        this.handler = function (e, h) {
             if (h === r && 0 !== l) return l = 0, s(n);
             if (h === r) return i;
             if (0 === l) {
@@ -124,11 +124,11 @@
     }
 
     function y(e) {
-        e.fatal, this.handler = function(e, n) {
+        e.fatal, this.handler = function (e, n) {
             if (n === r) return i;
-            if (function(e) {
-                    return e >= 0 && e <= 127
-                }(n)) return n;
+            if (function (e) {
+                return e >= 0 && e <= 127
+            }(n)) return n;
             var o, s;
             t(n, 128, 2047) ? (o = 1, s = 192) : t(n, 2048, 65535) ? (o = 2, s = 224) : t(n, 65536, 1114111) && (o = 3, s = 240);
             for (var a = [(n >> 6 * o) + s]; o > 0;) {
@@ -139,117 +139,117 @@
         }
     }
     if (Object.defineProperty && (Object.defineProperty(g.prototype, "encoding", {
-            get: function() {
-                return this._encoding.name.toLowerCase()
-            }
-        }), Object.defineProperty(g.prototype, "fatal", {
-            get: function() {
-                return "fatal" === this._error_mode
-            }
-        }), Object.defineProperty(g.prototype, "ignoreBOM", {
-            get: function() {
-                return this._ignoreBOM
-            }
-        })), g.prototype.decode = function(e, t) {
-            var s, a;
-            s = "object" == typeof e && e instanceof ArrayBuffer ? new Uint8Array(e) : "object" == typeof e && "buffer" in e && e.buffer instanceof ArrayBuffer ? new Uint8Array(e.buffer, e.byteOffset, e.byteLength) : new Uint8Array(0), t = n(t), this._do_not_flush || (this._decoder = u[this._encoding.name]({
-                fatal: "fatal" === this._error_mode
-            }), this._BOMseen = !1), this._do_not_flush = Boolean(t.stream);
-            for (var l = new o(s), c = [];;) {
-                var f = l.read();
-                if (f === r) break;
-                if ((a = this._decoder.handler(l, f)) === i) break;
+        get: function () {
+            return this._encoding.name.toLowerCase()
+        }
+    }), Object.defineProperty(g.prototype, "fatal", {
+        get: function () {
+            return "fatal" === this._error_mode
+        }
+    }), Object.defineProperty(g.prototype, "ignoreBOM", {
+        get: function () {
+            return this._ignoreBOM
+        }
+    })), g.prototype.decode = function (e, t) {
+        var s, a;
+        s = "object" == typeof e && e instanceof ArrayBuffer ? new Uint8Array(e) : "object" == typeof e && "buffer" in e && e.buffer instanceof ArrayBuffer ? new Uint8Array(e.buffer, e.byteOffset, e.byteLength) : new Uint8Array(0), t = n(t), this._do_not_flush || (this._decoder = u[this._encoding.name]({
+            fatal: "fatal" === this._error_mode
+        }), this._BOMseen = !1), this._do_not_flush = Boolean(t.stream);
+        for (var l = new o(s), c = []; ;) {
+            var f = l.read();
+            if (f === r) break;
+            if ((a = this._decoder.handler(l, f)) === i) break;
+            null !== a && (Array.isArray(a) ? c.push.apply(c, a) : c.push(a))
+        }
+        if (!this._do_not_flush) {
+            do {
+                if ((a = this._decoder.handler(l, l.read())) === i) break;
                 null !== a && (Array.isArray(a) ? c.push.apply(c, a) : c.push(a))
-            }
-            if (!this._do_not_flush) {
-                do {
-                    if ((a = this._decoder.handler(l, l.read())) === i) break;
-                    null !== a && (Array.isArray(a) ? c.push.apply(c, a) : c.push(a))
-                } while (!l.endOfStream());
-                this._decoder = null
-            }
-            return function(e) {
-                var t, n;
-                return t = ["UTF-8", "UTF-16LE", "UTF-16BE"], n = this._encoding.name, -1 === t.indexOf(n) || this._ignoreBOM || this._BOMseen || (e.length > 0 && 65279 === e[0] ? (this._BOMseen = !0, e.shift()) : e.length > 0 && (this._BOMseen = !0)),
-                    function(e) {
-                        for (var t = "", n = 0; n < e.length; ++n) {
-                            var r = e[n];
-                            r <= 65535 ? t += String.fromCharCode(r) : (r -= 65536, t += String.fromCharCode(55296 + (r >> 10), 56320 + (1023 & r)))
-                        }
-                        return t
-                    }(e)
-            }.call(this, c)
-        }, Object.defineProperty && Object.defineProperty(p.prototype, "encoding", {
-            get: function() {
-                return this._encoding.name.toLowerCase()
-            }
-        }), p.prototype.encode = function(e, t) {
-            var s;
-            e = void 0 === e ? "" : String(e), t = n(t), this._do_not_flush || (this._encoder = h[this._encoding.name]({
-                fatal: "fatal" === this._fatal
-            })), this._do_not_flush = Boolean(t.stream);
-            for (var a = new o(function(e) {
-                    for (var t = String(e), n = t.length, r = 0, o = []; r < n;) {
-                        var i = t.charCodeAt(r);
-                        if (i < 55296 || i > 57343) o.push(i);
-                        else if (i >= 56320 && i <= 57343) o.push(65533);
-                        else if (i >= 55296 && i <= 56319)
-                            if (r === n - 1) o.push(65533);
-                            else {
-                                var s = t.charCodeAt(r + 1);
-                                if (s >= 56320 && s <= 57343) {
-                                    var a = 1023 & i,
-                                        l = 1023 & s;
-                                    o.push(65536 + (a << 10) + l), r += 1
-                                } else o.push(65533)
-                            } r += 1
+            } while (!l.endOfStream());
+            this._decoder = null
+        }
+        return function (e) {
+            var t, n;
+            return t = ["UTF-8", "UTF-16LE", "UTF-16BE"], n = this._encoding.name, -1 === t.indexOf(n) || this._ignoreBOM || this._BOMseen || (e.length > 0 && 65279 === e[0] ? (this._BOMseen = !0, e.shift()) : e.length > 0 && (this._BOMseen = !0)),
+                function (e) {
+                    for (var t = "", n = 0; n < e.length; ++n) {
+                        var r = e[n];
+                        r <= 65535 ? t += String.fromCharCode(r) : (r -= 65536, t += String.fromCharCode(55296 + (r >> 10), 56320 + (1023 & r)))
                     }
-                    return o
-                }(e)), l = [];;) {
-                var c = a.read();
-                if (c === r) break;
-                if ((s = this._encoder.handler(a, c)) === i) break;
-                Array.isArray(s) ? l.push.apply(l, s) : l.push(s)
+                    return t
+                }(e)
+        }.call(this, c)
+    }, Object.defineProperty && Object.defineProperty(p.prototype, "encoding", {
+        get: function () {
+            return this._encoding.name.toLowerCase()
+        }
+    }), p.prototype.encode = function (e, t) {
+        var s;
+        e = void 0 === e ? "" : String(e), t = n(t), this._do_not_flush || (this._encoder = h[this._encoding.name]({
+            fatal: "fatal" === this._fatal
+        })), this._do_not_flush = Boolean(t.stream);
+        for (var a = new o(function (e) {
+            for (var t = String(e), n = t.length, r = 0, o = []; r < n;) {
+                var i = t.charCodeAt(r);
+                if (i < 55296 || i > 57343) o.push(i);
+                else if (i >= 56320 && i <= 57343) o.push(65533);
+                else if (i >= 55296 && i <= 56319)
+                    if (r === n - 1) o.push(65533);
+                    else {
+                        var s = t.charCodeAt(r + 1);
+                        if (s >= 56320 && s <= 57343) {
+                            var a = 1023 & i,
+                                l = 1023 & s;
+                            o.push(65536 + (a << 10) + l), r += 1
+                        } else o.push(65533)
+                    } r += 1
             }
-            if (!this._do_not_flush) {
-                for (;
-                    (s = this._encoder.handler(a, a.read())) !== i;) Array.isArray(s) ? l.push.apply(l, s) : l.push(s);
-                this._encoder = null
-            }
-            return new Uint8Array(l)
-        }, window.TextDecoder ||= g, window.TextEncoder ||= p, l = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", c = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/, window.btoa = window.btoa || function(e) {
-            for (var t, n, r, o, i = "", s = 0, a = (e = String(e)).length % 3; s < e.length;) {
-                if ((n = e.charCodeAt(s++)) > 255 || (r = e.charCodeAt(s++)) > 255 || (o = e.charCodeAt(s++)) > 255) throw new TypeError("Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range.");
-                i += l.charAt((t = n << 16 | r << 8 | o) >> 18 & 63) + l.charAt(t >> 12 & 63) + l.charAt(t >> 6 & 63) + l.charAt(63 & t)
-            }
-            return a ? i.slice(0, a - 3) + "===".substring(a) : i
-        }, window.atob = window.atob || function(e) {
-            if (e = String(e).replace(/[\t\n\f\r ]+/g, ""), !c.test(e)) throw new TypeError("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
-            var t, n, r;
-            e += "==".slice(2 - (3 & e.length));
-            for (var o = "", i = 0; i < e.length;) t = l.indexOf(e.charAt(i++)) << 18 | l.indexOf(e.charAt(i++)) << 12 | (n = l.indexOf(e.charAt(i++))) << 6 | (r = l.indexOf(e.charAt(i++))), o += 64 === n ? String.fromCharCode(t >> 16 & 255) : 64 === r ? String.fromCharCode(t >> 16 & 255, t >> 8 & 255) : String.fromCharCode(t >> 16 & 255, t >> 8 & 255, 255 & t);
             return o
-        }, Array.prototype.fill || Object.defineProperty(Array.prototype, "fill", {
-            value: function(e) {
-                if (null == this) throw new TypeError("this is null or not defined");
-                for (var t = Object(this), n = t.length >>> 0, r = 0 | arguments[1], o = r < 0 ? Math.max(n + r, 0) : Math.min(r, n), i = arguments[2], s = void 0 === i ? n : 0 | i, a = s < 0 ? Math.max(n + s, 0) : Math.min(s, n); o < a;) t[o] = e, o++;
-                return t
-            }
-        }), function() {
-            if ("object" != typeof globalThis || !globalThis) try {
-                if (Object.defineProperty(Object.prototype, "__global__", {
-                        get: function() {
-                            return this
-                        },
-                        configurable: !0
-                    }), !__global__) throw new Error("Global not found.");
-                __global__.globalThis = __global__, delete Object.prototype.__global__
-            } catch (e) {
-                window.globalThis = function() {
-                    return "undefined" != typeof window ? window : void 0 !== this ? this : void 0
-                }()
-            }
-        }(), !globalThis.fs) {
+        }(e)), l = []; ;) {
+            var c = a.read();
+            if (c === r) break;
+            if ((s = this._encoder.handler(a, c)) === i) break;
+            Array.isArray(s) ? l.push.apply(l, s) : l.push(s)
+        }
+        if (!this._do_not_flush) {
+            for (;
+                (s = this._encoder.handler(a, a.read())) !== i;) Array.isArray(s) ? l.push.apply(l, s) : l.push(s);
+            this._encoder = null
+        }
+        return new Uint8Array(l)
+    }, window.TextDecoder ||= g, window.TextEncoder ||= p, l = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", c = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/, window.btoa = window.btoa || function (e) {
+        for (var t, n, r, o, i = "", s = 0, a = (e = String(e)).length % 3; s < e.length;) {
+            if ((n = e.charCodeAt(s++)) > 255 || (r = e.charCodeAt(s++)) > 255 || (o = e.charCodeAt(s++)) > 255) throw new TypeError("Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range.");
+            i += l.charAt((t = n << 16 | r << 8 | o) >> 18 & 63) + l.charAt(t >> 12 & 63) + l.charAt(t >> 6 & 63) + l.charAt(63 & t)
+        }
+        return a ? i.slice(0, a - 3) + "===".substring(a) : i
+    }, window.atob = window.atob || function (e) {
+        if (e = String(e).replace(/[\t\n\f\r ]+/g, ""), !c.test(e)) throw new TypeError("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
+        var t, n, r;
+        e += "==".slice(2 - (3 & e.length));
+        for (var o = "", i = 0; i < e.length;) t = l.indexOf(e.charAt(i++)) << 18 | l.indexOf(e.charAt(i++)) << 12 | (n = l.indexOf(e.charAt(i++))) << 6 | (r = l.indexOf(e.charAt(i++))), o += 64 === n ? String.fromCharCode(t >> 16 & 255) : 64 === r ? String.fromCharCode(t >> 16 & 255, t >> 8 & 255) : String.fromCharCode(t >> 16 & 255, t >> 8 & 255, 255 & t);
+        return o
+    }, Array.prototype.fill || Object.defineProperty(Array.prototype, "fill", {
+        value: function (e) {
+            if (null == this) throw new TypeError("this is null or not defined");
+            for (var t = Object(this), n = t.length >>> 0, r = 0 | arguments[1], o = r < 0 ? Math.max(n + r, 0) : Math.min(r, n), i = arguments[2], s = void 0 === i ? n : 0 | i, a = s < 0 ? Math.max(n + s, 0) : Math.min(s, n); o < a;) t[o] = e, o++;
+            return t
+        }
+    }), function () {
+        if ("object" != typeof globalThis || !globalThis) try {
+            if (Object.defineProperty(Object.prototype, "__global__", {
+                get: function () {
+                    return this
+                },
+                configurable: !0
+            }), !__global__) throw new Error("Global not found.");
+            __global__.globalThis = __global__, delete Object.prototype.__global__
+        } catch (e) {
+            window.globalThis = function () {
+                return "undefined" != typeof window ? window : void 0 !== this ? this : void 0
+            }()
+        }
+    }(), !globalThis.fs) {
         let t = "";
         globalThis.fs = {
             constants: {
@@ -340,41 +340,41 @@
         }
     }
     globalThis.process || (globalThis.process = {
-            getuid: () => -1,
-            getgid: () => -1,
-            geteuid: () => -1,
-            getegid: () => -1,
-            getgroups() {
-                throw e()
-            },
-            pid: -1,
-            ppid: -1,
-            umask() {
-                throw e()
-            },
-            cwd() {
-                throw e()
-            },
-            chdir() {
-                throw e()
-            }
-        }), "crypto" in globalThis && globalThis.crypto || (globalThis.crypto = globalThis.msCrypto || {
-            getRandomValues: e => {
-                for (let t = 0, n = e.length; t < n; t++) e[t] = Math.floor(256 * Math.random());
-                return e
-            }
-        }),
-        function() {
+        getuid: () => -1,
+        getgid: () => -1,
+        geteuid: () => -1,
+        getegid: () => -1,
+        getgroups() {
+            throw e()
+        },
+        pid: -1,
+        ppid: -1,
+        umask() {
+            throw e()
+        },
+        cwd() {
+            throw e()
+        },
+        chdir() {
+            throw e()
+        }
+    }), "crypto" in globalThis && globalThis.crypto || (globalThis.crypto = globalThis.msCrypto || {
+        getRandomValues: e => {
+            for (let t = 0, n = e.length; t < n; t++) e[t] = Math.floor(256 * Math.random());
+            return e
+        }
+    }),
+        function () {
             if (!globalThis.performance || !globalThis.performance.now)
-                if (globalThis.performance = globalThis.performance || {}, globalThis.performance.timing && globalThis.performance.timing.navigationStart && globalThis.performance.mark && globalThis.performance.clearMarks && globalThis.performance.getEntriesByName) globalThis.performance.now = function() {
+                if (globalThis.performance = globalThis.performance || {}, globalThis.performance.timing && globalThis.performance.timing.navigationStart && globalThis.performance.mark && globalThis.performance.clearMarks && globalThis.performance.getEntriesByName) globalThis.performance.now = function () {
                     return globalThis.performance.clearMarks("__PERFORMANCE_NOW__"), globalThis.performance.mark("__PERFORMANCE_NOW__"), globalThis.performance.getEntriesByName("__PERFORMANCE_NOW__")[0].startTime
                 };
                 else if ("now" in globalThis.performance == 0) {
-                var e = Date.now();
-                globalThis.performance.timing && globalThis.performance.timing.navigationStart && (e = globalThis.performance.timing.navigationStart), globalThis.performance.now = function() {
-                    return Date.now() - e
+                    var e = Date.now();
+                    globalThis.performance.timing && globalThis.performance.timing.navigationStart && (e = globalThis.performance.timing.navigationStart), globalThis.performance.now = function () {
+                        return Date.now() - e
+                    }
                 }
-            }
         }();
     const m = new TextEncoder("utf-8"),
         w = new TextDecoder("utf-8");
@@ -438,7 +438,7 @@
                 l = Date.now() - performance.now();
             this.importObject = {
                 wasi_snapshot_preview1: {
-                    fd_write: function(t, n, r, o) {
+                    fd_write: function (t, n, r, o) {
                         let i = 0;
                         if (1 == t)
                             for (let t = 0; t < r; t++) {
@@ -565,7 +565,7 @@
             }, this.importObject.env = this.importObject.gojs
         }
         async run(e) {
-            for (this._inst = e, this._values = [NaN, 0, null, !0, !1, globalThis, this], this._goRefCounts = [], this._ids = new Map, this._idPool = [], this.exited = !1;;) {
+            for (this._inst = e, this._values = [NaN, 0, null, !0, !1, globalThis, this], this._goRefCounts = [], this._ids = new Map, this._idPool = [], this.exited = !1; ;) {
                 const e = new Promise((e => {
                     this._resolveCallbackPromise = () => {
                         if (this.exited) throw new Error("bad callback: Go program has already exited");
@@ -582,7 +582,7 @@
         }
         _makeFuncWrapper(e) {
             const t = this;
-            return function() {
+            return function () {
                 const n = {
                     id: e,
                     this: this,
@@ -601,8 +601,8 @@
                 }
             });
         const instance = WebAssembly.instantiateStreaming ? (await WebAssembly.instantiateStreaming(t, e.importObject)).instance : (await WebAssembly.instantiate(await (await t).arrayBuffer(), e.importObject)).instance
+        console.log(instance.exports);
         await e.run(instance);
-        console.log(instance.exports)
     } catch (e) {
         console.log(e)
     }
