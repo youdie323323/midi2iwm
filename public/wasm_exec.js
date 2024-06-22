@@ -1,561 +1,609 @@
-// Copyright 2018 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-"use strict";
-
-(() => {
-    const enosys = () => {
-        const err = new Error("not implemented");
-        err.code = "ENOSYS";
-        return err;
+(async () => {
+    if (!window.WebAssembly) return void globalThis.alert("Webassembly is not supported in your browser. try update your browser to the latest version.");
+    const e = () => {
+        const e = new Error("not implemented");
+        return e.code = "ENOSYS", e
     };
 
-    if (!globalThis.fs) {
-        let outputBuf = "";
-        globalThis.fs = {
-            constants: { O_WRONLY: -1, O_RDWR: -1, O_CREAT: -1, O_TRUNC: -1, O_APPEND: -1, O_EXCL: -1 }, // unused
-            writeSync(fd, buf) {
-                outputBuf += decoder.decode(buf);
-                const nl = outputBuf.lastIndexOf("\n");
-                if (nl != -1) {
-                    console.log(outputBuf.substring(0, nl));
-                    outputBuf = outputBuf.substring(nl + 1);
-                }
-                return buf.length;
-            },
-            write(fd, buf, offset, length, position, callback) {
-                if (offset !== 0 || length !== buf.length || position !== null) {
-                    callback(enosys());
-                    return;
-                }
-                const n = this.writeSync(fd, buf);
-                callback(null, n);
-            },
-            chmod(path, mode, callback) { callback(enosys()); },
-            chown(path, uid, gid, callback) { callback(enosys()); },
-            close(fd, callback) { callback(enosys()); },
-            fchmod(fd, mode, callback) { callback(enosys()); },
-            fchown(fd, uid, gid, callback) { callback(enosys()); },
-            fstat(fd, callback) { callback(enosys()); },
-            fsync(fd, callback) { callback(null); },
-            ftruncate(fd, length, callback) { callback(enosys()); },
-            lchown(path, uid, gid, callback) { callback(enosys()); },
-            link(path, link, callback) { callback(enosys()); },
-            lstat(path, callback) { callback(enosys()); },
-            mkdir(path, perm, callback) { callback(enosys()); },
-            open(path, flags, mode, callback) { callback(enosys()); },
-            read(fd, buffer, offset, length, position, callback) { callback(enosys()); },
-            readdir(path, callback) { callback(enosys()); },
-            readlink(path, callback) { callback(enosys()); },
-            rename(from, to, callback) { callback(enosys()); },
-            rmdir(path, callback) { callback(enosys()); },
-            stat(path, callback) { callback(enosys()); },
-            symlink(path, link, callback) { callback(enosys()); },
-            truncate(path, length, callback) { callback(enosys()); },
-            unlink(path, callback) { callback(enosys()); },
-            utimes(path, atime, mtime, callback) { callback(enosys()); },
-        };
+    function t(e, t, n) {
+        return t <= e && e <= n
     }
 
-    if (!globalThis.process) {
-        globalThis.process = {
-            getuid() { return -1; },
-            getgid() { return -1; },
-            geteuid() { return -1; },
-            getegid() { return -1; },
-            getgroups() { throw enosys(); },
+    function n(e) {
+        if (void 0 === e) return {};
+        if (e === Object(e)) return e;
+        throw TypeError("Could not convert argument to dictionary")
+    }
+    var r = -1;
+
+    function o(e) {
+        this.tokens = [].slice.call(e), this.tokens.reverse()
+    }
+    o.prototype = {
+        endOfStream: function() {
+            return !this.tokens.length
+        },
+        read: function() {
+            return this.tokens.length ? this.tokens.pop() : r
+        },
+        prepend: function(e) {
+            if (Array.isArray(e))
+                for (var t = e; t.length;) this.tokens.push(t.pop());
+            else this.tokens.push(e)
+        },
+        push: function(e) {
+            if (Array.isArray(e))
+                for (var t = e; t.length;) this.tokens.unshift(t.shift());
+            else this.tokens.unshift(e)
+        }
+    };
+    var i = -1;
+
+    function s(e, t) {
+        if (e) throw TypeError("Decoder error");
+        return t || 65533
+    }
+
+    function a(e) {
+        return e = String(e).trim().toLowerCase(), Object.prototype.hasOwnProperty.call(f, e) ? f[e] : null
+    }
+    var l, c, f = {};
+    [{
+        encodings: [{
+            labels: ["unicode-1-1-utf-8", "utf-8", "utf8"],
+            name: "UTF-8"
+        }],
+        heading: "The Encoding"
+    }].forEach((function(e) {
+        e.encodings.forEach((function(e) {
+            e.labels.forEach((function(t) {
+                f[t] = e
+            }))
+        }))
+    }));
+    var h = {
+            "UTF-8": function(e) {
+                return new y(e)
+            }
+        },
+        u = {
+            "UTF-8": function(e) {
+                return new _(e)
+            }
+        },
+        d = "utf-8";
+
+    function g(e, t) {
+        if (!(this instanceof g)) throw TypeError("Called as a function. Did you forget 'new'?");
+        e = void 0 !== e ? String(e) : d, t = n(t), this._encoding = null, this._decoder = null, this._ignoreBOM = !1, this._BOMseen = !1, this._error_mode = "replacement", this._do_not_flush = !1;
+        var r = a(e);
+        if (null === r || "replacement" === r.name) throw RangeError("Unknown encoding: " + e);
+        if (!u[r.name]) throw Error("Decoder not present. Did you forget to include encoding-indexes.js first?");
+        var o = this;
+        return o._encoding = r, t.fatal && (o._error_mode = "fatal"), t.ignoreBOM && (o._ignoreBOM = !0), Object.defineProperty || (this.encoding = o._encoding.name.toLowerCase(), this.fatal = "fatal" === o._error_mode, this.ignoreBOM = o._ignoreBOM), o
+    }
+
+    function p(e, t) {
+        if (!(this instanceof p)) throw TypeError("Called as a function. Did you forget 'new'?");
+        t = n(t), this._encoding = null, this._encoder = null, this._do_not_flush = !1, this._fatal = t.fatal ? "fatal" : "replacement";
+        var r = this;
+        if (t.NONSTANDARD_allowLegacyEncoding) {
+            var o = a(e = void 0 !== e ? String(e) : d);
+            if (null === o || "replacement" === o.name) throw RangeError("Unknown encoding: " + e);
+            if (!h[o.name]) throw Error("Encoder not present. Did you forget to include encoding-indexes.js first?");
+            r._encoding = o
+        } else r._encoding = a("utf-8");
+        return Object.defineProperty || (this.encoding = r._encoding.name.toLowerCase()), r
+    }
+
+    function _(e) {
+        var n = e.fatal,
+            o = 0,
+            a = 0,
+            l = 0,
+            c = 128,
+            f = 191;
+        this.handler = function(e, h) {
+            if (h === r && 0 !== l) return l = 0, s(n);
+            if (h === r) return i;
+            if (0 === l) {
+                if (t(h, 0, 127)) return h;
+                if (t(h, 194, 223)) l = 1, o = 31 & h;
+                else if (t(h, 224, 239)) 224 === h && (c = 160), 237 === h && (f = 159), l = 2, o = 15 & h;
+                else {
+                    if (!t(h, 240, 244)) return s(n);
+                    240 === h && (c = 144), 244 === h && (f = 143), l = 3, o = 7 & h
+                }
+                return null
+            }
+            if (!t(h, c, f)) return o = l = a = 0, c = 128, f = 191, e.prepend(h), s(n);
+            if (c = 128, f = 191, o = o << 6 | 63 & h, (a += 1) !== l) return null;
+            var u = o;
+            return o = l = a = 0, u
+        }
+    }
+
+    function y(e) {
+        e.fatal, this.handler = function(e, n) {
+            if (n === r) return i;
+            if (function(e) {
+                    return e >= 0 && e <= 127
+                }(n)) return n;
+            var o, s;
+            t(n, 128, 2047) ? (o = 1, s = 192) : t(n, 2048, 65535) ? (o = 2, s = 224) : t(n, 65536, 1114111) && (o = 3, s = 240);
+            for (var a = [(n >> 6 * o) + s]; o > 0;) {
+                var l = n >> 6 * (o - 1);
+                a.push(63 & l | 128), o -= 1
+            }
+            return a
+        }
+    }
+    if (Object.defineProperty && (Object.defineProperty(g.prototype, "encoding", {
+            get: function() {
+                return this._encoding.name.toLowerCase()
+            }
+        }), Object.defineProperty(g.prototype, "fatal", {
+            get: function() {
+                return "fatal" === this._error_mode
+            }
+        }), Object.defineProperty(g.prototype, "ignoreBOM", {
+            get: function() {
+                return this._ignoreBOM
+            }
+        })), g.prototype.decode = function(e, t) {
+            var s, a;
+            s = "object" == typeof e && e instanceof ArrayBuffer ? new Uint8Array(e) : "object" == typeof e && "buffer" in e && e.buffer instanceof ArrayBuffer ? new Uint8Array(e.buffer, e.byteOffset, e.byteLength) : new Uint8Array(0), t = n(t), this._do_not_flush || (this._decoder = u[this._encoding.name]({
+                fatal: "fatal" === this._error_mode
+            }), this._BOMseen = !1), this._do_not_flush = Boolean(t.stream);
+            for (var l = new o(s), c = [];;) {
+                var f = l.read();
+                if (f === r) break;
+                if ((a = this._decoder.handler(l, f)) === i) break;
+                null !== a && (Array.isArray(a) ? c.push.apply(c, a) : c.push(a))
+            }
+            if (!this._do_not_flush) {
+                do {
+                    if ((a = this._decoder.handler(l, l.read())) === i) break;
+                    null !== a && (Array.isArray(a) ? c.push.apply(c, a) : c.push(a))
+                } while (!l.endOfStream());
+                this._decoder = null
+            }
+            return function(e) {
+                var t, n;
+                return t = ["UTF-8", "UTF-16LE", "UTF-16BE"], n = this._encoding.name, -1 === t.indexOf(n) || this._ignoreBOM || this._BOMseen || (e.length > 0 && 65279 === e[0] ? (this._BOMseen = !0, e.shift()) : e.length > 0 && (this._BOMseen = !0)),
+                    function(e) {
+                        for (var t = "", n = 0; n < e.length; ++n) {
+                            var r = e[n];
+                            r <= 65535 ? t += String.fromCharCode(r) : (r -= 65536, t += String.fromCharCode(55296 + (r >> 10), 56320 + (1023 & r)))
+                        }
+                        return t
+                    }(e)
+            }.call(this, c)
+        }, Object.defineProperty && Object.defineProperty(p.prototype, "encoding", {
+            get: function() {
+                return this._encoding.name.toLowerCase()
+            }
+        }), p.prototype.encode = function(e, t) {
+            var s;
+            e = void 0 === e ? "" : String(e), t = n(t), this._do_not_flush || (this._encoder = h[this._encoding.name]({
+                fatal: "fatal" === this._fatal
+            })), this._do_not_flush = Boolean(t.stream);
+            for (var a = new o(function(e) {
+                    for (var t = String(e), n = t.length, r = 0, o = []; r < n;) {
+                        var i = t.charCodeAt(r);
+                        if (i < 55296 || i > 57343) o.push(i);
+                        else if (i >= 56320 && i <= 57343) o.push(65533);
+                        else if (i >= 55296 && i <= 56319)
+                            if (r === n - 1) o.push(65533);
+                            else {
+                                var s = t.charCodeAt(r + 1);
+                                if (s >= 56320 && s <= 57343) {
+                                    var a = 1023 & i,
+                                        l = 1023 & s;
+                                    o.push(65536 + (a << 10) + l), r += 1
+                                } else o.push(65533)
+                            } r += 1
+                    }
+                    return o
+                }(e)), l = [];;) {
+                var c = a.read();
+                if (c === r) break;
+                if ((s = this._encoder.handler(a, c)) === i) break;
+                Array.isArray(s) ? l.push.apply(l, s) : l.push(s)
+            }
+            if (!this._do_not_flush) {
+                for (;
+                    (s = this._encoder.handler(a, a.read())) !== i;) Array.isArray(s) ? l.push.apply(l, s) : l.push(s);
+                this._encoder = null
+            }
+            return new Uint8Array(l)
+        }, window.TextDecoder ||= g, window.TextEncoder ||= p, l = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=", c = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/, window.btoa = window.btoa || function(e) {
+            for (var t, n, r, o, i = "", s = 0, a = (e = String(e)).length % 3; s < e.length;) {
+                if ((n = e.charCodeAt(s++)) > 255 || (r = e.charCodeAt(s++)) > 255 || (o = e.charCodeAt(s++)) > 255) throw new TypeError("Failed to execute 'btoa' on 'Window': The string to be encoded contains characters outside of the Latin1 range.");
+                i += l.charAt((t = n << 16 | r << 8 | o) >> 18 & 63) + l.charAt(t >> 12 & 63) + l.charAt(t >> 6 & 63) + l.charAt(63 & t)
+            }
+            return a ? i.slice(0, a - 3) + "===".substring(a) : i
+        }, window.atob = window.atob || function(e) {
+            if (e = String(e).replace(/[\t\n\f\r ]+/g, ""), !c.test(e)) throw new TypeError("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.");
+            var t, n, r;
+            e += "==".slice(2 - (3 & e.length));
+            for (var o = "", i = 0; i < e.length;) t = l.indexOf(e.charAt(i++)) << 18 | l.indexOf(e.charAt(i++)) << 12 | (n = l.indexOf(e.charAt(i++))) << 6 | (r = l.indexOf(e.charAt(i++))), o += 64 === n ? String.fromCharCode(t >> 16 & 255) : 64 === r ? String.fromCharCode(t >> 16 & 255, t >> 8 & 255) : String.fromCharCode(t >> 16 & 255, t >> 8 & 255, 255 & t);
+            return o
+        }, Array.prototype.fill || Object.defineProperty(Array.prototype, "fill", {
+            value: function(e) {
+                if (null == this) throw new TypeError("this is null or not defined");
+                for (var t = Object(this), n = t.length >>> 0, r = 0 | arguments[1], o = r < 0 ? Math.max(n + r, 0) : Math.min(r, n), i = arguments[2], s = void 0 === i ? n : 0 | i, a = s < 0 ? Math.max(n + s, 0) : Math.min(s, n); o < a;) t[o] = e, o++;
+                return t
+            }
+        }), function() {
+            if ("object" != typeof globalThis || !globalThis) try {
+                if (Object.defineProperty(Object.prototype, "__global__", {
+                        get: function() {
+                            return this
+                        },
+                        configurable: !0
+                    }), !__global__) throw new Error("Global not found.");
+                __global__.globalThis = __global__, delete Object.prototype.__global__
+            } catch (e) {
+                window.globalThis = function() {
+                    return "undefined" != typeof window ? window : void 0 !== this ? this : void 0
+                }()
+            }
+        }(), !globalThis.fs) {
+        let t = "";
+        globalThis.fs = {
+            constants: {
+                O_WRONLY: -1,
+                O_RDWR: -1,
+                O_CREAT: -1,
+                O_TRUNC: -1,
+                O_APPEND: -1,
+                O_EXCL: -1
+            },
+            writeSync(e, n) {
+                t += w.decode(n);
+                const r = t.lastIndexOf("\n");
+                return -1 != r && (console.log(t.substr(0, r)), t = t.substr(r + 1)), n.length
+            },
+            write(t, n, r, o, i, s) {
+                0 === r && o === n.length && null === i ? s(null, this.writeSync(t, n)) : s(e())
+            },
+            chmod(t, n, r) {
+                r(e())
+            },
+            chown(t, n, r, o) {
+                o(e())
+            },
+            close(t, n) {
+                n(e())
+            },
+            fchmod(t, n, r) {
+                r(e())
+            },
+            fchown(t, n, r, o) {
+                o(e())
+            },
+            fstat(t, n) {
+                n(e())
+            },
+            fsync(e, t) {
+                t(null)
+            },
+            ftruncate(t, n, r) {
+                r(e())
+            },
+            lchown(t, n, r, o) {
+                o(e())
+            },
+            link(t, n, r) {
+                r(e())
+            },
+            lstat(t, n) {
+                n(e())
+            },
+            mkdir(t, n, r) {
+                r(e())
+            },
+            open(t, n, r, o) {
+                o(e())
+            },
+            read(t, n, r, o, i, s) {
+                s(e())
+            },
+            readdir(t, n) {
+                n(e())
+            },
+            readlink(t, n) {
+                n(e())
+            },
+            rename(t, n, r) {
+                r(e())
+            },
+            rmdir(t, n) {
+                n(e())
+            },
+            stat(t, n) {
+                n(e())
+            },
+            symlink(t, n, r) {
+                r(e())
+            },
+            truncate(t, n, r) {
+                r(e())
+            },
+            unlink(t, n) {
+                n(e())
+            },
+            utimes(t, n, r, o) {
+                o(e())
+            }
+        }
+    }
+    globalThis.process || (globalThis.process = {
+            getuid: () => -1,
+            getgid: () => -1,
+            geteuid: () => -1,
+            getegid: () => -1,
+            getgroups() {
+                throw e()
+            },
             pid: -1,
             ppid: -1,
-            umask() { throw enosys(); },
-            cwd() { throw enosys(); },
-            chdir() { throw enosys(); },
-        }
-    }
-
-    if (!globalThis.crypto) {
-        throw new Error("globalThis.crypto is not available, polyfill required (crypto.getRandomValues only)");
-    }
-
-    if (!globalThis.performance) {
-        throw new Error("globalThis.performance is not available, polyfill required (performance.now only)");
-    }
-
-    if (!globalThis.TextEncoder) {
-        throw new Error("globalThis.TextEncoder is not available, polyfill required");
-    }
-
-    if (!globalThis.TextDecoder) {
-        throw new Error("globalThis.TextDecoder is not available, polyfill required");
-    }
-
-    const encoder = new TextEncoder("utf-8");
-    const decoder = new TextDecoder("utf-8");
-
-    globalThis.Go = class {
+            umask() {
+                throw e()
+            },
+            cwd() {
+                throw e()
+            },
+            chdir() {
+                throw e()
+            }
+        }), "crypto" in globalThis && globalThis.crypto || (globalThis.crypto = globalThis.msCrypto || {
+            getRandomValues: e => {
+                for (let t = 0, n = e.length; t < n; t++) e[t] = Math.floor(256 * Math.random());
+                return e
+            }
+        }),
+        function() {
+            if (!globalThis.performance || !globalThis.performance.now)
+                if (globalThis.performance = globalThis.performance || {}, globalThis.performance.timing && globalThis.performance.timing.navigationStart && globalThis.performance.mark && globalThis.performance.clearMarks && globalThis.performance.getEntriesByName) globalThis.performance.now = function() {
+                    return globalThis.performance.clearMarks("__PERFORMANCE_NOW__"), globalThis.performance.mark("__PERFORMANCE_NOW__"), globalThis.performance.getEntriesByName("__PERFORMANCE_NOW__")[0].startTime
+                };
+                else if ("now" in globalThis.performance == 0) {
+                var e = Date.now();
+                globalThis.performance.timing && globalThis.performance.timing.navigationStart && (e = globalThis.performance.timing.navigationStart), globalThis.performance.now = function() {
+                    return Date.now() - e
+                }
+            }
+        }();
+    const m = new TextEncoder("utf-8"),
+        w = new TextDecoder("utf-8");
+    let b = new DataView(new ArrayBuffer(8));
+    var v = [];
+    const T = class {
         constructor() {
-            this.argv = ["js"];
-            this.env = {};
-            this.exit = (code) => {
-                if (code !== 0) {
-                    console.warn("exit code:", code);
-                }
-            };
-            this._exitPromise = new Promise((resolve) => {
-                this._resolveExitPromise = resolve;
-            });
-            this._pendingEvent = null;
-            this._scheduledTimeouts = new Map();
-            this._nextCallbackTimeoutID = 1;
-
-            const setInt64 = (addr, v) => {
-                this.mem.setUint32(addr + 0, v, true);
-                this.mem.setUint32(addr + 4, Math.floor(v / 4294967296), true);
-            }
-
-            const setInt32 = (addr, v) => {
-                this.mem.setUint32(addr + 0, v, true);
-            }
-
-            const getInt64 = (addr) => {
-                const low = this.mem.getUint32(addr + 0, true);
-                const high = this.mem.getInt32(addr + 4, true);
-                return low + high * 4294967296;
-            }
-
-            const loadValue = (addr) => {
-                const f = this.mem.getFloat64(addr, true);
-                if (f === 0) {
-                    return undefined;
-                }
-                if (!isNaN(f)) {
-                    return f;
-                }
-
-                const id = this.mem.getUint32(addr, true);
-                return this._values[id];
-            }
-
-            const storeValue = (addr, v) => {
-                const nanHead = 0x7FF80000;
-
-                if (typeof v === "number" && v !== 0) {
-                    if (isNaN(v)) {
-                        this.mem.setUint32(addr + 4, nanHead, true);
-                        this.mem.setUint32(addr, 0, true);
-                        return;
+            this._callbackTimeouts = new Map, this._nextCallbackTimeoutID = 1;
+            const e = () => new DataView(this._inst.exports.memory.buffer),
+                t = e => {
+                    b.setBigInt64(0, e, !0);
+                    const t = b.getFloat64(0, !0);
+                    if (0 === t) return;
+                    if (!isNaN(t)) return t;
+                    const n = 0xffffffffn & e;
+                    return this._values[n]
+                },
+                n = n => {
+                    let r = e().getBigUint64(n, !0);
+                    return t(r)
+                },
+                r = e => {
+                    const t = 0x7FF80000n;
+                    if ("number" == typeof e) return isNaN(e) ? t << 32n : 0 === e ? t << 32n | 1n : (b.setFloat64(0, e, !0), b.getBigInt64(0, !0));
+                    switch (e) {
+                        case void 0:
+                            return 0n;
+                        case null:
+                            return t << 32n | 2n;
+                        case !0:
+                            return t << 32n | 3n;
+                        case !1:
+                            return t << 32n | 4n
                     }
-                    this.mem.setFloat64(addr, v, true);
-                    return;
-                }
-
-                if (v === undefined) {
-                    this.mem.setFloat64(addr, 0, true);
-                    return;
-                }
-
-                let id = this._ids.get(v);
-                if (id === undefined) {
-                    id = this._idPool.pop();
-                    if (id === undefined) {
-                        id = this._values.length;
+                    let n = this._ids.get(e);
+                    void 0 === n && (n = this._idPool.pop(), void 0 === n && (n = BigInt(this._values.length)), this._values[n] = e, this._goRefCounts[n] = 0, this._ids.set(e, n)), this._goRefCounts[n]++;
+                    let r = 1n;
+                    switch (typeof e) {
+                        case "string":
+                            r = 2n;
+                            break;
+                        case "symbol":
+                            r = 3n;
+                            break;
+                        case "function":
+                            r = 4n
                     }
-                    this._values[id] = v;
-                    this._goRefCounts[id] = 0;
-                    this._ids.set(v, id);
-                }
-                this._goRefCounts[id]++;
-                let typeFlag = 0;
-                switch (typeof v) {
-                    case "object":
-                        if (v !== null) {
-                            typeFlag = 1;
-                        }
-                        break;
-                    case "string":
-                        typeFlag = 2;
-                        break;
-                    case "symbol":
-                        typeFlag = 3;
-                        break;
-                    case "function":
-                        typeFlag = 4;
-                        break;
-                }
-                this.mem.setUint32(addr + 4, nanHead | typeFlag, true);
-                this.mem.setUint32(addr, id, true);
-            }
-
-            const loadSlice = (addr) => {
-                const array = getInt64(addr + 0);
-                const len = getInt64(addr + 8);
-                return new Uint8Array(this._inst.exports.mem.buffer, array, len);
-            }
-
-            const loadSliceOfValues = (addr) => {
-                const array = getInt64(addr + 0);
-                const len = getInt64(addr + 8);
-                const a = new Array(len);
-                for (let i = 0; i < len; i++) {
-                    a[i] = loadValue(array + i * 8);
-                }
-                return a;
-            }
-
-            const loadString = (addr) => {
-                const saddr = getInt64(addr + 0);
-                const len = getInt64(addr + 8);
-                return decoder.decode(new DataView(this._inst.exports.mem.buffer, saddr, len));
-            }
-
-            const timeOrigin = Date.now() - performance.now();
+                    return n | (t | r) << 32n
+                },
+                o = (t, n) => {
+                    let o = r(n);
+                    e().setBigUint64(t, o, !0)
+                },
+                i = (e, t, n) => new Uint8Array(this._inst.exports.memory.buffer, e, t),
+                s = (e, t, r) => {
+                    const o = new Array(t);
+                    for (let r = 0; r < t; r++) o[r] = n(e + 8 * r);
+                    return o
+                },
+                a = (e, t) => w.decode(new DataView(this._inst.exports.memory.buffer, e, t)),
+                l = Date.now() - performance.now();
             this.importObject = {
-                _gotest: {
-                    add: (a, b) => a + b,
+                wasi_snapshot_preview1: {
+                    fd_write: function(t, n, r, o) {
+                        let i = 0;
+                        if (1 == t)
+                            for (let t = 0; t < r; t++) {
+                                let r = n + 8 * t,
+                                    o = e().getUint32(r + 0, !0),
+                                    s = e().getUint32(r + 4, !0);
+                                i += s;
+                                for (let t = 0; t < s; t++) {
+                                    let n = e().getUint8(o + t);
+                                    if (13 == n);
+                                    else if (10 == n) {
+                                        let e = w.decode(new Uint8Array(v));
+                                        v = [], console.log(e)
+                                    } else v.push(n)
+                                }
+                            } else console.error("invalid file descriptor:", t);
+                        return e().setUint32(o, i, !0), 0
+                    },
+                    fd_close: () => 0,
+                    fd_fdstat_get: () => 0,
+                    fd_seek: () => 0,
+                    proc_exit: e => {
+                        if (!globalThis.process) throw "trying to exit with code " + e;
+                        process.exit(e)
+                    },
+                    random_get: (e, t) => (crypto.getRandomValues(i(e, t)), 0)
                 },
                 gojs: {
-                    // Go's SP does not change as long as no Go code is running. Some operations (e.g. calls, getters and setters)
-                    // may synchronously trigger a Go event handler. This makes Go code get executed in the middle of the imported
-                    // function. A goroutine can switch to a new stack if the current stack is too small (see morestack function).
-                    // This changes the SP, thus we have to update the SP used by the imported function.
-
-                    // func wasmExit(code int32)
-                    "runtime.wasmExit": (sp) => {
-                        sp >>>= 0;
-                        const code = this.mem.getInt32(sp + 8, true);
-                        this.exited = true;
-                        delete this._inst;
-                        delete this._values;
-                        delete this._goRefCounts;
-                        delete this._ids;
-                        delete this._idPool;
-                        this.exit(code);
+                    "runtime.ticks": () => l + performance.now(),
+                    "runtime.sleepTicks": e => {
+                        setTimeout(this._inst.exports.go_scheduler, e)
                     },
-
-                    // func wasmWrite(fd uintptr, p unsafe.Pointer, n int32)
-                    "runtime.wasmWrite": (sp) => {
-                        sp >>>= 0;
-                        const fd = getInt64(sp + 8);
-                        const p = getInt64(sp + 16);
-                        const n = this.mem.getInt32(sp + 24, true);
-                        fs.writeSync(fd, new Uint8Array(this._inst.exports.mem.buffer, p, n));
+                    "syscall/js.stringVal": (e, t) => {
+                        const n = a(e, t);
+                        return r(n)
                     },
-
-                    // func resetMemoryDataView()
-                    "runtime.resetMemoryDataView": (sp) => {
-                        sp >>>= 0;
-                        this.mem = new DataView(this._inst.exports.mem.buffer);
+                    "syscall/js.valueGet": (e, n, o) => {
+                        let i = a(n, o),
+                            s = t(e),
+                            l = Reflect.get(s, i);
+                        return r(l)
                     },
-
-                    // func nanotime1() int64
-                    "runtime.nanotime1": (sp) => {
-                        sp >>>= 0;
-                        setInt64(sp + 8, (timeOrigin + performance.now()) * 1000000);
+                    "syscall/js.valueSet": (e, n, r, o) => {
+                        const i = t(e),
+                            s = a(n, r),
+                            l = t(o);
+                        Reflect.set(i, s, l)
                     },
-
-                    // func walltime() (sec int64, nsec int32)
-                    "runtime.walltime": (sp) => {
-                        sp >>>= 0;
-                        const msec = (new Date).getTime();
-                        setInt64(sp + 8, msec / 1000);
-                        this.mem.setInt32(sp + 16, (msec % 1000) * 1000000, true);
+                    "syscall/js.valueDelete": (e, n, r) => {
+                        const o = t(e),
+                            i = a(n, r);
+                        Reflect.deleteProperty(o, i)
                     },
-
-                    // func scheduleTimeoutEvent(delay int64) int32
-                    "runtime.scheduleTimeoutEvent": (sp) => {
-                        sp >>>= 0;
-                        const id = this._nextCallbackTimeoutID;
-                        this._nextCallbackTimeoutID++;
-                        this._scheduledTimeouts.set(id, setTimeout(
-                            () => {
-                                this._resume();
-                                while (this._scheduledTimeouts.has(id)) {
-                                    // for some reason Go failed to register the timeout event, log and try again
-                                    // (temporary workaround for https://github.com/golang/go/issues/28975)
-                                    console.warn("scheduleTimeoutEvent: missed timeout event");
-                                    this._resume();
-                                }
-                            },
-                            getInt64(sp + 8),
-                        ));
-                        this.mem.setInt32(sp + 16, id, true);
+                    "syscall/js.valueIndex": (e, n) => r(Reflect.get(t(e), n)),
+                    "syscall/js.valueSetIndex": (e, n, r) => {
+                        Reflect.set(t(e), n, t(r))
                     },
-
-                    // func clearTimeoutEvent(id int32)
-                    "runtime.clearTimeoutEvent": (sp) => {
-                        sp >>>= 0;
-                        const id = this.mem.getInt32(sp + 8, true);
-                        clearTimeout(this._scheduledTimeouts.get(id));
-                        this._scheduledTimeouts.delete(id);
-                    },
-
-                    // func getRandomData(r []byte)
-                    "runtime.getRandomData": (sp) => {
-                        sp >>>= 0;
-                        crypto.getRandomValues(loadSlice(sp + 8));
-                    },
-
-                    // func finalizeRef(v ref)
-                    "syscall/js.finalizeRef": (sp) => {
-                        sp >>>= 0;
-                        const id = this.mem.getUint32(sp + 8, true);
-                        this._goRefCounts[id]--;
-                        if (this._goRefCounts[id] === 0) {
-                            const v = this._values[id];
-                            this._values[id] = null;
-                            this._ids.delete(v);
-                            this._idPool.push(id);
-                        }
-                    },
-
-                    // func stringVal(value string) ref
-                    "syscall/js.stringVal": (sp) => {
-                        sp >>>= 0;
-                        storeValue(sp + 24, loadString(sp + 8));
-                    },
-
-                    // func valueGet(v ref, p string) ref
-                    "syscall/js.valueGet": (sp) => {
-                        sp >>>= 0;
-                        const result = Reflect.get(loadValue(sp + 8), loadString(sp + 16));
-                        sp = this._inst.exports.getsp() >>> 0; // see comment above
-                        storeValue(sp + 32, result);
-                    },
-
-                    // func valueSet(v ref, p string, x ref)
-                    "syscall/js.valueSet": (sp) => {
-                        sp >>>= 0;
-                        Reflect.set(loadValue(sp + 8), loadString(sp + 16), loadValue(sp + 32));
-                    },
-
-                    // func valueDelete(v ref, p string)
-                    "syscall/js.valueDelete": (sp) => {
-                        sp >>>= 0;
-                        Reflect.deleteProperty(loadValue(sp + 8), loadString(sp + 16));
-                    },
-
-                    // func valueIndex(v ref, i int) ref
-                    "syscall/js.valueIndex": (sp) => {
-                        sp >>>= 0;
-                        storeValue(sp + 24, Reflect.get(loadValue(sp + 8), getInt64(sp + 16)));
-                    },
-
-                    // valueSetIndex(v ref, i int, x ref)
-                    "syscall/js.valueSetIndex": (sp) => {
-                        sp >>>= 0;
-                        Reflect.set(loadValue(sp + 8), getInt64(sp + 16), loadValue(sp + 24));
-                    },
-
-                    // func valueCall(v ref, m string, args []ref) (ref, bool)
-                    "syscall/js.valueCall": (sp) => {
-                        sp >>>= 0;
+                    "syscall/js.valueCall": (n, r, i, l, c, f, h) => {
+                        const u = t(r),
+                            d = a(i, l),
+                            g = s(c, f);
                         try {
-                            const v = loadValue(sp + 8);
-                            const m = Reflect.get(v, loadString(sp + 16));
-                            const args = loadSliceOfValues(sp + 32);
-                            const result = Reflect.apply(m, v, args);
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 56, result);
-                            this.mem.setUint8(sp + 64, 1);
-                        } catch (err) {
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 56, err);
-                            this.mem.setUint8(sp + 64, 0);
+                            const t = Reflect.get(u, d);
+                            o(n, Reflect.apply(t, u, g)), e().setUint8(n + 8, 1)
+                        } catch (t) {
+                            o(n, t), e().setUint8(n + 8, 0)
                         }
                     },
-
-                    // func valueInvoke(v ref, args []ref) (ref, bool)
-                    "syscall/js.valueInvoke": (sp) => {
-                        sp >>>= 0;
+                    "syscall/js.valueInvoke": (n, r, i, a, l) => {
                         try {
-                            const v = loadValue(sp + 8);
-                            const args = loadSliceOfValues(sp + 16);
-                            const result = Reflect.apply(v, undefined, args);
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 40, result);
-                            this.mem.setUint8(sp + 48, 1);
-                        } catch (err) {
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 40, err);
-                            this.mem.setUint8(sp + 48, 0);
+                            const l = t(r),
+                                c = s(i, a);
+                            o(n, Reflect.apply(l, void 0, c)), e().setUint8(n + 8, 1)
+                        } catch (t) {
+                            o(n, t), e().setUint8(n + 8, 0)
                         }
                     },
-
-                    // func valueNew(v ref, args []ref) (ref, bool)
-                    "syscall/js.valueNew": (sp) => {
-                        sp >>>= 0;
+                    "syscall/js.valueNew": (n, r, i, a, l) => {
+                        const c = t(r),
+                            f = s(i, a);
                         try {
-                            const v = loadValue(sp + 8);
-                            const args = loadSliceOfValues(sp + 16);
-                            const result = Reflect.construct(v, args);
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 40, result);
-                            this.mem.setUint8(sp + 48, 1);
-                        } catch (err) {
-                            sp = this._inst.exports.getsp() >>> 0; // see comment above
-                            storeValue(sp + 40, err);
-                            this.mem.setUint8(sp + 48, 0);
+                            o(n, Reflect.construct(c, f)), e().setUint8(n + 8, 1)
+                        } catch (t) {
+                            o(n, t), e().setUint8(n + 8, 0)
                         }
                     },
-
-                    // func valueLength(v ref) int
-                    "syscall/js.valueLength": (sp) => {
-                        sp >>>= 0;
-                        setInt64(sp + 16, parseInt(loadValue(sp + 8).length));
+                    "syscall/js.valueLength": e => t(e).length,
+                    "syscall/js.valuePrepareString": (n, r) => {
+                        const i = String(t(r)),
+                            s = m.encode(i);
+                        o(n, s), e().setInt32(n + 8, s.length, !0)
                     },
-
-                    // valuePrepareString(v ref) (ref, int)
-                    "syscall/js.valuePrepareString": (sp) => {
-                        sp >>>= 0;
-                        const str = encoder.encode(String(loadValue(sp + 8)));
-                        storeValue(sp + 16, str);
-                        setInt64(sp + 24, str.length);
+                    "syscall/js.valueLoadString": (e, n, r, o) => {
+                        const s = t(e);
+                        i(n, r).set(s)
                     },
-
-                    // valueLoadString(v ref, b []byte)
-                    "syscall/js.valueLoadString": (sp) => {
-                        sp >>>= 0;
-                        const str = loadValue(sp + 8);
-                        loadSlice(sp + 16).set(str);
+                    "syscall/js.valueInstanceOf": (e, n) => t(e) instanceof t(n),
+                    "syscall/js.copyBytesToGo": (n, r, o, s, a) => {
+                        let l = n,
+                            c = n + 4;
+                        const f = i(r, o),
+                            h = t(a);
+                        if (!(h instanceof Uint8Array || h instanceof Uint8ClampedArray)) return void e().setUint8(c, 0);
+                        const u = h.subarray(0, f.length);
+                        f.set(u), e().setUint32(l, u.length, !0), e().setUint8(c, 1)
                     },
-
-                    // func valueInstanceOf(v ref, t ref) bool
-                    "syscall/js.valueInstanceOf": (sp) => {
-                        sp >>>= 0;
-                        this.mem.setUint8(sp + 24, (loadValue(sp + 8) instanceof loadValue(sp + 16)) ? 1 : 0);
+                    "syscall/js.copyBytesToJS": (n, r, o, s, a) => {
+                        let l = n,
+                            c = n + 4;
+                        const f = t(r),
+                            h = i(o, s);
+                        if (!(f instanceof Uint8Array || f instanceof Uint8ClampedArray)) return void e().setUint8(c, 0);
+                        const u = h.subarray(0, f.length);
+                        f.set(u), e().setUint32(l, u.length, !0), e().setUint8(c, 1)
                     },
-
-                    // func copyBytesToGo(dst []byte, src ref) (int, bool)
-                    "syscall/js.copyBytesToGo": (sp) => {
-                        sp >>>= 0;
-                        const dst = loadSlice(sp + 8);
-                        const src = loadValue(sp + 32);
-                        if (!(src instanceof Uint8Array || src instanceof Uint8ClampedArray)) {
-                            this.mem.setUint8(sp + 48, 0);
-                            return;
+                    "syscall/js.finalizeRef": n => {
+                        const r = e().getUint32(t(n), !0);
+                        if (this._goRefCounts[r]--, 0 === this._goRefCounts[r]) {
+                            const e = this._values[r];
+                            this._values[r] = null, this._ids.delete(e), this._idPool.push(r)
                         }
-                        const toCopy = src.subarray(0, dst.length);
-                        dst.set(toCopy);
-                        setInt64(sp + 40, toCopy.length);
-                        this.mem.setUint8(sp + 48, 1);
-                    },
-
-                    // func copyBytesToJS(dst ref, src []byte) (int, bool)
-                    "syscall/js.copyBytesToJS": (sp) => {
-                        sp >>>= 0;
-                        const dst = loadValue(sp + 8);
-                        const src = loadSlice(sp + 16);
-                        if (!(dst instanceof Uint8Array || dst instanceof Uint8ClampedArray)) {
-                            this.mem.setUint8(sp + 48, 0);
-                            return;
-                        }
-                        const toCopy = src.subarray(0, dst.length);
-                        dst.set(toCopy);
-                        setInt64(sp + 40, toCopy.length);
-                        this.mem.setUint8(sp + 48, 1);
-                    },
-
-                    "debug": (value) => {
-                        console.log(value);
-                    },
+                    }
                 }
-            };
+            }, this.importObject.env = this.importObject.gojs
         }
-
-        async run(instance) {
-            if (!(instance instanceof WebAssembly.Instance)) {
-                throw new Error("Go.run: WebAssembly.Instance expected");
+        async run(e) {
+            for (this._inst = e, this._values = [NaN, 0, null, !0, !1, globalThis, this], this._goRefCounts = [], this._ids = new Map, this._idPool = [], this.exited = !1;;) {
+                const e = new Promise((e => {
+                    this._resolveCallbackPromise = () => {
+                        if (this.exited) throw new Error("bad callback: Go program has already exited");
+                        setTimeout(e, 0)
+                    }
+                }));
+                if (this._inst.exports._start(), this.exited) break;
+                await e
             }
-            this._inst = instance;
-            this.mem = new DataView(this._inst.exports.mem.buffer);
-            this._values = [ // JS values that Go currently has references to, indexed by reference id
-                NaN,
-                0,
-                null,
-                true,
-                false,
-                globalThis,
-                this,
-            ];
-            this._goRefCounts = new Array(this._values.length).fill(Infinity); // number of references that Go has to a JS value, indexed by reference id
-            this._ids = new Map([ // mapping from JS values to reference ids
-                [0, 1],
-                [null, 2],
-                [true, 3],
-                [false, 4],
-                [globalThis, 5],
-                [this, 6],
-            ]);
-            this._idPool = [];   // unused ids that have been garbage collected
-            this.exited = false; // whether the Go program has exited
-
-            // Pass command line arguments and environment variables to WebAssembly by writing them to the linear memory.
-            let offset = 4096;
-
-            const strPtr = (str) => {
-                const ptr = offset;
-                const bytes = encoder.encode(str + "\0");
-                new Uint8Array(this.mem.buffer, offset, bytes.length).set(bytes);
-                offset += bytes.length;
-                if (offset % 8 !== 0) {
-                    offset += 8 - (offset % 8);
-                }
-                return ptr;
-            };
-
-            const argc = this.argv.length;
-
-            const argvPtrs = [];
-            this.argv.forEach((arg) => {
-                argvPtrs.push(strPtr(arg));
-            });
-            argvPtrs.push(0);
-
-            const keys = Object.keys(this.env).sort();
-            keys.forEach((key) => {
-                argvPtrs.push(strPtr(`${key}=${this.env[key]}`));
-            });
-            argvPtrs.push(0);
-
-            const argv = offset;
-            argvPtrs.forEach((ptr) => {
-                this.mem.setUint32(offset, ptr, true);
-                this.mem.setUint32(offset + 4, 0, true);
-                offset += 8;
-            });
-
-            // The linker guarantees global data starts from at least wasmMinDataAddr.
-            // Keep in sync with cmd/link/internal/ld/data.go:wasmMinDataAddr.
-            const wasmMinDataAddr = 4096 + 8192;
-            if (offset >= wasmMinDataAddr) {
-                throw new Error("total length of command line and environment variables exceeds limit");
-            }
-
-            this._inst.exports.run(argc, argv);
-            if (this.exited) {
-                this._resolveExitPromise();
-            }
-            await this._exitPromise;
         }
-
         _resume() {
-            if (this.exited) {
-                throw new Error("Go program has already exited");
-            }
-            this._inst.exports.resume();
-            if (this.exited) {
-                this._resolveExitPromise();
+            if (this.exited) throw new Error("Go program has already exited");
+            this._inst.exports.resume(), this.exited && this._resolveExitPromise()
+        }
+        _makeFuncWrapper(e) {
+            const t = this;
+            return function() {
+                const n = {
+                    id: e,
+                    this: this,
+                    args: arguments
+                };
+                return t._pendingEvent = n, t._resume(), n.result
             }
         }
-
-        _makeFuncWrapper(id) {
-            const go = this;
-            return function () {
-                const event = { id: id, this: this, args: arguments };
-                go._pendingEvent = event;
-                go._resume();
-                return event.result;
-            };
-        }
+    };
+    try {
+        const e = new T,
+            t = fetch(new URL("app.wasm", import.meta.url), {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/wasm"
+                }
+            });
+        const instance = WebAssembly.instantiateStreaming ? (await WebAssembly.instantiateStreaming(t, e.importObject)).instance : (await WebAssembly.instantiate(await (await t).arrayBuffer(), e.importObject)).instance
+        await e.run(instance);
+        console.log(instance.exports)
+    } catch (e) {
+        console.log(e)
     }
 })();
