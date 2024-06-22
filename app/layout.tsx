@@ -7,7 +7,6 @@ import { Analytics } from '@vercel/analytics/react';
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "I Wanna Maker Tools",
-  description: "Tools for IWM, made by youdi3",
 };
 
 export default function RootLayout({
