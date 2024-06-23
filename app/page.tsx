@@ -9,7 +9,7 @@ declare global {
 }
 
 export default function App() {
-  function base64Encode(input: any) {
+  function imageAsBase64(input: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -49,7 +49,7 @@ export default function App() {
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await base64Encode(file)), 800, 608, 0.6, 7));
+          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 608, 0.6, 7));
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
