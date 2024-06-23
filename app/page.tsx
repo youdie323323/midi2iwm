@@ -3,21 +3,21 @@ import { useEffect, useState } from 'react';
 import Script from 'next/script'
 
 export default function App() {
-  function base64Encode(input) {
+  function base64Encode(input: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
+      reader.onloadend = () => resolve((reader?.result as string).split(',')[1]);
       reader.onerror = error => reject(error);
       reader.readAsDataURL(input);
     });
   }
 
-  function drawObjects(objects) {
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas?.getContext('2d');
+  function drawObjects(objects: any) {
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+    const ctx = canvas?.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    objects.forEach((obj) => {
+    objects.forEach((obj: any) => {
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
       ctx.fillStyle = "#" + obj.color.toString(16).padStart(6, '0');
@@ -28,14 +28,13 @@ export default function App() {
 
   return (
     <div>
+      <canvas id="canvas" width="800" height="608"></canvas>
       <input type="file" id="upload" onInput={async function (e) {
-        const file = e.target?.files[0];
+        const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          const base64Str = await base64Encode(file);
-          drawObjects(window.__iwm_wasm_exports.image(base64Str, 800, 608, 0.6, 7));
+          drawObjects(eval("window.__iwm_wasm_exports").image(await base64Encode(file), 800, 608, 0.6, 7));
         }
       }} />
-      <canvas id="canvas" width="800" height="608"></canvas>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
