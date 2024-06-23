@@ -125,6 +125,10 @@ export default function App() {
                 >Show Preview</button>
                 {showCanvas && (
                   <div className="fullscreen-canvas-container">
+                    <button
+                      className="btn btn-secondary close-preview-button"
+                      onClick={() => setShowCanvas(false)}
+                    >Close Preview</button>
                     <canvas id="preview-image"></canvas>
                   </div>
                 )}
@@ -145,10 +149,14 @@ export default function App() {
           justify-content: center;
           align-items: center;
           z-index: 9999;
+          flex-direction: column;
         }
         canvas {
-          max-width: 100%;
-          max-height: 100%;
+          max-width: 90%;
+          max-height: 90%;
+        }
+        .close-preview-button {
+          margin-bottom: 10px;
         }
       `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
