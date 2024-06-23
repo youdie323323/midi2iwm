@@ -25,7 +25,7 @@ export default function App() {
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
     const offscreenCtx = offscreenCanvas.getContext('2d')!;
-    
+
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
 
@@ -71,18 +71,12 @@ export default function App() {
         </div>
       </nav>
       <div className="container mt-4">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item active" aria-current="page">
-              Dashboard
-            </li>
-          </ol>
-        </nav>
         <h2>
-          Welcome
+          Hello
         </h2>
         <p>
-          This is IWM tools dashboard.
+          This is a web tool made for i-Wanna-Maker on Steam. Please read and follow the official game rules.<br></br>
+          This tool does not contain any viruses and only run in client-side using WebAssembly.
         </p>
 
         <input
@@ -92,7 +86,7 @@ export default function App() {
           id="mapfile"
           type="file" />
 
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file before, *.map file only<br></br>Map file path is &quot;C:\Users\yourUsername\AppData\Local\IWM\maps&quot;</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file</p>
 
         <div className="row row-cols-1 row-cols-md-2 g-4">
           <div className="col-md-6">
