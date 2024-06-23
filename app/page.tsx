@@ -9,6 +9,8 @@ declare global {
 }
 
 export default function App() {
+  const [showCanvas, setShowCanvas] = useState(false);
+
   function imageAsBase64(input: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -117,8 +119,18 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p><br></br>
-                <p className="card-text">Preview</p>
-                <canvas id="preview-image" style={{ width: '100%', height: 'auto', border: '1px solid #ccc' }}></canvas>
+                <button
+                  className="btn btn-primary mt-2"
+                  onClick={() => setShowCanvas(true)}
+                >
+                  Show Preview
+                </button>
+                {showCanvas && (
+                  <>
+                    <p className="card-text mt-2">Preview</p>
+                    <canvas id="preview-image" style={{ width: '100%', height: 'auto', border: '1px solid #ccc' }}></canvas>
+                  </>
+                )}
               </div>
             </div>
           </div>
