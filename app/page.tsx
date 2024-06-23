@@ -10,6 +10,24 @@ declare global {
 
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
+  const [fadeType, setFadeType] = useState<'fade-in' | 'fade-out'>('fade-in');
+
+  useEffect(() => {
+    if (showCanvas) {
+      setFadeType('fade-in');
+    } else {
+      setFadeType('fade-out');
+    }
+  }, [showCanvas]);
+
+  function handleCloseCanvas() {
+    setFadeType('fade-out');
+    setTimeout(() => setShowCanvas(false), 300);
+  }
+
+  function handleShowCanvas() {
+    setShowCanvas(true);
+  }
 
   function imageAsBase64(input: any) {
     return new Promise((resolve, reject) => {
@@ -121,13 +139,13 @@ export default function App() {
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p><br></br>
                 <button
                   className="btn btn-primary mt-2"
-                  onClick={() => setShowCanvas(true)}
+                  onClick={handleShowCanvas}
                 >Show Preview</button>
                 {showCanvas && (
-                  <div className="fullscreen-canvas-container">
+                  <div className={`fullscreen-canvas-container ${fadeType}`}>
                     <button
                       className="close-preview-button"
-                      onClick={() => setShowCanvas(false)}
+                      onClick={handleCloseCanvas}
                     >
                       <i className="material-icons">arrow_back</i>
                     </button>
@@ -151,6 +169,14 @@ export default function App() {
           justify-content: center;
           align-items: center;
           z-index: 9999;
+          opacity: 0;
+          transition: opacity 0.3s;
+        }
+        .fullscreen-canvas-container.fade-in {
+          opacity: 1;
+        }
+        .fullscreen-canvas-container.fade-out {
+          opacity: 0;
         }
         .close-preview-button {
           position: absolute;
