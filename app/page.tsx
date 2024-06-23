@@ -20,8 +20,9 @@ export default function App() {
     }
   }, [showCanvas]);
 
+  const previewContainer = document.getElementById("preview-container");
+
   function handleCloseCanvas() {
-    const previewContainer = document.getElementById("preview-container");
     previewContainer!.style.display = "none";
 
     setFadeType('fade-out');
@@ -29,7 +30,6 @@ export default function App() {
   }
 
   function handleShowCanvas() {
-    const previewContainer = document.getElementById("preview-container");
     previewContainer!.style.display = "block";
 
     setShowCanvas(true);
@@ -69,6 +69,8 @@ export default function App() {
     });
 
     ctx.drawImage(offscreenCanvas, 0, 0, rWidth, rHeight);
+
+    offscreenCanvas.remove();
   }
 
   return (
@@ -154,7 +156,7 @@ export default function App() {
                   >
                   <i className="material-icons">arrow_back</i>
                   </button>
-                  <canvas id="preview-image"></canvas>
+                  <canvas id="preview-image" width="798" height="602"></canvas>
                 </div>
               </div>
             </div>
