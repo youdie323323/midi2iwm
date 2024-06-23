@@ -20,9 +20,9 @@ export default function App() {
     }
   }, [showCanvas]);
 
-  const previewContainer = document.getElementById("preview-container");
 
   function handleCloseCanvas() {
+    const previewContainer = document.getElementById("preview-container");
     previewContainer!.style.display = "none";
 
     setFadeType('fade-out');
@@ -30,6 +30,7 @@ export default function App() {
   }
 
   function handleShowCanvas() {
+    const previewContainer = document.getElementById("preview-container");
     previewContainer!.style.display = "block";
 
     setShowCanvas(true);
@@ -154,7 +155,7 @@ export default function App() {
                     className="close-preview-button"
                     onClick={handleCloseCanvas}
                   >
-                  <i className="material-icons">arrow_back</i>
+                    <i className="material-icons">arrow_back</i>
                   </button>
                   <canvas id="preview-image" width="798" height="602"></canvas>
                 </div>
