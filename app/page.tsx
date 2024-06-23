@@ -24,8 +24,8 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const color = obj.color;
-      const r = (color >> 16) & 0xFF;
-      const g = color & 0xFF;
+      const r = color & 0xFF;
+      const g = (color >> 16) & 0xFF;
       const b = (color >> 8) & 0xFF;
       ctx.fillStyle = "#" + r.toString(16) + g.toString(16) + b.toString(16)
 
