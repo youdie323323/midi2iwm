@@ -124,16 +124,33 @@ export default function App() {
                   onClick={() => setShowCanvas(true)}
                 >Show Preview</button>
                 {showCanvas && (
-                  <>
-                    <p className="card-text mt-2">Preview</p>
-                    <canvas id="preview-image" style={{ width: '100%', height: 'auto', border: '1px solid #ccc' }}></canvas>
-                  </>
+                  <div className="fullscreen-canvas-container">
+                    <canvas id="preview-image"></canvas>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .fullscreen-canvas-container {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 9999;
+        }
+        canvas {
+          max-width: 100%;
+          max-height: 100%;
+        }
+      `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
     </div>
   )
