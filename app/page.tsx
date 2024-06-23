@@ -122,9 +122,7 @@ export default function App() {
                 <button
                   className="btn btn-primary mt-2"
                   onClick={() => setShowCanvas(true)}
-                >
-                  Show Preview
-                </button>
+                >Show Preview</button>
                 {showCanvas && (
                   <>
                     <p className="card-text mt-2">Preview</p>
