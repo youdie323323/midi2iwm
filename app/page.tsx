@@ -52,7 +52,7 @@ export default function App() {
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 602, 0.6, 7));
+          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 602, 0.6, 7), 800 / 2, 602 / 2);
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
