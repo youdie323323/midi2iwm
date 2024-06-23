@@ -31,7 +31,7 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = `rgb(${decoded.r}, ${decoded.g}, ${decoded.b})`;
+      ctx.fillStyle = `rgb(${obj.rgb})`;
 
       ctx.fill();
       ctx.closePath();
