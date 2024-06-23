@@ -21,16 +21,16 @@ export default function App() {
   }, [showCanvas]);
 
   function handleCloseCanvas() {
-    const cnvs = document.getElementById("preview-image");
-    cnvs!.style.display = "none";
+    const previewContainer = document.getElementById("preview-container");
+    previewContainer!.style.display = "none";
 
     setFadeType('fade-out');
     setTimeout(() => setShowCanvas(false), 300);
   }
 
   function handleShowCanvas() {
-    const cnvs = document.getElementById("preview-image");
-    cnvs!.style.display = "block";
+    const previewContainer = document.getElementById("preview-container");
+    previewContainer!.style.display = "block";
 
     setShowCanvas(true);
   }
@@ -59,7 +59,6 @@ export default function App() {
     canvas.height = rHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
     objects.forEach((obj: any) => {
       offscreenCtx.beginPath();
@@ -74,7 +73,7 @@ export default function App() {
 
   return (
     <div>
-      <canvas id="preview-image"></canvas>
+
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -148,16 +147,15 @@ export default function App() {
                   className="btn btn-primary mt-2"
                   onClick={handleShowCanvas}
                 >Show Preview</button>
-                {showCanvas && (
-                  <div className={`fullscreen-canvas-container ${fadeType}`}>
-                    <button
-                      className="close-preview-button"
-                      onClick={handleCloseCanvas}
-                    >
-                      <i className="material-icons">arrow_back</i>
-                    </button>
-                  </div>
-                )}
+                <div className={`fullscreen-canvas-container ${fadeType}`} id="preview-container" style={{ display: "none" }}>
+                  <button
+                    className="close-preview-button"
+                    onClick={handleCloseCanvas}
+                  >
+                    <i className="material-icons">arrow_back</i>
+                  </button>
+                  <canvas id="preview-image"></canvas>
+                </div>
               </div>
             </div>
           </div>
