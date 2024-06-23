@@ -15,9 +15,9 @@ export default function App() {
   }
 
   function decodeIwmBlendColor(encodedColor: number): { r: number, g: number, b: number } {
-    const r = encodedColor & 0xFF;
+    const b = encodedColor & 0xFF;
     const g = (encodedColor >> 8) & 0xFF;
-    const b = (encodedColor >> 16) & 0xFF;
+    const r = (encodedColor >> 16) & 0xFF;
     return { r, g, b };
   }
 
@@ -40,7 +40,7 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = rgbToHex(decoded.b, decoded.g, decoded.r);
+      ctx.fillStyle = rgbToHex(decoded.r, decoded.g, decoded.b);
 
       ctx.fill(); 
       ctx.closePath();
