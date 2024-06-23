@@ -26,9 +26,9 @@ export default function App() {
       const r = obj.color & 0xFF;
       const g = (obj.color >> 8) & 0xFF;
       const b = (obj.color >> 16) & 0xFF;
-      const hexColor = (r | (g << 8) | (b << 16)).toString(16).padStart(6, '0');
+      const hexColor = ((b << 16) | (g << 8) | r).toString(16).padStart(6, '0');
       ctx.fillStyle = `#${hexColor}`;
-      
+
       ctx.fill();
       ctx.closePath();
     });
