@@ -15,11 +15,11 @@ export default function App() {
   }
 
   function decodeIwmBlendColor(encodedColor: number): { r: number, g: number, b: number } {
-    const b = encodedColor & 0xFF;
+    const r = encodedColor & 0xFF;
     const g = (encodedColor >> 8) & 0xFF;
-    const r = (encodedColor >> 16) & 0xFF;
+    const b = (encodedColor >> 16) & 0xFF;
     return { r, g, b };
-}
+  }
 
   function drawObjects(objects: any) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -31,12 +31,8 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      const rHex = decoded.r.toString(16).padStart(2, '0');
-      const gHex = decoded.g.toString(16).padStart(2, '0');
-      const bHex = decoded.b.toString(16).padStart(2, '0');
-  
-      ctx.fillStyle = `#${rHex}${gHex}${bHex}`;
-  
+      ctx.fillStyle = `rgb(${decoded.r, decoded.g, decoded.b})`;
+
       ctx.fill();
       ctx.closePath();
     });
