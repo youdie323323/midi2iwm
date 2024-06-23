@@ -20,8 +20,8 @@ export default function App() {
     });
   }
 
-  function drawObjects(objects: any, rWidth: number, rHeight: number) {
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  function drawObjects(objects: any, rWidth: number, rHeight: number, id: string) {
+    const canvas = document.getElementById(id) as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
     const offscreenCtx = offscreenCanvas.getContext('2d')!;
@@ -112,13 +112,13 @@ export default function App() {
                   onInput={async function (e) {
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798 / 2, 602 / 2);
+                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798, 602, "preview-image");
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p><br></br>
                 <p className="card-text">Preview</p>
-                <canvas id="canvas"></canvas>
+                <canvas id="preview-image"></canvas>
               </div>
             </div>
           </div>
