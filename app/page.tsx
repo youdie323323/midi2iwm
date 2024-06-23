@@ -48,13 +48,6 @@ export default function App() {
 
   return (
     <div>
-      <canvas id="canvas"></canvas>
-      <input type="file" id="upload" onInput={async function (e) {
-        const file = (e.target as HTMLInputElement).files![0];
-        if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798 / 2, 602 / 2);
-        }
-      }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -107,9 +100,7 @@ export default function App() {
                     }}
                   >image</i>{" "}
                   Image To IWM
-                  <span className="ms-auto" style={{ color: "#666" }}>
-                    Stable
-                  </span>
+                  <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
                 </h3>
                 <p className="card-text">
                   Convert image to IWM using bullet
@@ -117,12 +108,17 @@ export default function App() {
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
                   aria-describedby="file_input_help"
-                  accept=".png,.jpeg"
-                  onInput={function (e) {
-
+                  accept=".png,.jpeg,.jfif"
+                  onInput={async function (e) {
+                    const file = (e.target as HTMLInputElement).files![0];
+                    if (file) {
+                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798 / 2, 602 / 2);
+                    }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p><br></br>
+                <p className="card-text">Preview</p>
+                <canvas id="canvas"></canvas>
               </div>
             </div>
           </div>
