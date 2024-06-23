@@ -14,22 +14,6 @@ export default function App() {
     });
   }
 
-  function decodeIwmBlendColor(encodedColor: number): { r: number, g: number, b: number } {
-    const b = encodedColor & 0xFF;
-    const g = (encodedColor >> 8) & 0xFF;
-    const r = (encodedColor >> 16) & 0xFF;
-    return { r, g, b };
-  }
-
-  function componentToHex(c: any) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-  }
-  
-  function rgbToHex(r: number, g: number, b: number) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-  }
-
   function drawObjects(objects: any) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
@@ -39,10 +23,14 @@ export default function App() {
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
-      const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = rgbToHex(decoded.r, decoded.g, decoded.b);
+      const color = obj.color;
+      const r = color & 0xFF;
+      const g = (color >> 8) & 0xFF;
+      const b = (color >> 16) & 0xFF;
+      const rgbColor = (r << 16) | (g << 8) | b;
+      ctx.fillStyle = "#" + rgbColor.toString(16).padStart(6, '0');
 
-      ctx.fill(); 
+      ctx.fill();
       ctx.closePath();
     });
   }
