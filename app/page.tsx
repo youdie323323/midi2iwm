@@ -13,6 +13,7 @@ export default function App() {
   }
 
   function drawObjects(objects: any) {
+    console.log(objects)
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -32,7 +33,7 @@ export default function App() {
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(eval("window.__iwm_wasm_exports").image(await base64Encode(file), 800, 608, 0.6, 7));
+          drawObjects(eval("window.__iwm_wasm_exports").image((await base64Encode(file)), 800, 608, 0.6, 7));
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
