@@ -17,15 +17,24 @@ export default function App() {
   function drawObjects(objects: any) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d')!;
+    
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+    
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
-    ctx.beginPath();
     objects.forEach((obj: any) => {
-      ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
-      ctx.fillStyle = `rgb(${obj.rgb})`;
-      ctx.fill();
+      offscreenCtx.beginPath();
+      offscreenCtx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
+      offscreenCtx.fillStyle = `rgb(${obj.rgb})`;
+      offscreenCtx.fill();
+      offscreenCtx.closePath();
     });
-    ctx.closePath();
+
+    ctx.drawImage(offscreenCanvas, 0, 0);
   }
 
   return (
