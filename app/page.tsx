@@ -2,6 +2,12 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
 
+declare global {
+  interface Window {
+    __iwm_wasm_exports: any;
+  }
+}
+
 export default function App() {
   function base64Encode(input: any) {
     return new Promise((resolve, reject) => {
@@ -22,7 +28,7 @@ export default function App() {
     
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
-    
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
@@ -43,7 +49,7 @@ export default function App() {
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(eval("window.__iwm_wasm_exports").image((await base64Encode(file)), 800, 608, 0.6, 7));
+          drawObjects(window.__iwm_wasm_exports.image((await base64Encode(file)), 800, 608, 0.6, 7));
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
