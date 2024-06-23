@@ -195,6 +195,8 @@ export default function App() {
         canvas {
           max-width: 90%;
           max-height: 90%;
+          margin: auto;
+          display: block;
         }
       `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
