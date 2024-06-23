@@ -20,45 +20,39 @@ export default function App() {
     });
   }
 
-  function drawObjects(objects: any, canvasWidth: number, canvasHeight: number) {
+  function drawObjects(objects: any, rWidth: number, rHeight: number) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
     const offscreenCtx = offscreenCanvas.getContext('2d')!;
 
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
-    offscreenCanvas.width = canvasWidth;
-    offscreenCanvas.height = canvasHeight;
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+
+    canvas.width = rWidth;
+    canvas.height = rHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
     objects.forEach((obj: any) => {
       offscreenCtx.beginPath();
-      offscreenCtx.arc(
-        obj.x * canvasWidth,
-        obj.y * canvasHeight,
-        obj.scale * 10 * (canvasWidth / canvas.width),
-        0,
-        2 * Math.PI,
-        false
-      );
+      offscreenCtx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
       offscreenCtx.fillStyle = `rgb(${obj.rgb})`;
       offscreenCtx.fill();
       offscreenCtx.closePath();
     });
 
-    ctx.drawImage(offscreenCanvas, 0, 0);
+    ctx.drawImage(offscreenCanvas, 0, 0, rWidth, rHeight);
   }
 
   return (
     <div>
-      <canvas id="canvas"></canvas>
+      <canvas id="canvas" width="800" height="602"></canvas>
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 608, 0.6, 7), 800 / 3, 608 / 3);
+          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 602, 0.6, 7));
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
