@@ -152,7 +152,7 @@ export default function App() {
                     className="close-preview-button"
                     onClick={handleCloseCanvas}
                   >
-                    <i className="material-icons">arrow_back</i>
+                  <i className="material-icons">arrow_back</i>
                   </button>
                   <canvas id="preview-image"></canvas>
                 </div>
