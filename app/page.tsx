@@ -19,15 +19,13 @@ export default function App() {
     const ctx = canvas?.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.beginPath();
     objects.forEach((obj: any) => {
-      ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
-
       ctx.fillStyle = `rgb(${obj.rgb})`;
-
       ctx.fill();
-      ctx.closePath();
     });
+    ctx.closePath();
   }
 
   return (
