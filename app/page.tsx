@@ -27,7 +27,7 @@ export default function App() {
       const r = color & 0xFF;
       const g = (color >> 8) & 0xFF;
       const b = (color >> 16) & 0xFF;
-      ctx.fillStyle = "#" + (b << 16).toString(16) + (g << 8).toString(16) + r.toString(16)
+      ctx.fillStyle = "#" + b.toString(16) + g.toString(16) + r.toString(16)
 
       ctx.fill();
       ctx.closePath();
