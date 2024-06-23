@@ -6,7 +6,10 @@ export default function App() {
   function base64Encode(input: any) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve((reader?.result as string).split(',')[1]);
+      reader.onloadend = () => {
+        console.log((reader?.result as string).split(',')[1])
+        resolve((reader?.result as string).split(',')[1])
+      };
       reader.onerror = error => reject(error);
       reader.readAsDataURL(input);
     });
