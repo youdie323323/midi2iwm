@@ -21,11 +21,17 @@ export default function App() {
   }, [showCanvas]);
 
   function handleCloseCanvas() {
+    const cnvs = document.getElementById("preview-image");
+    cnvs!.style.display = "none";
+
     setFadeType('fade-out');
     setTimeout(() => setShowCanvas(false), 300);
   }
 
   function handleShowCanvas() {
+    const cnvs = document.getElementById("preview-image");
+    cnvs!.style.display = "block";
+
     setShowCanvas(true);
   }
 
@@ -40,8 +46,8 @@ export default function App() {
     });
   }
 
-  function drawObjects(objects: any, rWidth: number, rHeight: number, id: string) {
-    const canvas = document.getElementById(id) as HTMLCanvasElement;
+  function drawObjects(objects: any, rWidth: number, rHeight: number) {
+    const canvas = document.getElementById("preview-image") as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
     const offscreenCtx = offscreenCanvas.getContext('2d')!;
@@ -68,6 +74,7 @@ export default function App() {
 
   return (
     <div>
+      <canvas id="preview-image"></canvas>
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div className="container">
           <a className="navbar-brand">
@@ -132,11 +139,11 @@ export default function App() {
                   onInput={async function (e) {
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798, 602, "preview-image");
+                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798, 602);
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p><br></br>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p>
                 <button
                   className="btn btn-primary mt-2"
                   onClick={handleShowCanvas}
@@ -149,7 +156,6 @@ export default function App() {
                     >
                       <i className="material-icons">arrow_back</i>
                     </button>
-                    <canvas id="preview-image"></canvas>
                   </div>
                 )}
               </div>
