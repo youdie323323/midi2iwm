@@ -24,11 +24,10 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const color = obj.color;
-      const r = color & 0xFF;
+      const r = (color >> 16) & 0xFF;
       const g = (color >> 8) & 0xFF;
-      const b = (color >> 16) & 0xFF;
-      const rgbColor = (r << 16) | (g << 8) | b;
-      ctx.fillStyle = "#" + rgbColor.toString(16).padStart(6, '0');
+      const b = color & 0xFF;
+      ctx.fillStyle = "#" + r.toString(16) + g.toString(16) + b.toString(16)
 
       ctx.fill();
       ctx.closePath();
