@@ -15,7 +15,6 @@ export default function App() {
   }
 
   function drawObjects(objects: any) {
-    console.log(objects)
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
