@@ -48,11 +48,11 @@ export default function App() {
 
   return (
     <div>
-      <canvas id="canvas" width="800" height="602"></canvas>
+      <canvas id="canvas"></canvas>
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 602, 0.6, 7), 800 / 2, 602 / 2);
+          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798 / 2, 602 / 2);
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -105,9 +105,7 @@ export default function App() {
                       marginRight: 10,
                       verticalAlign: "middle"
                     }}
-                  >
-                    image
-                  </i>{" "}
+                  >image</i>{" "}
                   Image To IWM
                   <span className="ms-auto" style={{ color: "#666" }}>
                     Stable
@@ -125,81 +123,6 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-6">
-            <div className="card widget">
-              <div className="card-body">
-                <h3
-                  className="card-title"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <i
-                    className="material-icons text-danger-emphasis"
-                    style={{
-                      fontSize: 24,
-                      marginRight: 10,
-                      verticalAlign: "middle"
-                    }}
-                  >
-                    light_mode
-                  </i>{" "}
-                  Image to IWM Bright
-                  <span className="ms-auto" style={{ color: "#666" }}>
-                    Stable
-                  </span>
-                </h3>
-                <p className="card-text">
-                  Convert image to IWM using bright
-                </p>
-                <input
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
-                  aria-describedby="file_input_help"
-                  accept=".png,.jpeg"
-                  onInput={function (e) {
-
-                  } as React.ChangeEventHandler<HTMLInputElement>}
-                  type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-6">
-            <div className="card widget">
-              <div className="card-body">
-                <h3
-                  className="card-title"
-                  style={{ display: "flex", alignItems: "center" }}
-                >
-                  <i
-                    className="material-icons text-danger-emphasis"
-                    style={{
-                      fontSize: 24,
-                      marginRight: 10,
-                      verticalAlign: "middle"
-                    }}
-                  >
-                    music_note
-                  </i>{" "}
-                  Midi to IWM
-                  <span className="ms-auto" style={{ color: "#666" }}>
-                    Stable
-                  </span>
-                </h3>
-                <p className="card-text">
-                  Convert midi to IWM
-                </p>
-                <input
-                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
-                  aria-describedby="file_input_help"
-                  accept=".mid"
-                  onInput={function (e) {
-
-                  } as React.ChangeEventHandler<HTMLInputElement>}
-                  type="file" />
               </div>
             </div>
           </div>
