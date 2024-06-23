@@ -14,13 +14,6 @@ export default function App() {
     });
   }
 
-  function decodeIwmBlendColor(encodedColor: number): { r: number, g: number, b: number } {
-    const b = (encodedColor >> 16) & 0xFF;
-    const g = (encodedColor >> 8) & 0xFF;
-    const r = encodedColor & 0xFF;
-    return { r, g, b };
-  }
-
   function drawObjects(objects: any) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
@@ -30,7 +23,6 @@ export default function App() {
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
-      const decoded = decodeIwmBlendColor(obj.color)
       ctx.fillStyle = `rgb(${obj.rgb})`;
 
       ctx.fill();
