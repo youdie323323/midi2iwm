@@ -116,7 +116,7 @@ export default function App() {
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Input your image file</p><br></br>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p><br></br>
                 <p className="card-text">Preview</p>
                 <canvas id="preview-image"></canvas>
               </div>
