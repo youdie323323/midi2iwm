@@ -31,8 +31,12 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = "#" + decoded.r.toString(16) + decoded.g.toString(16) + decoded.b.toString(16)
-
+      const rHex = decoded.r.toString(16).padStart(2, '0');
+      const gHex = decoded.g.toString(16).padStart(2, '0');
+      const bHex = decoded.b.toString(16).padStart(2, '0');
+  
+      ctx.fillStyle = `#${rHex}${gHex}${bHex}`;
+  
       ctx.fill();
       ctx.closePath();
     });
