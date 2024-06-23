@@ -18,14 +18,22 @@ export default function App() {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
+  
     objects.forEach((obj: any) => {
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
-      ctx.fillStyle = "#" + obj.color.toString(16).padStart(6, '0');
+      
+      // エンコードされた色をデコードしてRGBの順序に変換
+      const color = obj.color;
+      const r = color & 0xFF;
+      const g = (color >> 8) & 0xFF;
+      const b = (color >> 16) & 0xFF;
+      const rgbColor = (r << 16) | (g << 8) | b;
+  
+      ctx.fillStyle = "#" + rgbColor.toString(16).padStart(6, '0');
       ctx.fill();
       ctx.closePath();
-    });
+    }); 
   }
 
   return (
