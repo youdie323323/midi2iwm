@@ -15,9 +15,9 @@ export default function App() {
   }
 
   function decodeIwmBlendColor(encodedColor: number): { r: number, g: number, b: number } {
-    const r = encodedColor & 0xFF;
-    const g = (encodedColor >> 8) & 0xFF;
     const b = (encodedColor >> 16) & 0xFF;
+    const g = (encodedColor >> 8) & 0xFF;
+    const r = encodedColor & 0xFF;
     return { r, g, b };
   }
 
