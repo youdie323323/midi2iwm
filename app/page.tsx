@@ -27,8 +27,7 @@ export default function App() {
       const r = color & 0xFF;
       const g = (color >> 8) & 0xFF;
       const b = (color >> 16) & 0xFF;
-      const rgbColor = (r << 16) | (g << 8) | b;
-      ctx.fillStyle = "#" + rgbColor.toString(16).padStart(6, '0');
+      ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
 
       ctx.fill();
       ctx.closePath();
