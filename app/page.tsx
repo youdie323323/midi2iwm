@@ -118,7 +118,7 @@ export default function App() {
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p><br></br>
                 <p className="card-text">Preview</p>
-                <canvas id="preview-image"></canvas>
+                <canvas id="preview-image" style={{ width: '100%', height: 'auto', border: '1px solid #ccc' }}></canvas>
               </div>
             </div>
           </div>
