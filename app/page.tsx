@@ -20,21 +20,30 @@ export default function App() {
     });
   }
 
-  function drawObjects(objects: any) {
+  function drawObjects(objects: any, canvasWidth: number, canvasHeight: number) {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
     const offscreenCtx = offscreenCanvas.getContext('2d')!;
 
-    offscreenCanvas.width = canvas.width;
-    offscreenCanvas.height = canvas.height;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    offscreenCanvas.width = canvasWidth;
+    offscreenCanvas.height = canvasHeight;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
     objects.forEach((obj: any) => {
       offscreenCtx.beginPath();
-      offscreenCtx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
+      offscreenCtx.arc(
+        obj.x * canvasWidth,
+        obj.y * canvasHeight,
+        obj.scale * 10 * (canvasWidth / canvas.width),
+        0,
+        2 * Math.PI,
+        false
+      );
       offscreenCtx.fillStyle = `rgb(${obj.rgb})`;
       offscreenCtx.fill();
       offscreenCtx.closePath();
@@ -45,11 +54,11 @@ export default function App() {
 
   return (
     <div>
-      <canvas id="canvas" width="800" height="608"></canvas>
+      <canvas id="canvas"></canvas>
       <input type="file" id="upload" onInput={async function (e) {
         const file = (e.target as HTMLInputElement).files![0];
         if (file) {
-          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 608, 0.6, 7));
+          drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 800, 608, 0.6, 7), 800 / 3, 608 / 3);
         }
       }} />
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -72,13 +81,12 @@ export default function App() {
       </nav>
       <div className="container mt-4">
         <h2>
-          Hello
+          Welcome
         </h2>
         <p>
           This is a web tool made for i-Wanna-Maker on Steam. Please read and follow the official game rules.<br></br>
           This tool does not contain any viruses and only run in client-side using WebAssembly.
         </p>
-
         <input
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
           aria-describedby="file_input_help"
