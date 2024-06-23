@@ -40,9 +40,9 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = rgbToHex(decoded.r, decoded.g, decoded.b);
+      ctx.fillStyle = rgbToHex(decoded.b, decoded.g, decoded.r);
 
-      ctx.fill();
+      ctx.fill(); 
       ctx.closePath();
     });
   }
