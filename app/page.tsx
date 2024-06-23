@@ -40,7 +40,7 @@ export default function App() {
       ctx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
 
       const decoded = decodeIwmBlendColor(obj.color)
-      ctx.fillStyle = rgbToHex(decoded.b, decoded.g, decoded.r);
+      ctx.fillStyle = rgbToHex(decoded.r, decoded.b, decoded.g);
 
       ctx.fill(); 
       ctx.closePath();
