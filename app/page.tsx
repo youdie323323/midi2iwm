@@ -22,11 +22,12 @@ export default function App() {
 
 
   function handleCloseCanvas() {
-    const previewContainer = document.getElementById("preview-container");
-    previewContainer!.style.display = "none";
-
     setFadeType('fade-out');
-    setTimeout(() => setShowCanvas(false), 300);
+    setTimeout(() => {
+      const previewContainer = document.getElementById("preview-container");
+      previewContainer!.style.display = "none";
+      setShowCanvas(false);
+    }, 300);
   }
 
   function handleShowCanvas() {
