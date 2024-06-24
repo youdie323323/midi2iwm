@@ -60,9 +60,6 @@ export default function App() {
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
 
-    canvas.width = rWidth;
-    canvas.height = rHeight;
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     result.objects.forEach((obj: any) => {
@@ -181,7 +178,7 @@ export default function App() {
                   >
                     <i className="material-icons">arrow_back</i>
                   </button>
-                  <canvas id="preview-image" width="805" height="609"></canvas>
+                  <canvas id="preview-image" width="800" height="608"></canvas>
                 </div>
               </div>
             </div>
