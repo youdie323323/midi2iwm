@@ -8,6 +8,9 @@ declare global {
   }
 }
 
+const MAX_MAP_WIDTH = 798;
+const MAX_MAP_HEIGHT = 602;
+
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [fadeType, setFadeType] = useState<'fade-in' | 'fade-out'>('fade-in');
@@ -48,7 +51,7 @@ export default function App() {
     });
   }
 
-  function drawObjects(objects: any, rWidth: number, rHeight: number) {
+  function drawObjects(result: any, rWidth: number, rHeight: number) {
     const canvas = document.getElementById("preview-image") as HTMLCanvasElement;
     const ctx = canvas?.getContext('2d')!;
     const offscreenCanvas = document.createElement('canvas');
@@ -62,7 +65,7 @@ export default function App() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    objects.forEach((obj: any) => {
+    result.objects.forEach((obj: any) => {
       offscreenCtx.beginPath();
       offscreenCtx.arc(obj.x, obj.y, obj.scale * 10, 0, 2 * Math.PI, false);
       offscreenCtx.fillStyle = `rgb(${obj.rgb})`;
@@ -75,9 +78,29 @@ export default function App() {
     offscreenCanvas.remove();
   }
 
+  function readText(file: Blob) {
+    return new Promise((resolve) => {
+      var fr = new FileReader();
+      fr.onload = (e) => {
+        resolve(e.target?.result);
+      };
+      fr.readAsText(file);
+    });
+  };
+
+  // https://kuma-emon.com/it/pc/1228/
+  function downloadText(fName: string, text: string) {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const aTag = document.createElement('a');
+    aTag.href = URL.createObjectURL(blob);
+    aTag.target = '_blank';
+    aTag.download = fName;
+    aTag.click();
+    URL.revokeObjectURL(aTag.href);
+  };
+
   return (
     <div>
-
       <div className="container mt-4">
         <h2>
           Welcome
@@ -90,7 +113,7 @@ export default function App() {
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
           aria-describedby="file_input_help"
           accept=".map"
-          id="mapfile"
+          id="map"
           type="file" />
 
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your map file</p>
@@ -122,9 +145,22 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg,.jfif"
                   onInput={async function (e) {
+                    const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
+                    if (!txt) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      drawObjects(window.__iwm_wasm_exports.image((await imageAsBase64(file)), 798, 602, 0.6, 7), 798, 602);
+                      const result = window.__iwm_wasm_exports.image((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.6, 7, txt);
+                      if (!(typeof result === 'object' && !Array.isArray(result) && result !== null)) {
+                        globalThis.alert("Object generation failure. there are problems with your image and map.");
+                        return
+                      };
+
+                      drawObjects(result, MAX_MAP_WIDTH, MAX_MAP_HEIGHT);
+                      downloadText("download.map", result.rawXml)
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
