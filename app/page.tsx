@@ -60,6 +60,9 @@ export default function App() {
     offscreenCanvas.width = canvas.width;
     offscreenCanvas.height = canvas.height;
 
+    offscreenCtx.fillStyle = 'black';
+    offscreenCtx.fillRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     result.objects.forEach((obj: any) => {
