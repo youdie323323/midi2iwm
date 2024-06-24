@@ -8,8 +8,8 @@ declare global {
   }
 }
 
-const MAX_MAP_WIDTH = 805;
-const MAX_MAP_HEIGHT = 616;
+const MAX_MAP_WIDTH = 798;
+const MAX_MAP_HEIGHT = 609;
 
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
@@ -181,7 +181,7 @@ export default function App() {
                   >
                     <i className="material-icons">arrow_back</i>
                   </button>
-                  <canvas id="preview-image" width="798" height="602"></canvas>
+                  <canvas id="preview-image" width="805" height="609"></canvas>
                 </div>
               </div>
             </div>
