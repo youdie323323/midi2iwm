@@ -145,6 +145,11 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".png,.jpeg,.jfif"
                   onInput={async function (e) {
+                    if (!(document.getElementById('map') as HTMLInputElement).files![0]) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+                    
                     const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
                     if (!txt) {
                       globalThis.alert("Map file not specified")
