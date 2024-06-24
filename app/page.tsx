@@ -8,8 +8,8 @@ declare global {
   }
 }
 
-const MAX_MAP_WIDTH = 798;
-const MAX_MAP_HEIGHT = 602;
+const MAX_MAP_WIDTH = 805;
+const MAX_MAP_HEIGHT = 616;
 
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
@@ -149,7 +149,7 @@ export default function App() {
                       globalThis.alert("Map file not specified")
                       return;
                     }
-                    
+
                     const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
                     if (!txt) {
                       globalThis.alert("Map file not specified")
