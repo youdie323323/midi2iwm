@@ -78,24 +78,6 @@ export default function App() {
   return (
     <div>
 
-      <nav className="navbar navbar-expand-lg bg-body-tertiary">
-        <div className="container">
-          <a className="navbar-brand">
-            IWM Tools
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon" />
-          </button>
-        </div>
-      </nav>
       <div className="container mt-4">
         <h2>
           Welcome
