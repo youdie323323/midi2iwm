@@ -135,7 +135,7 @@ export default function App() {
   
       const instrument = instruments[channel];
       if (name === 'Note on' && velocity > 0) {
-        instrument.play(noteName, audioContext!.currentTime, {
+        instrument.play && instrument.play(noteName, audioContext!.currentTime, {
           gain: velocity / 127,
         });
       }
