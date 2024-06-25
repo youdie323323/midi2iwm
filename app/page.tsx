@@ -330,15 +330,16 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid,.midi"
                   onInput={async function (e) {
-                    const target = e.target as HTMLInputElement;
+                    /*const target = e.target as HTMLInputElement;
                     const file = target.files?.[0];
                     if (file) {
                       playMidi(file);
-                    }
+                    }*/
+                   window.alert("Currently not working")
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <hr className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</hr>
-                <p className="mt-1 text-sm text-red-500 dark:text-red-300">Disabled</p>
+                <p className="mt-1 text-sm text-red-500 dark:text-red-300">Currently implementing this</p>
               </div>
             </div>
           </div>
