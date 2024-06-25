@@ -361,15 +361,18 @@ export default function App() {
                       {trackConfigs.map((isEnabled, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                           Track {index + 1}
-                          <i
-                            className="material-icons text-primary-emphasis"
-                            style={{
-                              fontSize: 24,
-                              marginRight: 10,
-                              verticalAlign: "middle"
-                            }}
+                          <button
+                            className="track-config-button"
                             onClick={(event) => handleTrackConfig(index, event)}
-                          >settings</i>{" "}
+                          >
+                            <i
+                              className="material-icons text-primary-emphasis"
+                              style={{
+                                fontSize: 24,
+                                verticalAlign: "middle"
+                              }}
+                            >settings</i>{" "}
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -416,6 +419,23 @@ export default function App() {
           max-height: 90%;
           margin: auto;
           display: block;
+        }
+        .track-config-button {
+          background: none;
+          border: none;
+          padding: 5px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+        }
+        .track-config-button:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+          border-radius: 50%;
+        }
+        .track-config-button .material-icons {
+          font-size: 24px;
+          color: #007bff;
+          vertical-align: middle;
         }
       `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
