@@ -205,7 +205,7 @@ export default function App() {
                     }}
                   >light</i>{" "}
                   Image To light
-                  <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
+                  <span className="ms-auto" style={{ color: "#666" }}>Mysterious</span>
                 </h3>
                 <p className="card-text">
                 Reproduce the image using light hsl parameter
