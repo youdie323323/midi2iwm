@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
 import MIDIPlayer from 'midi-player-js';
-import Soundfont, {InstrumentName} from 'soundfont-player';
+import Soundfont, { InstrumentName } from 'soundfont-player';
 
 declare global {
   interface Window {
@@ -108,40 +108,40 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  
+
   useEffect(() => {
     const loadInstruments = async () => {
       if (!audioContext) {
         const context = new window.AudioContext();
         setAudioContext(context);
-  
+
         const instrument = await Soundfont.instrument(
           context,
           'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName
         );
-  
+
         const loadedInstruments = Array.from({ length: 16 }, () => instrument);
         setInstruments(loadedInstruments);
         console.log('All instruments loaded');
       }
     };
-  
+
     loadInstruments();
 
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any }) => {
       const { channel, velocity, name, noteName } = event;
-  
+
       if (!instruments) return;
-  
+
       const instrument = instruments[channel];
-      if (name === 'Note on' && velocity > 0) {
-        instrument.play && instrument.play(noteName, audioContext!.currentTime, {
+      if (instrument && instrument.play && name === 'Note on' && velocity > 0) {
+        instrument.play(noteName, audioContext!.currentTime, {
           gain: velocity / 127,
         });
       }
     });
   }, [audioContext, instruments, player]);
-  
+
   const playMidi = (file: File) => {
     player.stop();
 
