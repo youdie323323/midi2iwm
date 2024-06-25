@@ -134,7 +134,7 @@ export default function App() {
           Soundfont.instrument(
             context,
             // Fuck-it, lmao
-            'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_grand_piano-mp3.js' as InstrumentName,
+            'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName,
           ).then(inst => ({ [channel]: inst }))
         )
       ).then(results => results.reduce((acc, cur) => ({ ...acc, ...cur }), {}));
