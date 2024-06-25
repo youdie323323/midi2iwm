@@ -106,10 +106,9 @@ export default function App() {
 
   // MIDI players
   const player = new MIDIPlayer.Player();
+  const instruments: { [key: number]: any } = {};
   let audioContext: AudioContext;
   useEffect(() => {
-    const instruments: { [key: number]: any } = {};
-
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
       const { channel, noteNumber, velocity } = event;
 
@@ -121,15 +120,6 @@ export default function App() {
       } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
         instrument.stop(noteNumber, audioContext.currentTime);
       }
-    });
-
-    Promise.all(
-      [...Array(16).keys()].map(channel =>
-        Soundfont.instrument(audioContext, 'acoustic_grand_piano')
-          .then(inst => instruments[channel] = inst)
-      )
-    ).then(() => {
-      console.log('All instruments loaded');
     });
   }, [])
 
@@ -301,6 +291,15 @@ export default function App() {
                   accept=".mid,.midi"
                   onInput={async function (e) {
                     audioContext = new window.AudioContext()
+                    Promise.all(
+                      [...Array(16).keys()].map(channel =>
+                        Soundfont.instrument(audioContext, 'acoustic_grand_piano')
+                          .then(inst => instruments[channel] = inst)
+                      )
+                    ).then(() => {
+                      console.log('All instruments loaded');
+                    });
+
                     const target = e.target as HTMLInputElement;
                     const file = target.files?.[0];
                     if (file) {
