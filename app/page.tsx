@@ -130,9 +130,9 @@ export default function App() {
     loadInstruments();
 
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any, track?: number }) => {
-      const { channel, velocity, name, noteName, track } = event;
+      const { channel, velocity, name, noteName } = event;
 
-      if (!instruments || track === undefined || !tracks[track]) return;
+      if (!instruments) return;
 
       const instrument = instruments[channel];
       if (instrument && instrument.play && name === 'Note on' && velocity > 0) {
@@ -162,12 +162,12 @@ export default function App() {
 
   const toggleTrack = (trackIndex: number) => {
     setTracks(prevTracks => {
-      const newTracks = [...prevTracks];
+      const newTracks = prevTracks.slice(0);
       newTracks[trackIndex] = !newTracks[trackIndex];
+
       return newTracks;
     });
   };
-
 
   return (
     <div>
