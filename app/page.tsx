@@ -16,6 +16,10 @@ const SUB_MAP_HEIGHT = 609;
 const MAX_MAP_WIDTH = 800;
 const MAX_MAP_HEIGHT = 608;
 
+interface trackConfig {
+
+}
+
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
   const [fadeType, setFadeType] = useState<'fade-in' | 'fade-out'>('fade-in');
@@ -108,7 +112,7 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  let [tracksConfig, setTracksConfig] = useState<boolean[]>([]);
+  let [trackConfigs, setTrackConfigs] = useState<trackConfig[]>([]);
 
   useEffect(() => {
     const loadInstruments = async () => {
@@ -144,7 +148,7 @@ export default function App() {
 
     player.on('fileLoaded', () => {
       const trackCount = player.tracks?.length;
-      setTracksConfig(Array(trackCount).fill(true));
+      setTrackConfigs(Array(trackCount).fill(true));
     });
   }, [audioContext, instruments, player]);
 
@@ -160,11 +164,19 @@ export default function App() {
     reader.readAsArrayBuffer(file);
   };
 
-  const toggleTrack = (trackIndex: number) => {
-    let newTracks = tracksConfig.slice(0);
+  const toggleTrackConfig = (trackIndex: number, _new: trackConfig) => {
+    let newTracks = trackConfigs.slice(0);
     newTracks[trackIndex] = !newTracks[trackIndex];
-    setTracksConfig(newTracks);
+    setTrackConfigs(newTracks);
   };
+
+  const getCurrentTrackConfig = (trackIndex: number) => {
+    return trackConfigs[trackIndex]
+  };
+
+  const handleTrackConfig = (trackIndex: number, event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+  }
 
   return (
     <div>
@@ -345,7 +357,7 @@ export default function App() {
                   <div className="mt-4">
                     <h4 className="card-title">Track config</h4>
                     <ul className="list-group border border-secondary">
-                      {tracksConfig.map((isEnabled, index) => (
+                      {trackConfigs.map((isEnabled, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                           Track {index + 1}
                           <i
@@ -355,7 +367,7 @@ export default function App() {
                               marginRight: 10,
                               verticalAlign: "middle"
                             }}
-                            onClick={() => toggleTrack(index)}
+                            onClick={(event) => handleTrackConfig(index, event)}
                           >settings</i>{" "}
                         </li>
                       ))}
