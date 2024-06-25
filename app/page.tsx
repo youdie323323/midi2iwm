@@ -106,15 +106,41 @@ export default function App() {
 
   // MIDI players
   const [player] = useState(new MIDIPlayer.Player());
-  const [instruments, setInstruments] = useState<{ [key: number]: any }>({});
+  const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  
+  useEffect(() => {
+    const loadInstruments = async () => {
+      if (!audioContext) {
+        const context = new window.AudioContext();
+        setAudioContext(context);
+  
+        const instrument = await Soundfont.instrument(
+          context,
+          'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName
+        );
+  
+        const loadedInstruments = Array.from({ length: 16 }, () => instrument);
+        setInstruments(loadedInstruments);
+        console.log('All instruments loaded');
+      }
+    };
+  
+    loadInstruments();
+  
+    return () => {
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, [audioContext]);
   
   useEffect(() => {
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any }) => {
       const { channel, velocity, name, noteName } = event;
-
-      if (!instruments[channel]) return;
-
+  
+      if (!instruments) return;
+  
       const instrument = instruments[channel];
       if (name === 'Note on' && velocity > 0) {
         instrument.play(noteName, audioContext!.currentTime, {
@@ -124,25 +150,7 @@ export default function App() {
     });
   }, [player, instruments, audioContext]);
 
-  const playMidi = async (file: File) => {
-    if (!audioContext) {
-      const context = new window.AudioContext();
-      setAudioContext(context);
-
-      const loadedInstruments = await Promise.all(
-        [...Array(16).keys()].map(channel =>
-          Soundfont.instrument(
-            context,
-            // Fuck-it, lmao
-            'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName,
-          ).then(inst => ({ [channel]: inst }))
-        )
-      ).then(results => results.reduce((acc, cur) => ({ ...acc, ...cur }), {}));
-
-      setInstruments(loadedInstruments);
-      console.log('All instruments loaded');
-    }
-
+  const playMidi = (file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
