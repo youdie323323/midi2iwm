@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
 import MIDIPlayer from 'midi-player-js';
-import Soundfont from 'soundfont-player';
+import Soundfont, {InstrumentName} from 'soundfont-player';
 
 declare global {
   interface Window {
@@ -108,31 +108,34 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<{ [key: number]: any }>({});
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-
+  
   useEffect(() => {
-    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
-      const { channel, noteNumber, velocity } = event;
+    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any }) => {
+      const { channel, velocity, name, noteName } = event;
 
       if (!instruments[channel]) return;
 
       const instrument = instruments[channel];
-      if (event.name === 'Note on' && velocity > 0) {
-        instrument.play(noteNumber, audioContext!.currentTime, { gain: velocity / 127 });
-      } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
-        instrument.stop(noteNumber, audioContext!.currentTime);
+      if (name === 'Note on' && velocity > 0) {
+        instrument.play(noteName, audioContext!.currentTime, {
+          gain: velocity / 127,
+        });
       }
     });
   }, [player, instruments, audioContext]);
 
-  const loadMidiFile = async (file: File) => {
+  const playMidi = async (file: File) => {
     if (!audioContext) {
       const context = new window.AudioContext();
       setAudioContext(context);
 
       const loadedInstruments = await Promise.all(
         [...Array(16).keys()].map(channel =>
-          Soundfont.instrument(context, 'acoustic_grand_piano')
-            .then(inst => ({ [channel]: inst }))
+          Soundfont.instrument(
+            context,
+            // Fuck-it, lmao
+            'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/acoustic_guitar_nylon-mp3.js' as InstrumentName,
+          ).then(inst => ({ [channel]: inst }))
         )
       ).then(results => results.reduce((acc, cur) => ({ ...acc, ...cur }), {}));
 
@@ -320,7 +323,7 @@ export default function App() {
                     const target = e.target as HTMLInputElement;
                     const file = target.files?.[0];
                     if (file) {
-                      loadMidiFile(file);
+                      playMidi(file);
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
