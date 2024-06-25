@@ -344,18 +344,20 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</p>
-                <div className="mt-4">
-                  <h4 className="card-title">Track config</h4>
-                  <ul className="list-group border border-secondary">
-                    {tracks.map((isEnabled, index) => (
-                      <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                        Track {index + 1}
-                        <button className={`btn btn-${isEnabled ? 'success' : 'danger'}`} onClick={() => toggleTrack(index)}>
-                          {isEnabled ? 'On' : 'Off'}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="mt-4 border border-secondary rounded p-3 bg-light">
+                  <div className="mt-4">
+                    <h4 className="card-title">Track config</h4>
+                    <ul className="list-group border border-secondary">
+                      {tracks.map((isEnabled, index) => (
+                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                          Track {index + 1}
+                          <button className={`btn btn-${isEnabled ? 'success' : 'danger'}`} onClick={() => toggleTrack(index)}>
+                            {isEnabled ? 'On' : 'Off'}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
