@@ -16,9 +16,7 @@ const SUB_MAP_HEIGHT = 609;
 const MAX_MAP_WIDTH = 800;
 const MAX_MAP_HEIGHT = 608;
 
-interface trackConfig {
-
-}
+interface trackConfig {}
 
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
@@ -163,16 +161,6 @@ export default function App() {
       }
     };
     reader.readAsArrayBuffer(file);
-  };
-
-  const handleTrackConfig = (trackIndex: number, event: { preventDefault: () => void; }) => {
-    setCurrentTrackIndex(trackIndex);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setCurrentTrackIndex(null);
   };
 
   return (
@@ -349,47 +337,13 @@ export default function App() {
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</p>
-                <div className="mt-4 border border-secondary rounded p-3 bg-light">
-                  <div className="mt-4">
-                    <h4 className="card-title">Track config</h4>
-                    <ul className="list-group border border-secondary">
-                      {trackConfigs.map((isEnabled, index) => (
-                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                          Track {index + 1}
-                          <button
-                            className="track-config-button"
-                            onClick={(event) => handleTrackConfig(index, event)}
-                          >
-                            <i
-                              className="material-icons text-primary-emphasis"
-                              style={{
-                                fontSize: 24,
-                                verticalAlign: "middle"
-                              }}
-                            >settings</i>{" "}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                <hr className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</hr>
+                <p className="mt-1 text-sm text-red-500 dark:text-red-300">Disabled</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <button className="close-button" onClick={closeModal}>
-              &times;
-            </button>
-            <h2>Track Config for Track {currentTrackIndex! + 1}</h2>
-            <p>Configuration options will be here.</p>
-          </div>
-        </div>
-      )}
       <style jsx>{`
         .fullscreen-canvas-container {
           position: fixed;
@@ -426,53 +380,6 @@ export default function App() {
           max-height: 90%;
           margin: auto;
           display: block;
-        }
-        .track-config-button {
-          background: none;
-          border: none;
-          padding: 5px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-        }
-        .track-config-button:hover {
-          background-color: rgba(0, 0, 0, 0.1);
-          border-radius: 50%;
-        }
-        .track-config-button .material-icons {
-          font-size: 24px;
-          color: #007bff;
-          vertical-align: middle;
-        }
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-        .modal {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          position: relative;
-          width: 80%;
-          max-width: 500px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .close-button {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: none;
-          border: none;
-          font-size: 24px;
-          cursor: pointer;
         }
       `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
