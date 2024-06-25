@@ -108,7 +108,7 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  let [tracks, setTracks] = useState<boolean[]>([]);
+  let [tracksConfig, setTracksConfig] = useState<boolean[]>([]);
 
   useEffect(() => {
     const loadInstruments = async () => {
@@ -144,7 +144,7 @@ export default function App() {
 
     player.on('fileLoaded', () => {
       const trackCount = player.tracks?.length;
-      setTracks(Array(trackCount).fill(true));
+      setTracksConfig(Array(trackCount).fill(true));
     });
   }, [audioContext, instruments, player]);
 
@@ -161,9 +161,9 @@ export default function App() {
   };
 
   const toggleTrack = (trackIndex: number) => {
-    let newTracks = tracks.slice(0);
+    let newTracks = tracksConfig.slice(0);
     newTracks[trackIndex] = !newTracks[trackIndex];
-    setTracks(newTracks);
+    setTracksConfig(newTracks);
   };
 
   return (
@@ -345,7 +345,7 @@ export default function App() {
                   <div className="mt-4">
                     <h4 className="card-title">Track config</h4>
                     <ul className="list-group border border-secondary">
-                      {tracks.map((isEnabled, index) => (
+                      {tracksConfig.map((isEnabled, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                           Track {index + 1}
                           <i
