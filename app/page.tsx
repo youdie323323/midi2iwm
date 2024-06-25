@@ -146,7 +146,7 @@ export default function App() {
       const trackCount = player.tracks?.length;
       tracks = Array(trackCount).fill(true);
     });
-  }, [audioContext, instruments, player]);
+  }, [audioContext, instruments, player, tracks]);
 
   const playMidi = (file: File) => {
     player.stop();
