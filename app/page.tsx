@@ -108,20 +108,18 @@ export default function App() {
   const player = new MIDIPlayer.Player();
   const instruments: { [key: number]: any } = {};
   let audioContext: AudioContext;
-  useEffect(() => {
-    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
-      const { channel, noteNumber, velocity } = event;
+  player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
+    const { channel, noteNumber, velocity } = event;
 
-      if (!instruments[channel]) return;
+    if (!instruments[channel]) return;
 
-      const instrument = instruments[channel];
-      if (event.name === 'Note on' && velocity > 0) {
-        instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
-      } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
-        instrument.stop(noteNumber, audioContext.currentTime);
-      }
-    });
-  }, [])
+    const instrument = instruments[channel];
+    if (event.name === 'Note on' && velocity > 0) {
+      instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
+    } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
+      instrument.stop(noteNumber, audioContext.currentTime);
+    }
+  });
 
   return (
     <div>
@@ -290,7 +288,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid,.midi"
                   onInput={async function (e) {
-                    audioContext = new window.AudioContext()
+                    audioContext = new window.AudioContext();
                     Promise.all(
                       [...Array(16).keys()].map(channel =>
                         Soundfont.instrument(audioContext, 'acoustic_grand_piano')
@@ -306,6 +304,7 @@ export default function App() {
                       const reader = new FileReader();
                       reader.onload = (e) => {
                         player.loadArrayBuffer(e.target?.result as ArrayBuffer);
+                        player.play();
                       };
                       reader.readAsArrayBuffer(file);
                     }
