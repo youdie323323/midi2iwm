@@ -32,7 +32,6 @@ export default function App() {
     }
   }, [showCanvas]);
 
-
   function handleCloseCanvas() {
     setFadeType('fade-out');
     setTimeout(() => {
@@ -112,7 +111,9 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  let [trackConfigs, setTrackConfigs] = useState<trackConfig[]>([]);
+  const [trackConfigs, setTrackConfigs] = useState<trackConfig[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const loadInstruments = async () => {
@@ -176,7 +177,13 @@ export default function App() {
 
   const handleTrackConfig = (trackIndex: number, event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    console.log("aa")
+    setCurrentTrackIndex(trackIndex);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentTrackIndex(null);
   };
 
   return (
@@ -383,6 +390,18 @@ export default function App() {
           </div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <button className="close-button" onClick={closeModal}>
+              &times;
+            </button>
+            <h2>Track Config for Track {currentTrackIndex! + 1}</h2>
+            {/* Add your track configuration form or controls here */}
+            <p>Configuration options will be here.</p>
+          </div>
+        </div>
+      )}
       <style jsx>{`
         .fullscreen-canvas-container {
           position: fixed;
@@ -436,6 +455,36 @@ export default function App() {
           font-size: 24px;
           color: #007bff;
           vertical-align: middle;
+        }
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+        .modal {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          position: relative;
+          width: 80%;
+          max-width: 500px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .close-button {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
         }
       `}</style>
       <Script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js' />
