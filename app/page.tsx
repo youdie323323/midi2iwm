@@ -140,12 +140,6 @@ export default function App() {
         });
       }
     });
-  
-    return () => {
-      if (audioContext) {
-        audioContext.close();
-      }
-    };
   }, [audioContext, instruments, player]);
   
   const playMidi = (file: File) => {
