@@ -129,8 +129,8 @@ export default function App() {
 
     loadInstruments();
 
-    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any, track?: number }) => {
-      const { channel, velocity, name, noteName } = event;
+    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any }) => {
+      const { channel, velocity, name, noteName, } = event;
 
       if (!instruments) return;
 
@@ -162,8 +162,9 @@ export default function App() {
 
   const toggleTrack = (trackIndex: number) => {
     setTracks(prevTracks => {
-      prevTracks[trackIndex] = !prevTracks[trackIndex];
-      return prevTracks;
+      const newTracks = [...prevTracks];
+      newTracks[trackIndex] = !newTracks[trackIndex];
+      return newTracks;
     });
   };
 
