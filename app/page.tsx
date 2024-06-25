@@ -134,11 +134,11 @@ export default function App() {
                       verticalAlign: "middle"
                     }}
                   >image</i>{" "}
-                  Image To IWM
+                  Image To Bullet
                   <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
                 </h3>
                 <p className="card-text">
-                  Convert image to IWM using bullet
+                  Convert image to bullet image
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -183,6 +183,60 @@ export default function App() {
                   </button>
                   <canvas id="preview-image" width="800" height="608"></canvas>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="card widget">
+              <div className="card-body">
+                <h3
+                  className="card-title"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <i
+                    className="material-icons text-primary-emphasis"
+                    style={{
+                      fontSize: 24,
+                      marginRight: 10,
+                      verticalAlign: "middle"
+                    }}
+                  >light</i>{" "}
+                  Image To light
+                  <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
+                </h3>
+                <p className="card-text">
+                  Convert image to light image
+                </p>
+                <input
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
+                  aria-describedby="file_input_help"
+                  accept=".png,.jpeg,.jfif"
+                  onInput={async function (e) {
+                    if (!(document.getElementById('map') as HTMLInputElement).files![0]) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+
+                    const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
+                    if (!txt) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+
+                    const file = (e.target as HTMLInputElement).files![0];
+                    if (file) {
+                      const result = window.__iwm_wasm_exports.light((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.6, 7, txt);
+                      if (!(typeof result === 'object' && !Array.isArray(result) && result !== null)) {
+                        globalThis.alert("Object generation failure. there are problems with your image and map.");
+                        return
+                      };
+
+                      drawObjects(result, MAX_MAP_WIDTH, MAX_MAP_HEIGHT);
+                      downloadText("download.map", result.rawXml)
+                    }
+                  } as React.ChangeEventHandler<HTMLInputElement>}
+                  type="file" />
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p>
               </div>
             </div>
           </div>
