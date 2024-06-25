@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
-import MIDIPlayer from 'midi-player-js';
+import MIDIPlayer, { Track } from 'midi-player-js';
 import Soundfont, { InstrumentName } from 'soundfont-player';
 
 declare global {
@@ -104,68 +104,70 @@ export default function App() {
     URL.revokeObjectURL(aTag.href);
   };
 
-   // MIDI players
-   const [player] = useState(new MIDIPlayer.Player());
-   const [instruments, setInstruments] = useState<any>(null);
-   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-   const [tracks, setTracks] = useState<boolean[]>([]);
- 
-   useEffect(() => {
-     const loadInstruments = async () => {
-       if (!audioContext) {
-         const context = new window.AudioContext();
-         setAudioContext(context);
- 
-         const instrument = await Soundfont.instrument(
-           context,
-           'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName
-         );
- 
-         const loadedInstruments = Array.from({ length: 16 }, () => instrument);
-         setInstruments(loadedInstruments);
-         console.log('All instruments loaded');
-       }
-     };
- 
-     loadInstruments();
- 
-     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any, track?: number }) => {
-       const { channel, velocity, name, noteName, track } = event;
- 
-       if (!instruments || track === undefined || !tracks[track]) return;
- 
-       const instrument = instruments[channel];
-       if (instrument && instrument.play && name === 'Note on' && velocity > 0) {
-         instrument.play(noteName, audioContext!.currentTime, {
-           gain: velocity / 127,
-         });
-       }
-     });
-   }, [audioContext, instruments, player, tracks]);
- 
-   const playMidi = (file: File) => {
-     player.stop();
- 
-     const reader = new FileReader();
-     reader.onload = (e) => {
-       if (e.target?.result) {
-         player.loadArrayBuffer(e.target.result as ArrayBuffer);
-         const trackCount = player.tracks?.length;
-         setTracks(Array(trackCount).fill(true));
-         player.play();
-       }
-     };
-     reader.readAsArrayBuffer(file);
-   };
- 
-   const toggleTrack = (trackIndex: number) => {
-     setTracks(prevTracks => {
-       const newTracks = [...prevTracks];
-       newTracks[trackIndex] = !newTracks[trackIndex];
-       return newTracks;
-     });
-   };
- 
+  // MIDI players
+  const [player] = useState(new MIDIPlayer.Player());
+  const [instruments, setInstruments] = useState<any>(null);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [tracks, setTracks] = useState<boolean[]>([]);
+
+  useEffect(() => {
+    const loadInstruments = async () => {
+      if (!audioContext) {
+        const context = new window.AudioContext();
+        setAudioContext(context);
+
+        const instrument = await Soundfont.instrument(
+          context,
+          'https://raw.githubusercontent.com/gleitz/midi-js-soundfonts/gh-pages/MusyngKite/electric_grand_piano-mp3.js' as InstrumentName
+        );
+
+        const loadedInstruments = Array.from({ length: 16 }, () => instrument);
+        setInstruments(loadedInstruments);
+        console.log('All instruments loaded');
+      }
+    };
+
+    loadInstruments();
+
+    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any, track?: number }) => {
+      const { channel, velocity, name, noteName, track } = event;
+
+      if (!instruments || track === undefined || !tracks[track]) return;
+
+      const instrument = instruments[channel];
+      if (instrument && instrument.play && name === 'Note on' && velocity > 0) {
+        instrument.play(noteName, audioContext!.currentTime, {
+          gain: velocity / 127,
+        });
+      }
+    });
+
+    player.on('fileLoaded', () => {
+      const trackCount = player.tracks?.length;
+      setTracks(Array(trackCount).fill(true));
+    });
+  }, [audioContext, instruments, player, tracks]);
+
+  const playMidi = (file: File) => {
+    player.stop();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        player.loadArrayBuffer(e.target.result as ArrayBuffer);
+        player.play();
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const toggleTrack = (trackIndex: number) => {
+    setTracks(prevTracks => {
+      const newTracks = [...prevTracks];
+      newTracks[trackIndex] = !newTracks[trackIndex];
+      return newTracks;
+    });
+  };
+
 
   return (
     <div>
@@ -342,22 +344,18 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</p>
-                <div className="col-md-6">
-                  <div className="card widget">
-                    <div className="card-body">
-                      <h3 className="card-title">Track List</h3>
-                      <ul className="list-group">
-                        {tracks.map((isEnabled, index) => (
-                          <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                            Track {index + 1}
-                            <button className={`btn btn-${isEnabled ? 'success' : 'danger'}`} onClick={() => toggleTrack(index)}>
-                              {isEnabled ? 'On' : 'Off'}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                <div className="mt-4">
+                  <h3 className="card-title">Track List</h3>
+                  <ul className="list-group">
+                    {tracks.map((isEnabled, index) => (
+                      <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                        Track {index + 1}
+                        <button className={`btn btn-${isEnabled ? 'success' : 'danger'}`} onClick={() => toggleTrack(index)}>
+                          {isEnabled ? 'On' : 'Off'}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
