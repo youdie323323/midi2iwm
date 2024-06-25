@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
 import MIDIPlayer from 'midi-player-js';
-import Soundfont, { InstrumentName, Player } from 'soundfont-player';
+import Soundfont from 'soundfont-player';
 
 declare global {
   interface Window {
@@ -106,30 +106,32 @@ export default function App() {
 
   // MIDI players
   const player = new MIDIPlayer.Player();
-  const audioContext = new window.AudioContext();
-  const instruments: { [key: number]: any } = {};
+  useEffect(() => {
+    const audioContext = new window.AudioContext();
+    const instruments: { [key: number]: any } = {};
 
-  player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
-    const { channel, noteNumber, velocity } = event;
+    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
+      const { channel, noteNumber, velocity } = event;
 
-    if (!instruments[channel]) return;
+      if (!instruments[channel]) return;
 
-    const instrument = instruments[channel];
-    if (event.name === 'Note on' && velocity > 0) {
-      instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
-    } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
-      instrument.stop(noteNumber, audioContext.currentTime);
-    }
-  });
+      const instrument = instruments[channel];
+      if (event.name === 'Note on' && velocity > 0) {
+        instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
+      } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
+        instrument.stop(noteNumber, audioContext.currentTime);
+      }
+    });
 
-  Promise.all(
-    [...Array(16).keys()].map(channel =>
-      Soundfont.instrument(audioContext, 'acoustic_grand_piano')
-        .then(inst => instruments[channel] = inst)
-    )
-  ).then(() => {
-    console.log('All instruments loaded');
-  });
+    Promise.all(
+      [...Array(16).keys()].map(channel =>
+        Soundfont.instrument(audioContext, 'acoustic_grand_piano')
+          .then(inst => instruments[channel] = inst)
+      )
+    ).then(() => {
+      console.log('All instruments loaded');
+    });
+  }, [])
 
   return (
     <div>
@@ -298,20 +300,16 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid,.midi"
                   onInput={async function (e) {
-                    if (!(document.getElementById('map') as HTMLInputElement).files![0]) {
-                      globalThis.alert("Map file not specified")
-                      return;
-                    }
-
-                    const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
-                    if (!txt) {
-                      globalThis.alert("Map file not specified")
-                      return;
-                    }
-
-                    const file = (e.target as HTMLInputElement).files![0];
+                    const target = e.target as HTMLInputElement;
+                    const file = target.files?.[0];
                     if (file) {
-                      const result = window.__iwm_wasm_exports.light((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.2, 8, txt);
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        player.loadArrayBuffer(e.target?.result as ArrayBuffer);
+                        const playButton = document.getElementById('play-button') as HTMLButtonElement;
+                        playButton.disabled = false;
+                      };
+                      reader.readAsArrayBuffer(file);
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
