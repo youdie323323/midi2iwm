@@ -176,7 +176,8 @@ export default function App() {
 
   const handleTrackConfig = (trackIndex: number, event: { preventDefault: () => void; }) => {
     event.preventDefault();
-  }
+    console.log("aa")
+  };
 
   return (
     <div>
