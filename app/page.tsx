@@ -348,9 +348,15 @@ export default function App() {
                       {tracks.map((isEnabled, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                           Track {index + 1}
-                          <button className={`btn btn-${isEnabled ? 'success' : 'danger'}`} onClick={() => toggleTrack(index)}>
-                            {isEnabled ? 'On' : 'Off'}
-                          </button>
+                          <i
+                            className="material-icons text-primary-emphasis"
+                            style={{
+                              fontSize: 24,
+                              marginRight: 10,
+                              verticalAlign: "middle"
+                            }}
+                            onClick={() => toggleTrack(index)}
+                          >settings</i>{" "}
                         </li>
                       ))}
                     </ul>
