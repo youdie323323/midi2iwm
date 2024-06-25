@@ -335,10 +335,9 @@ export default function App() {
                     if (file) {
                       playMidi(file);
                     }*/
-                   window.alert("Currently not working")
+                   window.alert("Currently not working, sorry")
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
-                <hr className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</hr>
                 <p className="mt-1 text-sm text-red-500 dark:text-red-300">Currently implementing this</p>
               </div>
             </div>
