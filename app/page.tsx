@@ -105,21 +105,50 @@ export default function App() {
   };
 
   // MIDI players
-  const player = new MIDIPlayer.Player();
-  const instruments: { [key: number]: any } = {};
-  let audioContext: AudioContext;
-  player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
-    const { channel, noteNumber, velocity } = event;
+  const [player] = useState(new MIDIPlayer.Player());
+  const [instruments, setInstruments] = useState<{ [key: number]: any }>({});
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
-    if (!instruments[channel]) return;
+  useEffect(() => {
+    player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
+      const { channel, noteNumber, velocity } = event;
 
-    const instrument = instruments[channel];
-    if (event.name === 'Note on' && velocity > 0) {
-      instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
-    } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
-      instrument.stop(noteNumber, audioContext.currentTime);
+      if (!instruments[channel]) return;
+
+      const instrument = instruments[channel];
+      if (event.name === 'Note on' && velocity > 0) {
+        instrument.play(noteNumber, audioContext!.currentTime, { gain: velocity / 127 });
+      } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
+        instrument.stop(noteNumber, audioContext!.currentTime);
+      }
+    });
+  }, [player, instruments, audioContext]);
+
+  const loadMidiFile = async (file: File) => {
+    if (!audioContext) {
+      const context = new window.AudioContext();
+      setAudioContext(context);
+
+      const loadedInstruments = await Promise.all(
+        [...Array(16).keys()].map(channel =>
+          Soundfont.instrument(context, 'acoustic_grand_piano')
+            .then(inst => ({ [channel]: inst }))
+        )
+      ).then(results => results.reduce((acc, cur) => ({ ...acc, ...cur }), {}));
+
+      setInstruments(loadedInstruments);
+      console.log('All instruments loaded');
     }
-  });
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        player.loadArrayBuffer(e.target.result as ArrayBuffer);
+        player.play();  // Start playing the MIDI file after loading
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   return (
     <div>
@@ -288,25 +317,10 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid,.midi"
                   onInput={async function (e) {
-                    audioContext = new window.AudioContext();
-                    Promise.all(
-                      [...Array(16).keys()].map(channel =>
-                        Soundfont.instrument(audioContext, 'acoustic_grand_piano')
-                          .then(inst => instruments[channel] = inst)
-                      )
-                    ).then(() => {
-                      console.log('All instruments loaded');
-                    });
-
                     const target = e.target as HTMLInputElement;
                     const file = target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (e) => {
-                        player.loadArrayBuffer(e.target?.result as ArrayBuffer);
-                        player.play();
-                      };
-                      reader.readAsArrayBuffer(file);
+                      loadMidiFile(file);
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
