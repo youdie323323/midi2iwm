@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Script from 'next/script'
+import MIDIPlayer from 'midi-player-js';
+import Soundfont, { InstrumentName, Player } from 'soundfont-player';
 
 declare global {
   interface Window {
@@ -102,6 +104,33 @@ export default function App() {
     URL.revokeObjectURL(aTag.href);
   };
 
+  // MIDI players
+  const player = new MIDIPlayer.Player();
+  const audioContext = new window.AudioContext();
+  const instruments: { [key: number]: any } = {};
+
+  player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
+    const { channel, noteNumber, velocity } = event;
+
+    if (!instruments[channel]) return;
+
+    const instrument = instruments[channel];
+    if (event.name === 'Note on' && velocity > 0) {
+      instrument.play(noteNumber, audioContext.currentTime, { gain: velocity / 127 });
+    } else if (event.name === 'Note off' || (event.name === 'Note on' && velocity === 0)) {
+      instrument.stop(noteNumber, audioContext.currentTime);
+    }
+  });
+
+  Promise.all(
+    [...Array(16).keys()].map(channel =>
+      Soundfont.instrument(audioContext, 'acoustic_grand_piano')
+        .then(inst => instruments[channel] = inst)
+    )
+  ).then(() => {
+    console.log('All instruments loaded');
+  });
+
   return (
     <div>
       <div className="container mt-4">
@@ -141,7 +170,7 @@ export default function App() {
                   <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
                 </h3>
                 <p className="card-text">
-                Reproduce the image using bullets blend color
+                  Reproduce the image using bullets blend color
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -208,7 +237,7 @@ export default function App() {
                   <span className="ms-auto" style={{ color: "#666" }}>Mysterious</span>
                 </h3>
                 <p className="card-text">
-                Reproduce the image using light hsl parameter
+                  Reproduce the image using light hsl parameter
                 </p>
                 <input
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
@@ -239,6 +268,54 @@ export default function App() {
                   } as React.ChangeEventHandler<HTMLInputElement>}
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your image. png,jpeg,jfif allowed</p>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="card widget">
+              <div className="card-body">
+                <h3
+                  className="card-title"
+                  style={{ display: "flex", alignItems: "center" }}
+                >
+                  <i
+                    className="material-icons text-primary-emphasis"
+                    style={{
+                      fontSize: 24,
+                      marginRight: 10,
+                      verticalAlign: "middle"
+                    }}
+                  >music_note</i>{" "}
+                  Midi to IWM
+                  <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
+                </h3>
+                <p className="card-text">
+                  Convert midi to IWM<br></br>
+                  Has a velocity system
+                </p>
+                <input
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-100 dark:border-gray-200 dark:placeholder-gray-400"
+                  aria-describedby="file_input_help"
+                  accept=".mid,.midi"
+                  onInput={async function (e) {
+                    if (!(document.getElementById('map') as HTMLInputElement).files![0]) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+
+                    const txt = (await readText((document.getElementById('map') as HTMLInputElement).files![0])) as string | undefined | null;
+                    if (!txt) {
+                      globalThis.alert("Map file not specified")
+                      return;
+                    }
+
+                    const file = (e.target as HTMLInputElement).files![0];
+                    if (file) {
+                      const result = window.__iwm_wasm_exports.light((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.2, 8, txt);
+                    }
+                  } as React.ChangeEventHandler<HTMLInputElement>}
+                  type="file" />
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</p>
               </div>
             </div>
           </div>
