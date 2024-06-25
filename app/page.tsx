@@ -306,8 +306,6 @@ export default function App() {
                       const reader = new FileReader();
                       reader.onload = (e) => {
                         player.loadArrayBuffer(e.target?.result as ArrayBuffer);
-                        const playButton = document.getElementById('play-button') as HTMLButtonElement;
-                        playButton.disabled = false;
                       };
                       reader.readAsArrayBuffer(file);
                     }
