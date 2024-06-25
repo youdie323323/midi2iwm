@@ -108,7 +108,7 @@ export default function App() {
   const [player] = useState(new MIDIPlayer.Player());
   const [instruments, setInstruments] = useState<any>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [tracks, setTracks] = useState<boolean[]>([]);
+  let [tracks, setTracks] = useState<boolean[]>([]);
 
   useEffect(() => {
     const loadInstruments = async () => {
@@ -144,9 +144,9 @@ export default function App() {
 
     player.on('fileLoaded', () => {
       const trackCount = player.tracks?.length;
-      setTracks(Array(trackCount).fill(true));
+      tracks = Array(trackCount).fill(true);
     });
-  }, [audioContext, instruments, player, tracks]);
+  }, [audioContext, instruments, player]);
 
   const playMidi = (file: File) => {
     player.stop();
