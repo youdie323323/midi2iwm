@@ -8,8 +8,11 @@ declare global {
   }
 }
 
-const MAX_MAP_WIDTH = 798;
-const MAX_MAP_HEIGHT = 609;
+const SUB_MAP_WIDTH = 798;
+const SUB_MAP_HEIGHT = 609;
+
+const MAX_MAP_WIDTH = 800;
+const MAX_MAP_HEIGHT = 608;
 
 export default function App() {
   const [showCanvas, setShowCanvas] = useState(false);
@@ -158,13 +161,13 @@ export default function App() {
 
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      const result = window.__iwm_wasm_exports.image((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.6, 7, txt);
+                      const result = window.__iwm_wasm_exports.image((await imageAsBase64(file)), SUB_MAP_WIDTH, SUB_MAP_HEIGHT, 0.6, 7, txt);
                       if (!(typeof result === 'object' && !Array.isArray(result) && result !== null)) {
                         globalThis.alert("Object generation failure. there are problems with your image and map.");
                         return
                       };
 
-                      drawObjects(result, MAX_MAP_WIDTH, MAX_MAP_HEIGHT);
+                      drawObjects(result, SUB_MAP_WIDTH, SUB_MAP_HEIGHT);
                       downloadText("download.map", result.rawXml)
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
