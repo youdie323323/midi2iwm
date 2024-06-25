@@ -161,11 +161,7 @@ export default function App() {
   };
 
   const toggleTrack = (trackIndex: number) => {
-    setTracks(prevTracks => {
-      const newTracks = [...prevTracks];
-      newTracks[trackIndex] = !newTracks[trackIndex];
-      return newTracks;
-    });
+    tracks[trackIndex] = !tracks[trackIndex];
   };
 
   return (
