@@ -231,7 +231,6 @@ export default function App() {
                         return
                       };
 
-                      drawObjects(result, MAX_MAP_WIDTH, MAX_MAP_HEIGHT);
                       downloadText("download.map", result.rawXml)
                     }
                   } as React.ChangeEventHandler<HTMLInputElement>}
