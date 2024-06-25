@@ -106,8 +106,8 @@ export default function App() {
 
   // MIDI players
   const player = new MIDIPlayer.Player();
+  let audioContext: AudioContext;
   useEffect(() => {
-    const audioContext = new window.AudioContext();
     const instruments: { [key: number]: any } = {};
 
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; }) => {
@@ -300,6 +300,7 @@ export default function App() {
                   aria-describedby="file_input_help"
                   accept=".mid,.midi"
                   onInput={async function (e) {
+                    audioContext = new window.AudioContext()
                     const target = e.target as HTMLInputElement;
                     const file = target.files?.[0];
                     if (file) {
