@@ -165,18 +165,7 @@ export default function App() {
     reader.readAsArrayBuffer(file);
   };
 
-  const toggleTrackConfig = (trackIndex: number, _new: trackConfig) => {
-    let newTracks = trackConfigs.slice(0);
-    newTracks[trackIndex] = !newTracks[trackIndex];
-    setTrackConfigs(newTracks);
-  };
-
-  const getCurrentTrackConfig = (trackIndex: number) => {
-    return trackConfigs[trackIndex]
-  };
-
   const handleTrackConfig = (trackIndex: number, event: { preventDefault: () => void; }) => {
-    event.preventDefault();
     setCurrentTrackIndex(trackIndex);
     setIsModalOpen(true);
   };
@@ -397,7 +386,6 @@ export default function App() {
               &times;
             </button>
             <h2>Track Config for Track {currentTrackIndex! + 1}</h2>
-            {/* Add your track configuration form or controls here */}
             <p>Configuration options will be here.</p>
           </div>
         </div>
