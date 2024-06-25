@@ -127,15 +127,7 @@ export default function App() {
     };
   
     loadInstruments();
-  
-    return () => {
-      if (audioContext) {
-        audioContext.close();
-      }
-    };
-  }, [audioContext]);
-  
-  useEffect(() => {
+
     player.on('midiEvent', (event: { name?: any; channel?: any; noteNumber?: any; velocity?: any; noteName?: any }) => {
       const { channel, velocity, name, noteName } = event;
   
@@ -148,14 +140,22 @@ export default function App() {
         });
       }
     });
-  }, [player, instruments, audioContext]);
-
+  
+    return () => {
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, [audioContext, instruments, player]);
+  
   const playMidi = (file: File) => {
+    player.stop();
+
     const reader = new FileReader();
     reader.onload = (e) => {
       if (e.target?.result) {
         player.loadArrayBuffer(e.target.result as ArrayBuffer);
-        player.play();  // Start playing the MIDI file after loading
+        player.play();
       }
     };
     reader.readAsArrayBuffer(file);
@@ -196,7 +196,7 @@ export default function App() {
                       verticalAlign: "middle"
                     }}
                   >image</i>{" "}
-                  Image To Bullet
+                  Image to bullet
                   <span className="ms-auto" style={{ color: "#666" }}>Stable</span>
                 </h3>
                 <p className="card-text">
@@ -263,7 +263,7 @@ export default function App() {
                       verticalAlign: "middle"
                     }}
                   >light</i>{" "}
-                  Image To light
+                  Image to light
                   <span className="ms-auto" style={{ color: "#666" }}>Mysterious</span>
                 </h3>
                 <p className="card-text">
