@@ -144,9 +144,9 @@ export default function App() {
 
     player.on('fileLoaded', () => {
       const trackCount = player.tracks?.length;
-      tracks = Array(trackCount).fill(true);
+      setTracks(Array(trackCount).fill(true));
     });
-  }, [audioContext, instruments, player, tracks]);
+  }, [audioContext, instruments, player]);
 
   const playMidi = (file: File) => {
     player.stop();
@@ -161,7 +161,9 @@ export default function App() {
   };
 
   const toggleTrack = (trackIndex: number) => {
-    tracks[trackIndex] = !tracks[trackIndex];
+    let newTracks = tracks.slice(0);
+    newTracks[trackIndex] = !newTracks[trackIndex];
+    setTracks(newTracks);
   };
 
   return (
