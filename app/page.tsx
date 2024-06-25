@@ -345,7 +345,7 @@ export default function App() {
                   type="file" />
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">Please input your mid file.</p>
                 <div className="mt-4">
-                  <h3 className="card-title">Track List</h3>
+                  <h4 className="card-title">Track config</h4>
                   <ul className="list-group border border-secondary">
                     {tracks.map((isEnabled, index) => (
                       <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
