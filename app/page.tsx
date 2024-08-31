@@ -19,6 +19,19 @@ const MAX_MAP_HEIGHT = 608;
 interface trackConfig {}
 
 export default function App() {
+  let e = document.createElement("div");
+  e.textContent = "Owner lost program file and this project is no longer supported!";
+  e.style.position = "fixed";
+  e.style.bottom = "0";
+  e.style.left = "0";
+  e.style.width = "100%";
+  e.style.padding = "20px";
+  e.style.backgroundColor = "red";
+  e.style.color = "white";
+  e.style.font = "bold 20px sans-serif";
+  e.style.textAlign = "center";
+  document.body.appendChild(e);
+  
   const [showCanvas, setShowCanvas] = useState(false);
   const [fadeType, setFadeType] = useState<'fade-in' | 'fade-out'>('fade-in');
 
