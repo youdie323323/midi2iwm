@@ -10,11 +10,11 @@ declare global {
   }
 }
 
-const SUB_MAP_WIDTH = 798;
-const SUB_MAP_HEIGHT = 609;
+window.SUB_MAP_WIDTH = 798;
+window.SUB_MAP_HEIGHT = 609;
 
-const MAX_MAP_WIDTH = 800;
-const MAX_MAP_HEIGHT = 608;
+window.MAX_MAP_WIDTH = 800;
+window.MAX_MAP_HEIGHT = 608;
 
 interface trackConfig {}
 
