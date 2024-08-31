@@ -7,6 +7,10 @@ import Soundfont, { InstrumentName } from 'soundfont-player';
 declare global {
   interface Window {
     __iwm_wasm_exports: any;
+    SUB_MAP_WIDTH: number;
+    SUB_MAP_HEIGHT: number;
+    MAX_MAP_WIDTH: number;
+    MAX_MAP_HEIGHT: number;
   }
 }
 
