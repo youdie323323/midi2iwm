@@ -241,7 +241,7 @@ export default function App() {
 
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      const result = window.__iwm_wasm_exports.image((await imageAsBase64(file)), SUB_MAP_WIDTH, SUB_MAP_HEIGHT, 0.6, 7, txt);
+                      const result = window.__iwm_wasm_exports.image((await imageAsBase64(file)), window.SUB_MAP_WIDTH, window.SUB_MAP_HEIGHT, 0.6, 7, txt);
                       if (!(typeof result === 'object' && !Array.isArray(result) && result !== null)) {
                         globalThis.alert("Object generation failure. there are problems with your image and map.");
                         return
@@ -308,7 +308,7 @@ export default function App() {
 
                     const file = (e.target as HTMLInputElement).files![0];
                     if (file) {
-                      const result = window.__iwm_wasm_exports.light((await imageAsBase64(file)), MAX_MAP_WIDTH, MAX_MAP_HEIGHT, 0.2, 8, txt);
+                      const result = window.__iwm_wasm_exports.light((await imageAsBase64(file)), window.MAX_MAP_WIDTH, window.MAX_MAP_HEIGHT, 0.2, 8, txt);
                       if (!(typeof result === 'object' && !Array.isArray(result) && result !== null)) {
                         globalThis.alert("Object generation failure. there are problems with your image and map.");
                         return
