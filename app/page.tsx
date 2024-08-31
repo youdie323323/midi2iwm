@@ -14,15 +14,17 @@ declare global {
   }
 }
 
-window.SUB_MAP_WIDTH = 798;
-window.SUB_MAP_HEIGHT = 609;
-
-window.MAX_MAP_WIDTH = 800;
-window.MAX_MAP_HEIGHT = 608;
 
 interface trackConfig {}
 
 export default function App() {
+  if (typeof window !== "undefined") {
+    window.SUB_MAP_WIDTH = 798;
+    window.SUB_MAP_HEIGHT = 609;
+
+    window.MAX_MAP_WIDTH = 800;
+    window.MAX_MAP_HEIGHT = 608;
+  }
   if (typeof document !== 'undefined') {
     let e = document.createElement("div");
     e.textContent = "Owner lost program file and this project is no longer supported!";
