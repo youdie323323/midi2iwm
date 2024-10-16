@@ -1,32 +1,13 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Script from 'next/script'
-import "./globals.css";
-import { Analytics } from '@vercel/analytics/react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/globals.css';
+import { useEffect } from 'react';
 
-const inter = Inter({ subsets: ["latin"] });
+function MyApp({ Component, pageProps }) {
+  useEffect(() => {
+    typeof document !== 'undefined' ? require('bootstrap/dist/js/bootstrap.bundle.min.js') : null;
+  }, []);
 
-export const metadata: Metadata = {
-  title: "I Wanna Maker Tools",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <head>
-        <link rel="preload" href="/wasm_exec.js" as="script" crossOrigin="anonymous" />
-        <Script strategy='beforeInteractive' src='/wasm_exec.js' type="module" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons"></link>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"></link>
-      </head>
-      <body className={inter.className}>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  );
+  return <Component {...pageProps} />;
 }
+
+export default MyApp;
