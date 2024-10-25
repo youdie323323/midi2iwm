@@ -226,7 +226,7 @@ export default function App() {
       updatedTracks[index] = {
         ...updatedTracks[index],
         [keys[0]]: {
-          ...updatedTracks[index][keys[0]],
+          ...updatedTracks[index][keys[0] as keyof TrackConfig],
           [keys[1]]: newValue,
         },
       };
