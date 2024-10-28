@@ -1,6 +1,6 @@
 'use client';
 import './globals.css';
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 interface TrackConfig {
@@ -34,75 +34,148 @@ declare global {
   }
 }
 
+const instrumentals: string[] = [
+  "Duck",
+  "Glass Break",
+  "Bubble",
+  "Light Switch",
+  "Ring Bell",
+  "Exclamation",
+  "Spring",
+  "Horn",
+  "OK",
+  "Glass Break 2",
+  "Punch",
+  "Laser Gun",
+  "Woosh",
+  "Whistle",
+  "Magic",
+  "Ninja",
+  "Clapping",
+  "Drum Roll",
+  "Piano",
+  "Bass",
+  "Party Noisemaker",
+  "Hoot",
+  "Laughter",
+  "Suspense",
+  "Wood Scraper",
+  "Drum",
+  "No-no",
+  "Glass Bottle",
+  "Woodimba",
+  "Metallic Hit",
+  "Gun",
+  "Electric Charge",
+  "Laser Blast (Foam Icon)",
+  "Heartbeat",
+  "Rubber Chicken",
+  "Dog Bark",
+  "Cat Meow",
+  "Toll Bell",
+  "Robot"
+];
+
+const defaultTrackConfig = (id: number): TrackConfig => ({
+  // Default is piano
+  id: id,
+  Track: 0,
+  Instrumental: instrumentals.indexOf("Piano"),
+  BaseNote: 51,
+  MaxNote: 73,
+  Offsets: {
+    Volume: 0,
+    VolumeConstant: false,
+    Pitch: 0,
+    PitchConstant: false,
+  },
+  Loop: {
+    Enable: false,
+    LoopOffset: 0,
+  },
+  Speed: 1.0,
+  StripAfter: 3000,
+  StripBefore: 0,
+  StartAt: 0,
+});
+
+const defaultConfigs: TrackConfig[] = [defaultTrackConfig(0)];
+
 export default function App() {
-  const instrumentals: string[] = [
-    "Duck",
-    "Glass Break",
-    "Bubble",
-    "Light Switch",
-    "Ring Bell",
-    "Exclamation",
-    "Spring",
-    "Horn",
-    "OK",
-    "Glass Break 2",
-    "Punch",
-    "Laser Gun",
-    "Woosh",
-    "Whistle",
-    "Magic",
-    "Ninja",
-    "Clapping",
-    "Drum Roll",
-    "Piano",
-    "Bass",
-    "Party Noisemaker",
-    "Hoot",
-    "Laughter",
-    "Suspense",
-    "Wood Scraper",
-    "Drum",
-    "No-no",
-    "Glass Bottle",
-    "Woodimba",
-    "Metallic Hit",
-    "Gun",
-    "Electric Charge",
-    "Laser Blast (Foam Icon)",
-    "Heartbeat",
-    "Rubber Chicken",
-    "Dog Bark",
-    "Cat Meow",
-    "Toll Bell",
-    "Robot"
-  ];
-
-  const defaultTrackConfig = (id: number): TrackConfig => ({
-    // Default is piano
-    id: id,
-    Track: 0,
-    Instrumental: instrumentals.indexOf("Piano"),
-    BaseNote: 51,
-    MaxNote: 73,
-    Offsets: {
-      Volume: 0,
-      VolumeConstant: false,
-      Pitch: 0,
-      PitchConstant: false,
-    },
-    Loop: {
-      Enable: false,
-      LoopOffset: 0,
-    },
-    Speed: 1.0,
-    StripAfter: 3000,
-    StripBefore: 0,
-    StartAt: 0,
-  });
-
-  const [configs, setConfigs] = useState([defaultTrackConfig(0)]);
+  const [configs, setConfigs] = useState(defaultConfigs);
   const [activeConfig, setActiveConfig] = useState(configs[0]);
+  const [configNames, setConfigNames] = useState<string[]>([]);
+  const [configsModified, setConfigsModified] = useState<boolean>(false);
   const tabListRef = useRef(null);
+
+  const loadConfigNames = () => {
+    const keys = Object.keys(localStorage).filter(key => key.startsWith('trackConfig_'));
+    setConfigNames(keys.map(key => key.replace('trackConfig_', '')));
+  };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      loadConfigNames();
+    }
+  }, []);
+
+  const saveConfigName = () => {
+    const configName = prompt("Input config name to load");
+    if (!configName) {
+      appendLog('Please specify valid name');
+      return
+    }
+    if (localStorage.getItem(`trackConfig_${configName}`) != null) {
+      appendLog(`Config with name '${configName}' already exists`);
+      return
+    }
+    localStorage.setItem(`trackConfig_${configName}`, JSON.stringify(configs));
+    appendLog(`Configuration '${configName}' saved to storage`);
+    loadConfigNames();
+  };
+
+  const deleteConfigName = () => {
+    const configName = prompt("Input config name to delete");
+    if (!configName) {
+      appendLog('Please specify valid name');
+      return
+    }
+    if (localStorage.getItem(`trackConfig_${configName}`) == null) {
+      appendLog(`Config with name '${configName}' not exists`);
+      return
+    }
+    localStorage.removeItem(`trackConfig_${configName}`);
+    appendLog(`Configuration '${configName}' deleted from storage`);
+    loadConfigNames();
+  };
+
+  const loadConfig = (name: string) => {
+    if (name === "THIS_IS_TEMP_DONT_USE") {
+      appendLog("Invalid config selected");
+      return;
+    }
+
+    if (configsModified) {
+      const confirmed = window.confirm("Unsaved changes exist. Do you want to load the new configuration and discard current changes?");
+      if (!confirmed) {
+        appendLog("Load canceled by user");
+        return;
+      }
+    }
+
+    const savedConfig = localStorage.getItem(`trackConfig_${name}`);
+    if (savedConfig) {
+      const parsedConfig = JSON.parse(savedConfig);
+      setConfigs(parsedConfig);
+      if (parsedConfig.length > 0) {
+        setActiveConfig(parsedConfig[0]);
+      }
+      appendLog(`Configuration '${name}' loaded from storage`);
+      setConfigsModified(false);
+    } else {
+      appendLog(`Configuration '${name}' not found in storage`);
+    }
+  };
 
   function toBase64(buffer: ArrayBuffer): string {
     const base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -152,16 +225,6 @@ export default function App() {
     }
   };
 
-  function downloadText(fileName: string, text: string) {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const aTag = document.createElement('a');
-    aTag.href = URL.createObjectURL(blob);
-    aTag.target = '_blank';
-    aTag.download = fileName;
-    aTag.click();
-    URL.revokeObjectURL(aTag.href);
-  }
-
   const appendLinkMessage = (message: string, data: string, numObject: number) => {
     const logConsole = document.getElementById("log-console");
     if (logConsole) {
@@ -191,6 +254,16 @@ export default function App() {
       logConsole.scrollTop = logConsole.scrollHeight;
     }
   };
+
+  function downloadText(fileName: string, text: string) {
+    const blob = new Blob([text], { type: 'text/plain' });
+    const aTag = document.createElement('a');
+    aTag.href = URL.createObjectURL(blob);
+    aTag.target = '_blank';
+    aTag.download = fileName;
+    aTag.click();
+    URL.revokeObjectURL(aTag.href);
+  }
 
   const loadMidiFile = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -232,6 +305,7 @@ export default function App() {
       };
     }
     setConfigs(updatedTracks);
+    setConfigsModified(true);
   };
 
   const addConfig = () => {
@@ -239,6 +313,7 @@ export default function App() {
     const config = defaultTrackConfig(newId);
     setConfigs([...configs, config]);
     setActiveConfig(config);
+    setConfigsModified(true);
   };
 
   const removeConfig = (cur: TrackConfig) => {
@@ -285,14 +360,24 @@ export default function App() {
           type="file"
         />
       </div>
-      <br/>
-      <h5>Log</h5><div aria-label="Webassembly Information" id="log-console"></div>
-
-      <div className="col-12 mt-2 mb-3 featuring text-center">
-        <h1 className="title"><i className="fas fa-minus"></i> Config editor <i
-          className="fas fa-minus"></i></h1>
+      <br />
+      <h5>Log</h5><div aria-label="System Information" id="log-console"></div>
+      <br />
+      <div className="d-flex justify-content-end">
+        <button className="btn btn-primary me-2" style={{ width: 75, height: 33, padding: "1px 0rem 0px 0px" }} onClick={saveConfigName}>Save</button>
+        <button className="btn btn-danger me-2" style={{ width: 82, height: 33, padding: "1px 0rem 0px 0px" }} onClick={deleteConfigName}>Delete</button>
+        <select
+          className="form-select me-2"
+          onChange={(e) => loadConfig(e.target.value)}
+        >
+          <option value="THIS_IS_TEMP_DONT_USE">Select Config to Load</option>
+          {configNames.map(name => (
+            <option key={name} value={name}>{name}</option>
+          ))}
+        </select>
       </div>
-
+      <br />
+      <h5>Config editor</h5>
       <ul className="nav nav-tabs mb-3" ref={tabListRef}>
         <TransitionGroup component={null}>
           {configs.map((track) => (
