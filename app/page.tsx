@@ -2,6 +2,7 @@
 import './globals.css';
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 
 interface TrackConfig {
   id: any;
@@ -495,10 +496,28 @@ export default function App() {
         {configs.map((track, index) => (
           activeConfig.id === track.id && (
             <div key={track.id} className="track-config mb-4">
-              <h4><i className="fa-brands fa-itunes-note"></i> Config {track.id + 1}</h4>
+              <h4><i className="fa-brands fa-itunes-note" style={{
+                transform: "translate(0px, 1.45px)",
+              }}></i> Config {track.id + 1}</h4>
               <div className="row mb-3">
                 <div className="col">
-                  <label htmlFor={`Track-${track.id}`} className="form-label">Track</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`Track-${track.id}`} className="form-label">Track</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Track number. You can see tracks by log (you need to input midi file)</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -528,7 +547,23 @@ export default function App() {
 
               <div className="row mb-3">
                 <div className="col">
-                  <label htmlFor={`BaseNote-${track.id}`} className="form-label">Base Note</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`BaseNote-${track.id}`} className="form-label">Base Note</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Pitch table value. Mainly controls when changing the pitch</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -539,7 +574,23 @@ export default function App() {
                   />
                 </div>
                 <div className="col">
-                  <label htmlFor={`MaxNote-${track.id}`} className="form-label">Max Note</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`MaxNote-${track.id}`} className="form-label">Max Note</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Maximum pitch value. Basically unchanged</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -552,10 +603,28 @@ export default function App() {
               </div>
 
               {/* Offsets */}
-              <h4><i className="fa-sharp fa-regular fa-volume"></i> Offsets</h4>
+              <h4><i className="fa-sharp fa-regular fa-volume" style={{
+                transform: "translate(0px, 1.45px)",
+              }}></i> Offsets</h4>
               <div className="row mb-3">
                 <div className="col">
-                  <label htmlFor={`Offsets.Volume-${track.id}`} className="form-label">Volume</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`Offsets.Volume-${track.id}`} className="form-label">Volume</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Volume offset added to original volume. If volume constant is on, use this value as a fixed value. you can use float value</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -580,7 +649,23 @@ export default function App() {
 
               <div className="row mb-3">
                 <div className="col">
-                  <label htmlFor={`Offsets.Pitch-${track.id}`} className="form-label">Pitch</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`Offsets.Pitch-${track.id}`} className="form-label">Pitch</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value. you can use float value</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -604,7 +689,9 @@ export default function App() {
               </div>
 
               {/* Loop Configuration */}
-              <h4><i className="fa-regular fa-arrows-rotate-reverse"></i> Loop</h4>
+              <h4><i className="fa-regular fa-arrows-rotate-reverse" style={{
+                transform: "translate(0px, 1.45px)",
+              }}></i> Loop</h4>
               <div className="row mb-3">
                 <div className="col">
                   <label className="form-check-label" htmlFor={`Loop.Enable-${track.id}`}>Enable Loop</label>
@@ -618,7 +705,23 @@ export default function App() {
                   />
                 </div>
                 <div className="col">
-                  <label htmlFor={`Loop.LoopOffset-${track.id}`} className="form-label">Loop Offset</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`Loop.LoopOffset-${track.id}`} className="form-label">Loop Offset</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Frame added to next loop. you can use minus value</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     className="form-control"
@@ -634,7 +737,23 @@ export default function App() {
               <h4>Frame</h4>
               <div className="row mb-3">
                 <div className="col">
-                  <label htmlFor={`Speed-${track.id}`} className="form-label">Speed</label>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor={`Speed-${track.id}`} className="form-label">Speed</label>
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={<Tooltip className="custom-tooltip">Frames speed. you can use float value</Tooltip>}
+                    >
+                      <span
+                        style={{
+                          width: '24px',
+                          height: '24px',
+                          fontSize: '14px',
+                          cursor: 'pointer',
+                          transform: "translate(8px, 4px)",
+                        }}
+                      ><i className="fas fa-info-circle"></i></span>
+                    </OverlayTrigger>
+                  </div>
                   <input
                     type="number"
                     step="0.01"

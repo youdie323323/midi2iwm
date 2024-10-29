@@ -75,6 +75,11 @@ select {
     padding: 0rem 0.6rem 0 !important;
 }
 
+.custom-tooltip {
+    border: 2px solid grey;
+    border-radius: 4px;
+}
+
 #log-console {
     font-size: 80%;
     --scale-element: 1;
