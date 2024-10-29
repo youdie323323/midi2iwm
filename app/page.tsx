@@ -31,8 +31,9 @@ declare global {
   interface Window {
     __wasm_iwm_exports: {
       getTracks: (arg: string) => string;
-      midiToObjectXML: (arg: string, config: string) => string;
-    }
+      midiToIwm: (arg: string, config: string) => string;
+    },
+    appendLog: (arg: string) => void;
   }
 }
 
@@ -270,6 +271,11 @@ export default function App() {
     }
   };
 
+  // Set appendLog to global for wasm
+  if (typeof window !== "undefined") {
+    window.appendLog = appendLog;
+  }
+
   const appendLinkMessage = (message: string, data: string, numObject: number) => {
     const logConsole = document.getElementById("log-console");
     if (logConsole) {
@@ -284,7 +290,7 @@ export default function App() {
       linkElement.className = "log-link";
       linkElement.innerHTML = message;
       linkElement.onclick = () => {
-        downloadText("out.txt", data);
+        downloadText(`out_${new Date().getTime()}.txt`, data);
       };
 
       const textBefore = document.createTextNode("Done. click ");
@@ -379,7 +385,7 @@ export default function App() {
       appendLog("Please input midi file before submit");
       return;
     }
-    const result = window.__wasm_iwm_exports.midiToObjectXML(await loadMidiFile(file), JSON.stringify(configs));
+    const result = window.__wasm_iwm_exports.midiToIwm(await loadMidiFile(file), JSON.stringify(configs));
     appendLinkMessage("here", result[0] as string, result[1] as unknown as number);
   };
 
