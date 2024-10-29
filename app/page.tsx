@@ -376,6 +376,7 @@ export default function App() {
         setActiveConfig(newActiveConfig);
       }
     }
+    setConfigsModified(true);
   };
 
   const handleSubmit = async (e: any) => {
@@ -430,7 +431,7 @@ export default function App() {
       <span>...or <div className='log-link' onClick={openFileDialog}>import</div>/<div className='log-link' onClick={() => {
         const configsJson = JSON.stringify(configs);
         downloadText(`export_${simpleHash(configsJson)}.json`, configsJson);
-      }}>export</div> as JSON</span>
+      }}>export</div> with JSON</span>
       <br />
       <h5>Config editor</h5>
       <ul className="nav nav-tabs mb-3" ref={tabListRef}>
