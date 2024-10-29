@@ -271,11 +271,6 @@ export default function App() {
     }
   };
 
-  // Set appendLog to global for wasm
-  if (typeof window !== "undefined") {
-    window.appendLog = appendLog;
-  }
-
   const appendLinkMessage = (message: string, data: string, numObject: number) => {
     const logConsole = document.getElementById("log-console");
     if (logConsole) {
@@ -289,9 +284,7 @@ export default function App() {
       const linkElement = document.createElement("div");
       linkElement.className = "log-link";
       linkElement.innerHTML = message;
-      linkElement.onclick = () => {
-        downloadText(`out_${new Date().getTime()}.txt`, data);
-      };
+      linkElement.onclick = () => downloadText(`out_${new Date().getTime()}.txt`, data);
 
       const textBefore = document.createTextNode("Done. click ");
       const textAfter = document.createTextNode(` to download objects | num objects: ${numObject}`);
@@ -330,17 +323,27 @@ export default function App() {
 
   const handleInputChange = (index: number, e: any) => {
     const { name, value, type, checked } = e.target;
+
     let newValue;
-    if (type === "checkbox") {
-      newValue = checked;
-    } else if (type === "number") {
-      newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ? parseFloat(value) : parseInt(value, 10);
-    } else {
-      newValue = parseInt(value, 10);
+    switch (type) {
+      case "checkbox": {
+        newValue = checked;
+        break;
+      }
+      case "number": {
+        newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ? parseFloat(value) : parseInt(value, 10);
+        break;
+      }
+      default: {
+        newValue = parseInt(value, 10);
+        break;
+      }
     }
-    if (isNaN(newValue)) {
+
+    if (Number.isNaN(newValue)) {
       newValue = "";
     }
+
     const keys = name.split('.');
 
     const updatedTracks = [...configs];
@@ -387,6 +390,10 @@ export default function App() {
       return;
     }
     const result = window.__wasm_iwm_exports.midiToIwm(await loadMidiFile(file), JSON.stringify(configs));
+    if (!Array.isArray(result)) {
+      appendLog(`Webassembly error: ${result}`);
+      return
+    }
     appendLinkMessage("here", result[0] as string, result[1] as unknown as number);
   };
 
@@ -406,7 +413,14 @@ export default function App() {
           onInput={async function (e) {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
-              appendLog(window.__wasm_iwm_exports.getTracks(await loadMidiFile(file)));
+              let result = window.__wasm_iwm_exports.getTracks(await loadMidiFile(file));
+              if (typeof result !== "string" || !result.startsWith("vas:")) {
+                appendLog(`Webassembly error: ${result}`);
+                return;
+              }
+              // Remove "vas:"
+              result = result.substring(4);
+              appendLog(result);
             }
           } as React.ChangeEventHandler<HTMLInputElement>}
           type="file"
