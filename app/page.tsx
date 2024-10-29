@@ -284,10 +284,18 @@ export default function App() {
       const linkElement = document.createElement("div");
       linkElement.className = "log-link";
       linkElement.innerHTML = message;
-      linkElement.onclick = () => downloadText(`out_${new Date().getTime()}.txt`, data);
+      linkElement.onclick = () => navigator.clipboard.writeText(data).then(
+        () => {
+          appendLog("Successfully copied!");
+        },
+        () => {
+          appendLog("Copy failed, downloading...");
+          downloadText(`out_${new Date().getTime()}.txt`, data);
+        },
+      );
 
       const textBefore = document.createTextNode("Done. click ");
-      const textAfter = document.createTextNode(` to download objects | num objects: ${numObject}`);
+      const textAfter = document.createTextNode(` to copy objects | num objects: ${numObject}`);
 
       logLine.appendChild(timestampSpan);
       logLine.appendChild(textBefore);
