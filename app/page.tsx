@@ -25,6 +25,8 @@ interface TrackConfig {
   StartAt: number;
 }
 
+const trackConfigKeys: (keyof TrackConfig)[] = ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"];
+
 declare global {
   interface Window {
     __wasm_iwm_exports: {
@@ -107,6 +109,49 @@ export default function App() {
   const [configNames, setConfigNames] = useState<string[]>([]);
   const [configsModified, setConfigsModified] = useState<boolean>(false);
   const tabListRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const simpleHash = (str: string) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+    }
+    return (hash >>> 0).toString(36).padStart(7, '0');
+  };
+
+  function hasAllKeys<T>(obj: any, keys: (keyof T)[]): obj is T {
+    return keys.every(key => key in obj);
+  }
+
+  const openFileDialog = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileContent = reader.result;
+        if (typeof fileContent !== "string") {
+          appendLog('Config is not valid type');
+          return;
+        }
+        const parsed = JSON.parse(fileContent);
+        if (!Array.isArray(parsed) || parsed.map((v) => hasAllKeys(v, trackConfigKeys)).some(v => v === false)) {
+          appendLog('Config is not valid type');
+          return;
+        }
+        setConfigs(parsed as TrackConfig[]);
+      };
+      reader.readAsText(file);
+    }
+
+    event.target.value = "";
+  };
 
   const loadConfigNames = () => {
     const keys = Object.keys(localStorage).filter(key => key.startsWith('trackConfig_'));
@@ -255,15 +300,15 @@ export default function App() {
     }
   };
 
-  function downloadText(fileName: string, text: string) {
-    const blob = new Blob([text], { type: 'text/plain' });
-    const aTag = document.createElement('a');
-    aTag.href = URL.createObjectURL(blob);
-    aTag.target = '_blank';
-    aTag.download = fileName;
-    aTag.click();
-    URL.revokeObjectURL(aTag.href);
-  }
+  const downloadText = (filename: string, text: string) => {
+    const element = document.createElement("a");
+    const file = new Blob([text], { type: "application/json" });
+    element.href = URL.createObjectURL(file);
+    element.download = filename;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
 
   const loadMidiFile = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -376,6 +421,10 @@ export default function App() {
           ))}
         </select>
       </div>
+      <span>...or <div className='log-link' onClick={openFileDialog}>import</div>/<div className='log-link' onClick={() => {
+        const configsJson = JSON.stringify(configs);
+        downloadText(`export_${simpleHash(configsJson)}.json`, configsJson);
+      }}>export</div> as JSON</span>
       <br />
       <h5>Config editor</h5>
       <ul className="nav nav-tabs mb-3" ref={tabListRef}>
@@ -610,6 +659,14 @@ export default function App() {
 
         <input type="submit" value="Submit config" />
       </form>
+
+      <input
+        type="file"
+        accept=".json"
+        ref={fileInputRef}
+        style={{ display: "none" }}
+        onChange={handleFileChange}
+      />
     </div>
   );
 }
