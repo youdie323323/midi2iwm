@@ -376,7 +376,7 @@ export default function App() {
     e.preventDefault();
     const file = (document.getElementById("midi-input") as HTMLInputElement).files?.[0];
     if (!file) {
-      alert("Please input midi file");
+      appendLog("Please input midi file before submit");
       return;
     }
     const result = window.__wasm_iwm_exports.midiToObjectXML(await loadMidiFile(file), JSON.stringify(configs));
