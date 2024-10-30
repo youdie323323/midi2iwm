@@ -505,7 +505,7 @@ export default function App() {
                     <label htmlFor={`Track-${track.id}`} className="form-label">Track</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Track number. You can see tracks by log (you need to input midi file)</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Track number. You can view track list by log (you need to input midi file)<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -551,7 +551,7 @@ export default function App() {
                     <label htmlFor={`BaseNote-${track.id}`} className="form-label">Base Note</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Pitch table value. Mainly controls when changing the pitch</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Pitch table value. Mainly controls when changing the pitch<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -578,7 +578,7 @@ export default function App() {
                     <label htmlFor={`MaxNote-${track.id}`} className="form-label">Max Note</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Maximum pitch value. Basically unchanged</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Maximum pitch value. Basically unchanged<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -612,7 +612,7 @@ export default function App() {
                     <label htmlFor={`Offsets.Volume-${track.id}`} className="form-label">Volume</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Volume offset added to original volume. If volume constant is on, use this value as a fixed value. you can use float value</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Volume offset added to original volume. If volume constant is on, use this value as a fixed value.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -653,7 +653,7 @@ export default function App() {
                     <label htmlFor={`Offsets.Pitch-${track.id}`} className="form-label">Pitch</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value. you can use float value</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -709,7 +709,7 @@ export default function App() {
                     <label htmlFor={`Loop.LoopOffset-${track.id}`} className="form-label">Loop Offset</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Frame added to next loop. you can use minus value</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Offset frames added to the original loop frames.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -741,7 +741,7 @@ export default function App() {
                     <label htmlFor={`Speed-${track.id}`} className="form-label">Speed</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Frames speed. you can use float value</Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Frames speed<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
                     >
                       <span
                         style={{
