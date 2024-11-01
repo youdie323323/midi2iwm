@@ -167,7 +167,7 @@ export default function App() {
   }, []);
 
   const saveConfigName = () => {
-    const configName = prompt("Input config name to load");
+    const configName = prompt("Input config name to save");
     if (!configName) {
       appendLog('Please specify valid name');
       return
