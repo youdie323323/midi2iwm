@@ -890,7 +890,7 @@ export default function App() {
             <div>
               <h4>Useful Informations</h4>
               <i>• The site </i>
-              <a href="https://signal.vercel.app/edit" style={{ color: "blue" }}>signal.vercel.app</a>
+              <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
               <i> can easily show & edit midi file.</i><br />
             </div>
 
