@@ -26,8 +26,8 @@ a,
 a:hover,
 a:focus,
 a:active {
-    text-decoration: none !important;
-    color: white !important;
+    text-decoration: none;
+    color: white;
     cursor: pointer !important;
 }
 
@@ -262,4 +262,38 @@ li {
     .featuring {
         padding-top: 40px !important;
     }
+}
+
+/* Hide the scrollbar */
+::-webkit-scrollbar {
+    display: none;
+}
+
+.ReactModal__Overlay {
+    opacity: 0;
+    transition: opacity 100ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+    opacity: 0;
+}
+
+.ReactModal__Content {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) !important;
+    transition: all 100ms ease-in-out;
+}
+
+.ReactModal__Content--after-open {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) !important;
+}
+
+.ReactModal__Content--before-close {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) !important;
 }

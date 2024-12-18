@@ -3,6 +3,9 @@ import './globals.css';
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import Modal from 'react-modal';
+import 'katex/dist/katex.min.css';
+import TeX from '@matejmazur/react-katex';
 
 interface TrackConfig {
   id: any;
@@ -105,6 +108,8 @@ const defaultTrackConfig = (id: number): TrackConfig => ({
 
 const defaultConfigs: TrackConfig[] = [defaultTrackConfig(0)];
 
+Modal.setAppElement('body');
+
 export default function App() {
   const [configs, setConfigs] = useState(defaultConfigs);
   const [activeConfig, setActiveConfig] = useState(configs[0]);
@@ -167,7 +172,7 @@ export default function App() {
   }, []);
 
   const saveConfigName = () => {
-    const configName = prompt("Input config name to save");
+    const configName = prompt("Input config name to load");
     if (!configName) {
       appendLog('Please specify valid name');
       return
@@ -410,6 +415,18 @@ export default function App() {
     appendLog("Webassembly setup");
   }, []);
 
+  // About more help modal
+
+  const [modalIsOpen, setIsOpen] = useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
   return (
     <div className="container">
       <div className="text-center mt-2">
@@ -578,7 +595,7 @@ export default function App() {
                     <label htmlFor={`MaxNote-${track.id}`} className="form-label">Max Note</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Maximum pitch value. Basically unchanged<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Maximum pitch value.<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -612,7 +629,7 @@ export default function App() {
                     <label htmlFor={`Offsets.Volume-${track.id}`} className="form-label">Volume</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Volume offset added to original volume. If volume constant is on, use this value as a fixed value.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Volume offset added to original volume. If volume constant is on, use this value as a fixed value.<br />Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -653,7 +670,7 @@ export default function App() {
                     <label htmlFor={`Offsets.Pitch-${track.id}`} className="form-label">Pitch</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value.<br />Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "green" }}>Decimal point</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -709,7 +726,7 @@ export default function App() {
                     <label htmlFor={`Loop.LoopOffset-${track.id}`} className="form-label">Loop Offset</label>
                     <OverlayTrigger
                       placement="top"
-                      overlay={<Tooltip className="custom-tooltip">Offset frames added to the original loop frames.<br/>Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
+                      overlay={<Tooltip className="custom-tooltip">Offset frames added to the original loop frames.<br />Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value<br />Type: <span style={{ color: "yellow" }}>Integer</span></Tooltip>}
                     >
                       <span
                         style={{
@@ -805,8 +822,209 @@ export default function App() {
           )
         ))}
 
-        <input type="submit" value="Submit config" />
+        <div className="d-flex align-items-center justify-content-between">
+          <input type="submit" value="Submit config" />
+          <button
+            type="button"
+            onClick={openModal}
+            style={{
+              fontSize: '20px',
+              marginRight: '5px',
+            }}
+          >
+            About more
+          </button>
+        </div>
       </form>
+
+      <div>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          closeTimeoutMS={100}
+          style={{
+            overlay: {
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            },
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              marginRight: '-50%',
+              transform: 'translate(-50%, -50%)',
+              backgroundColor: '#000000',
+              width: '900px',
+              height: '600px',
+              overflow: 'hidden',
+            },
+          }}
+          contentLabel="About More Modal"
+        >
+          <h5
+            style={{
+              position: 'absolute',
+              top: '15px',
+              left: '18px',
+            }}
+          >
+            About more
+          </h5>
+          <button
+            onClick={closeModal}
+            style={{
+              position: 'absolute',
+              right: '15px',
+              top: '15px',
+            }}
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+
+          {/* Scrollable div */}
+          <div style={{
+            marginTop: '30px',
+            height: 'calc(100% - 30px)',
+            overflowY: 'auto',
+          }}>
+            <div>
+              <h4>Useful Informations</h4>
+              <i>• The site </i>
+              <a href="https://signal.vercel.app/edit" style={{ color: "blue" }}>signal.vercel.app</a>
+              <i> can easily show & edit midi file.</i><br />
+            </div>
+
+            <hr style={{
+              margin: '20px 0',
+              border: 'none',
+              borderTop: '2px solid #ffffff'
+            }} />
+
+            {/* Track */}
+            <div>
+              <h5>Track</h5>
+              <i>Specifies which MIDI track number to process from the input file.</i><br />
+              <i>• Track numbers start from 0</i><br />
+              <i>• Only tracks containing note events are counted</i>
+            </div>
+
+            <hr style={{
+              margin: '20px 0',
+              border: 'none',
+              borderTop: '1px solid #ffffff'
+            }} />
+
+            {/* Instrumental */}
+            <div>
+              <h5>Instrumental</h5>
+              <i>Defines the sound ID to be used when playing notes from this track.</i><br />
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Base Note */}
+            <div>
+              <h5>Base Note</h5>
+              <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
+              <i>The frequency for any MIDI note number is calculated as:</i>
+              <TeX math="f = f_0 \cdot 2^{\frac{n-69}{12}}" block />
+              <i>where:</i><br />
+              <i>• f is the frequency of the desired note</i><br />
+              <i>• f₀ is the reference frequency (A4 = 440 Hz)</i><br />
+              <i>• n is the MIDI note number</i><br />
+              <i>In the implementation, relative pitch ratios are calculated using:</i>
+              <TeX math="ratio = 2^{\frac{n-baseNote}{12}}" block />
+              <i>where baseNote serves as the reference point (ratio = 1.0)</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Max Note */}
+            <div>
+              <h5>Max Note</h5>
+              <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
+              <i>The decreasing value is calculated as follows:</i>
+              <TeX math="pitchAdjustment = 7 \cdot \left\lceil\frac{\max(pitch) - maxNote}{7}\right\rceil" block />
+              <i>where max(pitch) is the maximum of all pitches in <TeX math="Track_{j}" /></i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Volume Offset */}
+            <div>
+              <h5>Volume Offset</h5>
+              <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
+              <i>The final volume is calculated as:</i>
+              <TeX math="volume = normalize(velocity) + offset" block />
+              <i>• Final volume is clamped between 0.05 and 1.0</i><br />
+              <i>When Volume Constant is true:</i><br />
+              <i>• The offset value is used directly as the volume</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Pitch Offset */}
+            <div>
+              <h5>Pitch Offset</h5>
+              <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
+              <i>The final pitch is calculated as:</i>
+              <TeX math="pitch = pitchRatio + offset" block />
+              <i>• Final pitch is clamped between 0.05 and 3.0</i><br />
+              <i>When Pitch Constant is true:</i><br />
+              <i>• The offset value is used directly as the pitch</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Loop */}
+            <div>
+              <h5>Loop Configuration</h5>
+              <i>Controls the looping behavior of the track:</i><br />
+              <i>• Enable: Toggles looping on/off</i><br />
+              <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
+              <i>The final loop length is calculated as:</i>
+              <TeX math="loopFrames = maxOffset + loopOffset" block />
+              <i>where maxOffset is the highest frame offset in the track</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Speed */}
+            <div>
+              <h5>Speed</h5>
+              <i>Adjusts the playback speed of the track.</i><br />
+              <i>The frame offset for each note is calculated as:</i>
+              <TeX math="offset = ticks \cdot tickLength \cdot 50 \cdot (2-speed)" block />
+              <i>• speed &gt; 1: Notes play faster than original</i><br />
+              <i>• speed &lt; 1: Notes play slower than original</i><br />
+              <i>• speed = 1: Notes play at original tempo</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Strip Before/After */}
+            <div>
+              <h5>Strip Before/After</h5>
+              <i>Filters out notes based on their frame offsets:</i><br />
+              <i>• Strip Before: Removes notes before the specified frame number</i><br />
+              <i>• Strip After: Removes notes after the specified frame number</i><br />
+              <i>When either value is 0, no stripping is performed for that boundary</i>
+            </div>
+
+            <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
+
+            {/* Start At */}
+            <div>
+              <h5>Start At</h5>
+              <i>Adds an offset to all note frame positions in the track.</i><br />
+              <i>The final frame offset for each note becomes:</i>
+              <TeX math="finalOffset = calculatedOffset + startAt + 1" block />
+              <i>• Positive values delay the track start</i><br />
+              <i>• Negative values advance the track start</i>
+            </div>
+          </div>
+        </Modal>
+      </div>
 
       <input
         type="file"
