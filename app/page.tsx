@@ -889,9 +889,15 @@ export default function App() {
           }}>
             <div>
               <h4>Useful Informations</h4>
-              <i>• The site </i>
-              <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
-              <i> can easily show & edit midi file.</i><br />
+              <div>
+                <i>• The site </i>
+                <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
+                <i> can easily show & edit midi file.</i><br />
+              </div>
+              <div>
+                <i>• How to use video: </i>
+                <a href="https://youtube.com/" target="_blank" style={{ color: "blue" }}>youtu.be/...</a>
+              </div>
             </div>
 
             <hr style={{
@@ -933,7 +939,7 @@ export default function App() {
               <i>• f₀ is the reference frequency (A4 = 440 Hz)</i><br />
               <i>• n is the MIDI note number</i><br />
               <i>In the implementation, relative pitch ratios are calculated using:</i>
-              <TeX math="ratio = 2^{\frac{n-baseNote}{12}}" block />
+              <TeX math="ratio_{j} = 2^{\frac{n-baseNote_{i}}{12}}" block />
               <i>where baseNote serves as the reference point (ratio = 1.0)</i>
             </div>
 
@@ -944,8 +950,8 @@ export default function App() {
               <h5>Max Note</h5>
               <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
               <i>The decreasing value is calculated as follows:</i>
-              <TeX math="pitchAdjustment = 7 \cdot \left\lceil\frac{\max(pitch) - maxNote}{7}\right\rceil" block />
-              <i>where max(pitch) is the maximum of all pitches in <TeX math="Track_{j}" /></i>
+              <TeX math="pitchAdjustment_{i} = 7 \cdot \left\lceil\frac{\max(Notes_{i}) - maxNote_{i}}{7}\right\rceil" block />
+              <i>where <TeX math="max(Notes_{i})" /> is the maximum of all pitches in <TeX math="Tracks_{i}" /></i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -955,7 +961,7 @@ export default function App() {
               <h5>Volume Offset</h5>
               <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
               <i>The final volume is calculated as:</i>
-              <TeX math="volume = normalize(velocity) + offset" block />
+              <TeX math="volume_{j} = normalize(velocity_{j}) + offset_{i}" block />
               <i>• Final volume is clamped between 0.05 and 1.0</i><br />
               <i>When Volume Constant is true:</i><br />
               <i>• The offset value is used directly as the volume</i>
@@ -968,7 +974,7 @@ export default function App() {
               <h5>Pitch Offset</h5>
               <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
               <i>The final pitch is calculated as:</i>
-              <TeX math="pitch = pitchRatio + offset" block />
+              <TeX math="pitch_{j} = pitchRatio_{j} + offset_{i}" block />
               <i>• Final pitch is clamped between 0.05 and 3.0</i><br />
               <i>When Pitch Constant is true:</i><br />
               <i>• The offset value is used directly as the pitch</i>
@@ -983,8 +989,8 @@ export default function App() {
               <i>• Enable: Toggles looping on/off</i><br />
               <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
               <i>The final loop length is calculated as:</i>
-              <TeX math="loopFrames = maxOffset + loopOffset" block />
-              <i>where maxOffset is the highest frame offset in the track</i>
+              <TeX math="loopFrames_{j} = maxOffset + loopOffset_{i}" block />
+              <i>where maxOffset is the highest frame offset in the <TeX math="Tracks" /></i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -994,7 +1000,8 @@ export default function App() {
               <h5>Speed</h5>
               <i>Adjusts the playback speed of the track.</i><br />
               <i>The frame offset for each note is calculated as:</i>
-              <TeX math="offset = ticks \cdot tickLength \cdot 50 \cdot (2-speed)" block />
+              <TeX math="offset_{j} = ticks_{j} \cdot tickLength \cdot 50 \cdot (2-speed_{i})" block />
+              <i>where tickLength is the μs tempo of <TeX math="Tracks" /></i><br />
               <i>• speed &gt; 1: Notes play faster than original</i><br />
               <i>• speed &lt; 1: Notes play slower than original</i><br />
               <i>• speed = 1: Notes play at original tempo</i>
@@ -1018,7 +1025,7 @@ export default function App() {
               <h5>Start At</h5>
               <i>Adds an offset to all note frame positions in the track.</i><br />
               <i>The final frame offset for each note becomes:</i>
-              <TeX math="finalOffset = calculatedOffset + startAt + 1" block />
+              <TeX math="finalOffset_{j} = offset_{j} + startAt_{i} + 1" block />
               <i>• Positive values delay the track start</i><br />
               <i>• Negative values advance the track start</i>
             </div>
