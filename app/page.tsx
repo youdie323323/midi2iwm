@@ -7,6 +7,17 @@ import Modal from 'react-modal';
 import 'katex/dist/katex.min.css';
 import TeX from '@matejmazur/react-katex';
 
+declare global {
+  // Define exports between wasm
+  interface Window {
+    __wasm_iwm_exports: {
+      getTracks: (arg: string) => string;
+      midiToIwm: (arg: string, config: string) => string;
+    },
+    appendLog: (arg: string) => void;
+  }
+}
+
 interface TrackConfig {
   id: any;
   Track: number;
@@ -30,16 +41,6 @@ interface TrackConfig {
 }
 
 const trackConfigKeys: (keyof TrackConfig)[] = ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"];
-
-declare global {
-  interface Window {
-    __wasm_iwm_exports: {
-      getTracks: (arg: string) => string;
-      midiToIwm: (arg: string, config: string) => string;
-    },
-    appendLog: (arg: string) => void;
-  }
-}
 
 const instrumentals: string[] = [
   "Duck",
@@ -344,12 +345,8 @@ export default function App() {
         newValue = checked;
         break;
       }
-      case "number": {
-        newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ? parseFloat(value) : parseInt(value, 10);
-        break;
-      }
       default: {
-        newValue = parseInt(value, 10);
+        newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ? parseFloat(value) : parseInt(value, 10);
         break;
       }
     }
@@ -360,18 +357,21 @@ export default function App() {
 
     const keys = name.split('.');
 
+    const [key1, key2]: [keyof TrackConfig, string] = keys;
+
     const updatedTracks = [...configs];
     if (keys.length === 1) {
       updatedTracks[index] = { ...updatedTracks[index], [name]: newValue };
     } else {
       updatedTracks[index] = {
         ...updatedTracks[index],
-        [keys[0]]: {
-          ...updatedTracks[index][keys[0] as keyof TrackConfig],
-          [keys[1]]: newValue,
+        [key1]: {
+          ...updatedTracks[index][key1],
+          [key2]: newValue,
         },
       };
     }
+
     setConfigs(updatedTracks);
     setConfigsModified(true);
   };
@@ -379,6 +379,7 @@ export default function App() {
   const addConfig = () => {
     const newId = configs.length > 0 ? Math.max(...configs.map(t => t.id)) + 1 : 0;
     const config = defaultTrackConfig(newId);
+
     setConfigs([...configs, config]);
     setActiveConfig(config);
     setConfigsModified(true);
@@ -906,6 +907,8 @@ export default function App() {
               borderTop: '2px solid #ffffff'
             }} />
 
+            <h4>Config Informations</h4>
+
             {/* Track */}
             <div>
               <h5>Track</h5>
@@ -951,7 +954,7 @@ export default function App() {
               <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
               <i>The decreasing value is calculated as follows:</i>
               <TeX math="pitchAdjustment_{i} = 7 \cdot \left\lceil\frac{\max(Notes_{i}) - maxNote_{i}}{7}\right\rceil" block />
-              <i>where <TeX math="max(Notes_{i})" /> is the maximum of all pitches in <TeX math="Tracks_{i}" /></i>
+              <i>where <TeX math="max(Notes_{i})" /> is the maximum of all pitches in <TeX math="Notes_{i}" /></i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -1001,7 +1004,7 @@ export default function App() {
               <i>Adjusts the playback speed of the track.</i><br />
               <i>The frame offset for each note is calculated as:</i>
               <TeX math="offset_{j} = ticks_{j} \cdot tickLength \cdot 50 \cdot (2-speed_{i})" block />
-              <i>where tickLength is the μs tempo of <TeX math="Tracks" /></i><br />
+              <i>where tickLength is the μs tempo of <TeX math="Tracks_{i}" /></i><br />
               <i>• speed &gt; 1: Notes play faster than original</i><br />
               <i>• speed &lt; 1: Notes play slower than original</i><br />
               <i>• speed = 1: Notes play at original tempo</i>
