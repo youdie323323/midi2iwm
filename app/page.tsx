@@ -1,6 +1,6 @@
 'use client';
 import './globals.css';
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, SyntheticEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Modal from 'react-modal';
@@ -22,7 +22,12 @@ interface TrackConfig {
   id: any;
   Track: number;
   Instrumental: number;
-  BaseNote: number;
+  /**
+   * @remarks
+   * 
+   * This value will string, but evalute to number on the submittion.
+   */
+  BaseNote: string;
   MaxNote: number;
   Offsets: {
     Volume: number;
@@ -39,6 +44,8 @@ interface TrackConfig {
   StripBefore: number;
   StartAt: number;
 }
+
+type RealTrackConfig = Omit<TrackConfig, "BaseNote"> & { BaseNote: number };
 
 const trackConfigKeys: (keyof TrackConfig)[] = ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"];
 
@@ -89,7 +96,7 @@ const defaultTrackConfig = (id: number): TrackConfig => ({
   id: id,
   Track: 0,
   Instrumental: instrumentals.indexOf("Piano"),
-  BaseNote: 51,
+  BaseNote: "61",
   MaxNote: 73,
   Offsets: {
     Volume: 0,
@@ -193,11 +200,14 @@ export default function App() {
       appendLog('Please specify valid name');
       return
     }
+
     if (localStorage.getItem(`trackConfig_${configName}`) == null) {
       appendLog(`Config with name '${configName}' not exists`);
       return
     }
+
     localStorage.removeItem(`trackConfig_${configName}`);
+
     appendLog(`Configuration '${configName}' deleted from storage`);
     loadConfigNames();
   };
@@ -255,7 +265,6 @@ export default function App() {
       string += base64Chars[(chunk & 0b000000111111000000000000) >> 12];
       string += base64Chars[(chunk & 0b000000000000111111000000) >> 6];
       string += "=";
-
     } else if (remainingBytesCount === 1) {
       const chunk = (bufferView[i] << 16);
       string += base64Chars[(chunk & 0b111111000000000000000000) >> 18];
@@ -271,8 +280,10 @@ export default function App() {
     if (logConsole) {
       const timestamp = new Date().toLocaleTimeString();
       const timestampSpan = `<span class="log-time text-nowrap">[${timestamp}]</span>`;
+
       const logLine = document.createElement("div");
       logLine.innerHTML = message.split("\n").map((str) => str.length !== 0 ? (timestampSpan + str) : null).filter(c => c != null).join("\n");
+
       logConsole.appendChild(logLine);
       logConsole.scrollTop = logConsole.scrollHeight;
     }
@@ -345,13 +356,23 @@ export default function App() {
         newValue = checked;
         break;
       }
+
       default: {
-        newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ? parseFloat(value) : parseInt(value, 10);
+        // BaseNote will evalute to number on the submittion
+        if (name === "BaseNote") {
+          newValue = value;
+          break;
+        }
+
+        newValue = ["Speed", "Offsets.Pitch", "Offsets.Volume"].indexOf(name) !== -1 ?
+          parseFloat(value) :
+          parseInt(value, 10);
+
         break;
       }
     }
 
-    if (Number.isNaN(newValue)) {
+    if (typeof newValue === "number" && isNaN(newValue)) {
       newValue = "";
     }
 
@@ -397,19 +418,58 @@ export default function App() {
     setConfigsModified(true);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-    const file = (document.getElementById("midi-input") as HTMLInputElement).files?.[0];
-    if (!file) {
-      appendLog("Please input midi file before submit");
-      return;
+
+    const submitterKind = ((e.nativeEvent as SubmitEvent).submitter as HTMLInputElement).id;
+
+    switch (submitterKind) {
+      case "submitConfig": {
+        const file = (document.getElementById("midi-input") as HTMLInputElement).files?.[0];
+        if (!file) {
+          appendLog("Please input midi file before submit");
+          return;
+        }
+    
+        const result = window.__wasm_iwm_exports.midiToIwm(
+          await loadMidiFile(file),
+          JSON.stringify(
+            // Evalute all MaxNote
+            configs.map(c => {
+              const newBaseNote = function () {
+                try {
+                  const evaluted = Number(eval(c.BaseNote));
+                  if (isNaN(evaluted)) return 61;
+                  return evaluted;
+                } catch (e) {
+                  return 61;
+                }
+              }();
+    
+              return {
+                ...c,
+                BaseNote: newBaseNote,
+              } satisfies RealTrackConfig;
+            })
+          )
+        );
+        if (!Array.isArray(result)) {
+          appendLog(`Webassembly error: ${result}`);
+          return;
+        }
+    
+        appendLinkMessage("here", result[0] as string, result[1] as unknown as number);
+
+        break;
+      }
+
+      case "submitAboutMore": {
+        openModal();
+        break;
+      }
+
+      default: window.alert("Unknown submittion: " + submitterKind);
     }
-    const result = window.__wasm_iwm_exports.midiToIwm(await loadMidiFile(file), JSON.stringify(configs));
-    if (!Array.isArray(result)) {
-      appendLog(`Webassembly error: ${result}`);
-      return
-    }
-    appendLinkMessage("here", result[0] as string, result[1] as unknown as number);
   };
 
   useLayoutEffect(() => {
@@ -583,7 +643,7 @@ export default function App() {
                     </OverlayTrigger>
                   </div>
                   <input
-                    type="number"
+                    type="text"
                     className="form-control"
                     id={`BaseNote-${track.id}`}
                     name="BaseNote"
@@ -824,17 +884,8 @@ export default function App() {
         ))}
 
         <div className="d-flex align-items-center justify-content-between">
-          <input type="submit" value="Submit config" />
-          <button
-            type="button"
-            onClick={openModal}
-            style={{
-              fontSize: '20px',
-              marginRight: '5px',
-            }}
-          >
-            About more
-          </button>
+          <input type="submit" value="Submit config" id="submitConfig"  />
+          <input type="submit" value="About more" id="submitAboutMore" />
         </div>
       </form>
 
@@ -891,12 +942,15 @@ export default function App() {
             <div>
               <h4>Useful Informations</h4>
               <div>
+                <i>• This tool is created for game named "I Wanna Maker" on steam. This tool make the midi playable in I Wanna Maker using sound play event.</i>
+              </div>
+              <div>
                 <i>• The site </i>
                 <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
                 <i> can easily show & edit midi file.</i><br />
               </div>
               <div>
-                <i>• How to use video: </i>
+                <i>• Example video: </i>
                 <a href="https://youtube.com/" target="_blank" style={{ color: "blue" }}>youtu.be/...</a>
               </div>
             </div>
@@ -913,6 +967,7 @@ export default function App() {
             <div>
               <h5>Track</h5>
               <i>Specifies which MIDI track number to process from the input file.</i><br />
+              <i>• The number of the track you want to play, as indicated in the log</i><br />
               <i>• Track numbers start from 0</i><br />
               <i>• Only tracks containing note events are counted</i>
             </div>
@@ -943,7 +998,10 @@ export default function App() {
               <i>• n is the MIDI note number</i><br />
               <i>In the implementation, relative pitch ratios are calculated using:</i>
               <TeX math="ratio_{j} = 2^{\frac{n-baseNote_{i}}{12}}" block />
-              <i>where baseNote serves as the reference point (ratio = 1.0)</i>
+              <i>where baseNote serves as the reference point (ratio = 1.0)</i><br />
+              <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
+                This value is evaluted as string on submittion. You can type value like this: "61-10".
+              </i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -953,8 +1011,8 @@ export default function App() {
               <h5>Max Note</h5>
               <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
               <i>The decreasing value is calculated as follows:</i>
-              <TeX math="pitchAdjustment_{i} = 7 \cdot \left\lceil\frac{\max(Notes_{i}) - maxNote_{i}}{7}\right\rceil" block />
-              <i>where <TeX math="max(Notes_{i})" /> is the maximum of all pitches in <TeX math="Notes_{i}" /></i>
+              <TeX math="pitchAdjustment_{i} = 7 \cdot \left\lceil\frac{Note_{i_{max}} - maxNote_{i}}{7}\right\rceil" block />
+              <i>where <TeX math="Note_{i_{max}}" /> is the maximum of all pitches in <TeX math="Note_{i}" /></i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -993,7 +1051,7 @@ export default function App() {
               <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
               <i>The final loop length is calculated as:</i>
               <TeX math="loopFrames_{j} = maxOffset + loopOffset_{i}" block />
-              <i>where maxOffset is the highest frame offset in the <TeX math="Tracks" /></i>
+              <i>where maxOffset is the highest frame offset in the all of tracks</i>
             </div>
 
             <hr style={{ margin: '20px 0', border: 'none', borderTop: '1px solid #ffffff' }} />
@@ -1004,7 +1062,7 @@ export default function App() {
               <i>Adjusts the playback speed of the track.</i><br />
               <i>The frame offset for each note is calculated as:</i>
               <TeX math="offset_{j} = ticks_{j} \cdot tickLength \cdot 50 \cdot (2-speed_{i})" block />
-              <i>where tickLength is the μs tempo of <TeX math="Tracks_{i}" /></i><br />
+              <i>where tickLength is the μs tempo of <TeX math="Note_{i}" /></i><br />
               <i>• speed &gt; 1: Notes play faster than original</i><br />
               <i>• speed &lt; 1: Notes play slower than original</i><br />
               <i>• speed = 1: Notes play at original tempo</i>
