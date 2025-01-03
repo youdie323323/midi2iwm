@@ -430,7 +430,7 @@ export default function App() {
           appendLog("Please input midi file before submit");
           return;
         }
-    
+
         const result = window.__wasm_iwm_exports.midiToIwm(
           await loadMidiFile(file),
           JSON.stringify(
@@ -445,7 +445,7 @@ export default function App() {
                   return 61;
                 }
               }();
-    
+
               return {
                 ...c,
                 BaseNote: newBaseNote,
@@ -457,7 +457,7 @@ export default function App() {
           appendLog(`Webassembly error: ${result}`);
           return;
         }
-    
+
         appendLinkMessage("here", result[0] as string, result[1] as unknown as number);
 
         break;
@@ -884,7 +884,7 @@ export default function App() {
         ))}
 
         <div className="d-flex align-items-center justify-content-between">
-          <input type="submit" value="Submit config" id="submitConfig"  />
+          <input type="submit" value="Submit config" id="submitConfig" />
           <input type="submit" value="About more" id="submitAboutMore" />
         </div>
       </form>
@@ -951,7 +951,7 @@ export default function App() {
               </div>
               <div>
                 <i>• Example video: </i>
-                <a href="https://youtube.com/" target="_blank" style={{ color: "blue" }}>youtu.be/...</a>
+                <a href="https://youtu.be/1fFJa8grDLM?si=uBFsZHyR0hyZLGh-" target="_blank" style={{ color: "blue" }}>youtu.be/1fFJa8grDLM</a>
               </div>
             </div>
 
