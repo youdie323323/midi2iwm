@@ -150,7 +150,7 @@ select:focus {
     }
 }
 
-input[type="number"] {
+input[type="number"], input[type="text"] {
     border: 1px solid #cccccc !important;
     display: flex !important;
     font-family: Courier New, Courier, monospace !important;
