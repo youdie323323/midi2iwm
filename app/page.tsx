@@ -942,7 +942,7 @@ export default function App() {
             <div>
               <h4>Useful Informations</h4>
               <div>
-                <i>• This tool is created for game named "I Wanna Maker" on steam. This tool make the midi playable in I Wanna Maker using sound play event.</i>
+                <i>• This tool is created for game named &quot;I Wanna Maker&quot; on steam. This tool make the midi playable in I Wanna Maker using sound play event.</i>
               </div>
               <div>
                 <i>• The site </i>
