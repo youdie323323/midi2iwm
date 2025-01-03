@@ -434,7 +434,7 @@ export default function App() {
         const result = window.__wasm_iwm_exports.midiToIwm(
           await loadMidiFile(file),
           JSON.stringify(
-            // Evalute all MaxNote
+            // Evalute all BaseNote
             configs.map(c => {
               const newBaseNote = function () {
                 try {
@@ -1000,7 +1000,7 @@ export default function App() {
               <TeX math="ratio_{j} = 2^{\frac{n-baseNote_{i}}{12}}" block />
               <i>where baseNote serves as the reference point (ratio = 1.0)</i><br />
               <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                This value is evaluted as string on submittion. You can type value like this: "61-10".
+                This value is evaluted as string on submittion. You can type value like this: &quot;61-10&quot;.
               </i>
             </div>
 
