@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	js.Global().Set("goiwmModule", js.ValueOf(map[string]interface{}{
+	js.Global().Set("goiwmModul", js.ValueOf(map[string]interface{}{
 		"getTracks": js.FuncOf(getTracks),
 		"midiToIwm": js.FuncOf(midiToIwm),
 	}))
