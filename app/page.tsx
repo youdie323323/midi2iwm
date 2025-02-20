@@ -1,6 +1,6 @@
 'use client';
 import './globals.css';
-import { Fragment, SyntheticEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type SyntheticEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Modal from 'react-modal';
@@ -8,13 +8,13 @@ import 'katex/dist/katex.min.css';
 import TeX from '@matejmazur/react-katex';
 
 declare global {
-  // Define exports between wasm
   interface Window {
+    // Define export between wasm
     goiwmModule: {
-      getTracks: (arg: string) => string;
-      midiToIwm: (arg: string, config: string) => string;
+      getTracks: (encodedMidi: string) => string;
+      midiToIwm: (encodedMidi: string, config: string) => string;
     },
-    appendLog: (arg: string) => void;
+    appendLog: (message: string) => void;
   }
 }
 
@@ -215,7 +215,7 @@ export default function App() {
   };
 
   const loadConfig = (name: string) => {
-    if (name === "THIS_IS_TEMP_DONT_USE") {
+    if (name === "VIEW_PLACEHOLDER_OFFSET") {
       appendLog("Invalid config selected");
       return;
     }
@@ -442,7 +442,7 @@ export default function App() {
                 try {
                   const evaluted = Number(eval(c.BaseNote));
                   if (isNaN(evaluted)) return 61;
-                  
+
                   return evaluted;
                 } catch (e) {
                   return 61;
@@ -527,7 +527,7 @@ export default function App() {
           className="form-select me-2"
           onChange={(e) => loadConfig(e.target.value)}
         >
-          <option value="THIS_IS_TEMP_DONT_USE">Select Config to Load</option>
+          <option value="VIEW_PLACEHOLDER_OFFSET">Select Config to Load</option>
           {configNames.map(name => (
             <option key={name} value={name}>{name}</option>
           ))}

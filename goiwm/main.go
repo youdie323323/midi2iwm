@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	js.Global().Set("goiwmModule", js.ValueOf(map[string]interface{}{
+	js.Global().Set("goiwmModule", js.ValueOf(map[string]any{
 		"getTracks": js.FuncOf(getTracks),
 		"midiToIwm": js.FuncOf(midiToIwm),
 	}))
@@ -19,7 +19,7 @@ func main() {
 	select {}
 }
 
-func getTracks(this js.Value, p []js.Value) interface{} {
+func getTracks(this js.Value, p []js.Value) any {
 	data, err := base64.StdEncoding.DecodeString(p[0].String())
 	if err != nil {
 		return err.Error()
@@ -33,7 +33,7 @@ func getTracks(this js.Value, p []js.Value) interface{} {
 	return "vas:" + SmfString(tracks)
 }
 
-func midiToIwm(this js.Value, p []js.Value) interface{} {
+func midiToIwm(this js.Value, p []js.Value) any {
 	data, err := base64.StdEncoding.DecodeString(p[0].String())
 	if err != nil {
 		return err.Error()
