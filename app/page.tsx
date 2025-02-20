@@ -10,7 +10,7 @@ import TeX from '@matejmazur/react-katex';
 declare global {
   // Define exports between wasm
   interface Window {
-    __wasm_iwm_exports: {
+    goiwmModule: {
       getTracks: (arg: string) => string;
       midiToIwm: (arg: string, config: string) => string;
     },
@@ -185,10 +185,12 @@ export default function App() {
       appendLog('Please specify valid name');
       return
     }
+
     if (localStorage.getItem(`trackConfig_${configName}`) != null) {
       appendLog(`Config with name '${configName}' already exists`);
       return
     }
+
     localStorage.setItem(`trackConfig_${configName}`, JSON.stringify(configs));
     appendLog(`Configuration '${configName}' saved to storage`);
     loadConfigNames();
@@ -431,7 +433,7 @@ export default function App() {
           return;
         }
 
-        const result = window.__wasm_iwm_exports.midiToIwm(
+        const result = window.goiwmModule.midiToIwm(
           await loadMidiFile(file),
           JSON.stringify(
             // Evalute all BaseNote
@@ -440,6 +442,7 @@ export default function App() {
                 try {
                   const evaluted = Number(eval(c.BaseNote));
                   if (isNaN(evaluted)) return 61;
+                  
                   return evaluted;
                 } catch (e) {
                   return 61;
@@ -500,11 +503,12 @@ export default function App() {
           onInput={async function (e) {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
-              let result = window.__wasm_iwm_exports.getTracks(await loadMidiFile(file));
+              let result = window.goiwmModule.getTracks(await loadMidiFile(file));
               if (typeof result !== "string" || !result.startsWith("vas:")) {
                 appendLog(`Webassembly error: ${result}`);
                 return;
               }
+
               // Remove "vas:"
               result = result.substring(4);
               appendLog(result);
