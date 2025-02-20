@@ -1026,8 +1026,15 @@ export default function App() {
               <h5>Volume Offset</h5>
               <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
               <i>The final volume is calculated as:</i>
-              <TeX math="volume_{j} = normalize(velocity_{j}) + offset_{i}" block />
-              <i>• Final volume is clamped between 0.05 and 1.0</i><br />
+              <TeX math="
+\begin{aligned}
+    v_j &= \operatorname{clamp} \left( V_{j_{\text{norm}}} + \text{offset}_i, v_{\min}, v_{\max} \right), \\
+    \text{where} \quad 
+    v_{\min} &= \frac{1}{20}, \quad
+    v_{\max} = 1, \\
+    V_{j_{\text{norm}}} &= v_{\min} + \left( \left( \frac{V_{j}}{127} \right)^2 (v_{\max} - v_{\min}) \right), \quad 0 \leq V_{j} \leq 127
+\end{aligned}
+" block />
               <i>When Volume Constant is true:</i><br />
               <i>• The offset value is used directly as the volume</i>
             </div>
@@ -1039,8 +1046,7 @@ export default function App() {
               <h5>Pitch Offset</h5>
               <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
               <i>The final pitch is calculated as:</i>
-              <TeX math="pitch_{j} = pitchRatio_{j} + offset_{i}" block />
-              <i>• Final pitch is clamped between 0.05 and 3.0</i><br />
+              <TeX math="pitch_{j} = \operatorname{clamp} \left( pitchRatio_{j} + offset_{i}, pitch_{\min}, pitch_{\max} \right)" block />
               <i>When Pitch Constant is true:</i><br />
               <i>• The offset value is used directly as the pitch</i>
             </div>
