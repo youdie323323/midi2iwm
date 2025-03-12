@@ -24,8 +24,7 @@ interface TrackConfig {
   Instrumental: number;
   /**
    * @remarks
-   * 
-   * This value will string, but evalute to number on the submittion.
+   * This value is string, but evalute on the submittion.
    */
   BaseNote: string;
   MaxNote: number;
@@ -47,9 +46,9 @@ interface TrackConfig {
 
 type RealTrackConfig = Omit<TrackConfig, "BaseNote"> & { BaseNote: number };
 
-const trackConfigKeys: (keyof TrackConfig)[] = ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"];
+const TRACK_CONFIG_KEYS: (keyof TrackConfig)[] = ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"];
 
-const instrumentals: string[] = [
+const INSTRUMENTALS: string[] = [
   "Duck",
   "Glass Break",
   "Bubble",
@@ -88,14 +87,15 @@ const instrumentals: string[] = [
   "Dog Bark",
   "Cat Meow",
   "Toll Bell",
-  "Robot"
+  "Robot",
+  "Damage",
 ];
 
 const defaultTrackConfig = (id: number): TrackConfig => ({
   // Default is piano
   id: id,
   Track: 0,
-  Instrumental: instrumentals.indexOf("Piano"),
+  Instrumental: INSTRUMENTALS.indexOf("Piano"),
   BaseNote: "61",
   MaxNote: 73,
   Offsets: {
@@ -156,7 +156,7 @@ export default function App() {
           return;
         }
         const parsed = JSON.parse(fileContent);
-        if (!Array.isArray(parsed) || parsed.map((v) => hasAllKeys(v, trackConfigKeys)).some(v => v === false)) {
+        if (!Array.isArray(parsed) || parsed.map((v) => hasAllKeys(v, TRACK_CONFIG_KEYS)).some(v => v === false)) {
           appendLog('Config is not valid type');
           return;
         }
@@ -620,7 +620,7 @@ export default function App() {
                     onChange={(e) => handleInputChange(index, e)}
                   >
                     <option value=""> -- inst -- </option>
-                    {instrumentals.map((track, index) => (
+                    {INSTRUMENTALS.map((track, index) => (
                       <option value={index} key={index}>{track}</option>
                     ))}
                   </select>
