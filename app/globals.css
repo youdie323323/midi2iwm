@@ -167,6 +167,11 @@ body::-webkit-scrollbar,
     }
 }
 
+/* Disable user select */
+body:not(input):not(select) {
+    user-select: none !important;
+}
+
 /* React-modal styles */
 
 .ReactModal__Overlay {
