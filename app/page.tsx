@@ -944,7 +944,7 @@ export default function App() {
                                                 <Tooltip className="configuration-tooltip">
                                                     Track. You can view track list by log (you need to input midi file).
                                                     <br />
-                                                    If track is logged like "Track: x, name: ..." you can input x here.
+                                                    If track is logged like &quot;Track: x, name: ...&quot; you can input x here.
                                                     <br />
                                                     Type: <span style={{ color: "yellow" }}>Integer</span>.
                                                 </Tooltip>
