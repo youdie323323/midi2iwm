@@ -7,6 +7,48 @@ import { Tooltip, OverlayTrigger } from "react-bootstrap";
 import Modal from "react-modal";
 import "katex/dist/katex.min.css";
 import TeX from "@matejmazur/react-katex";
+import Select from "react-select";
+import { StaticImageData } from "next/image";
+
+import duckIcon from "../public/icons/duck.png";
+import glassBreakIcon from "../public/icons/glass-break.png";
+import bubbleIcon from "../public/icons/bubble.png";
+import lightSwitchIcon from "../public/icons/light-switch.png";
+import ringBellIcon from "../public/icons/ring-bell.png";
+import exclamationIcon from "../public/icons/exclamation.png";
+import springIcon from "../public/icons/spring.png";
+import hornIcon from "../public/icons/horn.png";
+import okIcon from "../public/icons/ok.png";
+import punchIcon from "../public/icons/punch.png";
+import laserGunIcon from "../public/icons/laser-gun.png";
+import wooshIcon from "../public/icons/woosh.png";
+import whistleIcon from "../public/icons/whistle.png";
+import magicIcon from "../public/icons/magic.png";
+import ninjaIcon from "../public/icons/ninja.png";
+import clappingIcon from "../public/icons/clapping.png";
+import drumRollIcon from "../public/icons/drum-roll.png";
+import pianoIcon from "../public/icons/piano.png";
+import bassIcon from "../public/icons/bass.png";
+import partyNoisemakerIcon from "../public/icons/party-noisemaker.png";
+import hootIcon from "../public/icons/hoot.png";
+import laughterIcon from "../public/icons/laughter.png";
+import suspenseIcon from "../public/icons/suspense.png";
+import woodScraperIcon from "../public/icons/wood-scraper.png";
+import drumIcon from "../public/icons/drum.png";
+import nonoIcon from "../public/icons/no-no.png";
+import glassBottleIcon from "../public/icons/glass-bottle.png";
+import woodimbaIcon from "../public/icons/woodimba.png";
+import metallicHitIcon from "../public/icons/metallic-hit.png";
+import gunIcon from "../public/icons/gun.png";
+import electricChargeIcon from "../public/icons/electric-charge.png";
+import laserBlastIcon from "../public/icons/laser-blast.png";
+import heartbeatIcon from "../public/icons/heartbeat.png";
+import rubberChickenIcon from "../public/icons/rubber-chicken.png";
+import dogBarkIcon from "../public/icons/dog-bark.png";
+import catMeowIcon from "../public/icons/cat-meow.png";
+import tollBellIcon from "../public/icons/toll-bell.png";
+import robotIcon from "../public/icons/robot.png";
+import damageIcon from "../public/icons/damage.png";
 
 const TRACKS_NORMAL_PREFIX = "NOT_AN_ERROR:" as const;
 
@@ -19,12 +61,12 @@ declare global {
     }
 }
 
-const cyrb53 = (str: string, seed = 0): string => {
+const cyrb53 = (text: string, seed = 0): string => {
     let h1 = 0xdeadbeef ^ seed,
         h2 = 0x41c6ce57 ^ seed;
 
-    for (let i = 0, ch; i < str.length; i++) {
-        ch = str.charCodeAt(i);
+    for (let i = 0, ch; i < text.length; i++) {
+        ch = text.charCodeAt(i);
 
         h1 = Math.imul(h1 ^ ch, 2654435761);
         h2 = Math.imul(h2 ^ ch, 1597334677);
@@ -39,9 +81,9 @@ const cyrb53 = (str: string, seed = 0): string => {
     return (h2 >>> 0).toString(16).padStart(8, "0") + (h1 >>> 0).toString(16).padStart(8, "0");
 };
 
-const downloadJson = (fileName: string, data: string) => {
+const downloadText = (fileName: string, text: string) => {
     const tempElement = document.createElement("a");
-    const file = new Blob([data], { type: "application/json" });
+    const file = new Blob([text], { type: "application/json" });
 
     tempElement.href = URL.createObjectURL(file);
     tempElement.download = fileName;
@@ -144,47 +186,177 @@ type RealTrackConfig = Omit<TrackConfig, "BaseNote"> & { BaseNote: number };
 const TRACK_CONFIG_KEYS: Array<keyof TrackConfig> =
     ["id", "Track", "Instrumental", "BaseNote", "MaxNote", "Offsets", "Loop", "Speed", "StripAfter", "StripBefore", "StartAt"] as const;
 
-const INSTRUMENTALS: Array<string> = [
-    "Duck",
-    "Glass Break",
-    "Bubble",
-    "Light Switch",
-    "Ring Bell",
-    "Exclamation",
-    "Spring",
-    "Horn",
-    "OK",
-    "Glass Break 2",
-    "Punch",
-    "Laser Gun",
-    "Woosh",
-    "Whistle",
-    "Magic",
-    "Ninja",
-    "Clapping",
-    "Drum Roll",
-    "Piano",
-    "Bass",
-    "Party Noisemaker",
-    "Hoot",
-    "Laughter",
-    "Suspense",
-    "Wood Scraper",
-    "Drum",
-    "No-no",
-    "Glass Bottle",
-    "Woodimba",
-    "Metallic Hit",
-    "Gun",
-    "Electric Charge",
-    "Laser Blast (Foam Icon)",
-    "Heartbeat",
-    "Rubber Chicken",
-    "Dog Bark",
-    "Cat Meow",
-    "Toll Bell",
-    "Robot",
-    "Damage",
+const InstructionSelectLabel = (name: string, icon: StaticImageData) => {
+    return (
+        <div className="flex justify-between items-center w-full h-4">
+            {name} <img style={{ objectFit: "fill", width: 24, height: 24 }} src={icon.src} />
+        </div>
+    );
+};
+
+const PIANO_SELECT_OPTION = {
+    value: 18,
+    label: InstructionSelectLabel("Piano", pianoIcon),
+};
+
+const INSTRUCTION_SELECT_OPTIONS = [
+    {
+        value: 0,
+        label: InstructionSelectLabel("Duck", duckIcon),
+    },
+    {
+        value: 1,
+        label: InstructionSelectLabel("Glass Break", glassBreakIcon),
+    },
+    {
+        value: 2,
+        label: InstructionSelectLabel("Bubble", bubbleIcon),
+    },
+    {
+        value: 3,
+        label: InstructionSelectLabel("Light Switch", lightSwitchIcon),
+    },
+    {
+        value: 4,
+        label: InstructionSelectLabel("Ring Bell", ringBellIcon),
+    },
+    {
+        value: 5,
+        label: InstructionSelectLabel("Exclamation", exclamationIcon),
+    },
+    {
+        value: 6,
+        label: InstructionSelectLabel("Spring", springIcon),
+    },
+    {
+        value: 7,
+        label: InstructionSelectLabel("Horn", hornIcon),
+    },
+    {
+        value: 8,
+        label: InstructionSelectLabel("OK", okIcon),
+    },
+    // { // No needed since its same with Glass Break
+    //     value: 9,
+    //     label: InstructionSelectLabel("Glass Break 2", glassBreakIcon),
+    // },
+    {
+        value: 10,
+        label: InstructionSelectLabel("Punch", punchIcon),
+    },
+    {
+        value: 11,
+        label: InstructionSelectLabel("Laser Gun", laserGunIcon),
+    },
+    {
+        value: 12,
+        label: InstructionSelectLabel("Woosh", wooshIcon),
+    },
+    {
+        value: 13,
+        label: InstructionSelectLabel("Whistle", whistleIcon),
+    },
+    {
+        value: 14,
+        label: InstructionSelectLabel("Magic", magicIcon),
+    },
+    {
+        value: 15,
+        label: InstructionSelectLabel("Ninja", ninjaIcon),
+    },
+    {
+        value: 16,
+        label: InstructionSelectLabel("Clapping", clappingIcon),
+    },
+    {
+        value: 17,
+        label: InstructionSelectLabel("Drum Roll", drumRollIcon),
+    },
+    PIANO_SELECT_OPTION,
+    {
+        value: 19,
+        label: InstructionSelectLabel("Bass", bassIcon),
+    },
+    {
+        value: 20,
+        label: InstructionSelectLabel("Party Noisemaker", partyNoisemakerIcon),
+    },
+    {
+        value: 21,
+        label: InstructionSelectLabel("Hoot", hootIcon),
+    },
+    {
+        value: 22,
+        label: InstructionSelectLabel("Laughter", laughterIcon),
+    },
+    {
+        value: 23,
+        label: InstructionSelectLabel("Suspense", suspenseIcon),
+    },
+    {
+        value: 24,
+        label: InstructionSelectLabel("Wood Scraper", woodScraperIcon),
+    },
+    {
+        value: 25,
+        label: InstructionSelectLabel("Drum", drumIcon),
+    },
+    {
+        value: 26,
+        label: InstructionSelectLabel("No-no", nonoIcon),
+    },
+    {
+        value: 27,
+        label: InstructionSelectLabel("Glass Bottle", glassBottleIcon),
+    },
+    {
+        value: 28,
+        label: InstructionSelectLabel("Woodimba", woodimbaIcon),
+    },
+    {
+        value: 29,
+        label: InstructionSelectLabel("Metallic Hit", metallicHitIcon),
+    },
+    {
+        value: 30,
+        label: InstructionSelectLabel("Gun", gunIcon),
+    },
+    {
+        value: 31,
+        label: InstructionSelectLabel("Electric Charge", electricChargeIcon),
+    },
+    {
+        value: 32,
+        label: InstructionSelectLabel("Laser Blast", laserBlastIcon),
+    },
+    {
+        value: 33,
+        label: InstructionSelectLabel("Heartbeat", heartbeatIcon),
+    },
+    {
+        value: 34,
+        label: InstructionSelectLabel("Rubber Chicken", rubberChickenIcon),
+    },
+    {
+        value: 35,
+        label: InstructionSelectLabel("Dog Bark", dogBarkIcon),
+    },
+    {
+        value: 36,
+        label: InstructionSelectLabel("Cat Meow", catMeowIcon),
+    },
+    {
+        value: 37,
+        label: InstructionSelectLabel("Toll Bell", tollBellIcon),
+    },
+    {
+        value: 38,
+        label: InstructionSelectLabel("Robot", robotIcon),
+    },
+    {
+        value: 39,
+        label: InstructionSelectLabel("Damage", damageIcon),
+    },
 ];
 
 type DotNestedKeys<T> = {
@@ -202,10 +374,10 @@ type DotNestedTrackConfigKeys = DotNestedKeys<TrackConfig>;
 const INTERNAL_CONFIG_FLOAT_KEYS: Array<DotNestedTrackConfigKeys> =
     ["Speed", "Offsets.Pitch", "Offsets.Volume"] as const;
 
-const defaultTrackConfig = (id: number): TrackConfig => ({
+const makeDefaultTrackConfig = (id: number): TrackConfig => ({
     id: id,
     Track: 0,
-    Instrumental: INSTRUMENTALS.indexOf("Piano"),  // Default is piano
+    Instrumental: PIANO_SELECT_OPTION.value,  // Default is piano
     BaseNote: "61",
     MaxNote: 73,
     Offsets: {
@@ -224,7 +396,7 @@ const defaultTrackConfig = (id: number): TrackConfig => ({
     StartAt: 0,
 });
 
-const DEFAULT_TRACK_CONFIGS: Array<TrackConfig> = [defaultTrackConfig(0)];
+const DEFAULT_TRACK_CONFIGS: Array<TrackConfig> = [makeDefaultTrackConfig(0)];
 
 const STORAGE_TRACK_CONFIG_KEY_PREFIX = "trackConfig_" as const;
 
@@ -310,6 +482,24 @@ export default function App() {
         log("Webassembly setup");
     }, []);
 
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (trackConfigsModified) {
+                e.preventDefault();
+
+                e.returnValue = "";
+
+                return "";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [trackConfigsModified]);
+
     const saveTrackConfig = (name: string) => {
         const prefixedName = prefixTrackConfigName(name)
 
@@ -383,77 +573,19 @@ export default function App() {
         }
     };
 
-    const log = (message: string) => {
-        const logConsole = document.getElementById("log-console");
-        if (logConsole) {
-            const timestamp = new Date().toLocaleTimeString();
-
-            const timestampSpan = `<span class="log-time text-nowrap">[${timestamp}]</span>`;
-
-            const logLine = document.createElement("div");
-
-            logLine.innerHTML =
-                message.split("\n")
-                    .filter(line => line.length !== 0)
-                    .map(line => timestampSpan + line)
-                    .join("\n");
-
-            logConsole.appendChild(logLine);
-            logConsole.scrollTop = logConsole.scrollHeight;
-        }
-    };
-
-    const logGenerationDoneMessage = (objectsXml: string, numObjects: number) => {
-        const logConsole = document.getElementById("log-console");
-        if (logConsole) {
-            const timestamp = new Date().toLocaleTimeString();
-
-            const timestampSpan = document.createElement("span");
-
-            timestampSpan.className = "log-time";
-            timestampSpan.textContent = `[${timestamp}]`;
-
-            const logLine = document.createElement("div");
-
-            const linkElement = document.createElement("div");
-
-            linkElement.className = "log-link";
-            linkElement.innerHTML = "here";
-            linkElement.onclick = () => navigator.clipboard.writeText(objectsXml).then(
-                () => {
-                    log("Successfully copied!");
-                },
-                () => {
-                    log("Copy failed, downloading...");
-
-                    downloadJson(`out_${new Date().getTime()}.txt`, objectsXml);
-                },
-            );
-
-            const textBefore = document.createTextNode("Done. click ");
-            const textAfter = document.createTextNode(` to copy objects | num objects: ${numObjects}`);
-
-            logLine.appendChild(timestampSpan);
-            logLine.appendChild(textBefore);
-            logLine.appendChild(linkElement);
-            logLine.appendChild(textAfter);
-
-            logConsole.appendChild(logLine);
-
-            logConsole.scrollTop = logConsole.scrollHeight;
-        }
-    };
-
     type HandleableEvents = React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>;
 
     type DetailedElement<T> = Omit<T, "name"> & { name: DotNestedTrackConfigKeys };
 
-    type DetailedHandleableEventTarget =
-        (EventTarget & DetailedElement<HTMLInputElement>) | (EventTarget & DetailedElement<HTMLSelectElement>);
+    type HTMLInputElementEventTarget = EventTarget & DetailedElement<HTMLInputElement>;
+    type HTMLSelectElementEventTarget = EventTarget & DetailedElement<HTMLSelectElement>;
 
-    const handleInputChange = (event: HandleableEvents, index: number) => {
+    type DetailedHandleableEventTargets =
+        HTMLInputElementEventTarget | HTMLSelectElementEventTarget;
+
+    const handleTrackConfigChange = (event: HandleableEvents, index: number) => {
         const typedTarget =
-            event.target as DetailedHandleableEventTarget;
+            event.target as DetailedHandleableEventTargets;
 
         const { name, value, type } = typedTarget;
 
@@ -511,13 +643,75 @@ export default function App() {
         setTrackConfigsModified(true);
     };
 
+    const log = (message: string) => {
+        const logConsole = document.getElementById("log-console");
+        if (logConsole) {
+            const timestamp = new Date().toLocaleTimeString();
+
+            const timestampSpan = `<span class="log-time text-nowrap">[${timestamp}]</span>`;
+
+            const logLine = document.createElement("div");
+
+            logLine.innerHTML =
+                message.split("\n")
+                    .filter(line => line.length !== 0)
+                    .map(line => timestampSpan + line)
+                    .join("\n");
+
+            logConsole.appendChild(logLine);
+
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+    };
+
+    const logGenerationDoneMessage = (data: string, numObjects: number) => {
+        const logConsole = document.getElementById("log-console");
+        if (logConsole) {
+            const timestamp = new Date().toLocaleTimeString();
+
+            const timestampSpan = document.createElement("span");
+
+            timestampSpan.className = "log-time";
+            timestampSpan.textContent = `[${timestamp}]`;
+
+            const logLine = document.createElement("div");
+
+            const linkElement = document.createElement("div");
+
+            linkElement.className = "log-link";
+            linkElement.innerHTML = "here";
+            linkElement.onclick = () => navigator.clipboard.writeText(data).then(
+                () => {
+                    log("Successfully copied!");
+                },
+                () => {
+                    log("Copy failed, downloading...");
+
+                    downloadText(`out_${new Date().getTime()}.txt`, data);
+                },
+            );
+
+            const textBefore = document.createTextNode("Done. click ");
+            const textAfter = document.createTextNode(` to copy objects | num objects: ${numObjects}`);
+
+            logLine.appendChild(timestampSpan);
+            logLine.appendChild(textBefore);
+            logLine.appendChild(linkElement);
+            logLine.appendChild(textAfter);
+
+            logConsole.appendChild(logLine);
+
+            logConsole.scrollTop = logConsole.scrollHeight;
+        }
+    };
+
     const addTabTrackConfig = () => {
         const newId =
             trackConfigs.length > 0
                 ? Math.max(...trackConfigs.map(t => t.id)) + 1
                 : 0;
 
-        const config = defaultTrackConfig(newId);
+        const config = makeDefaultTrackConfig(newId);
 
         setTrackConfigs([...trackConfigs, config]);
         setSelectedTrackConfig(config);
@@ -548,10 +742,10 @@ export default function App() {
         const submitterId = ((event.nativeEvent as SubmitEvent).submitter as HTMLInputElement).id;
 
         switch (submitterId) {
-            case "submitConfig": {
+            case "submit-config": {
                 const file = (document.getElementById("midi-input") as HTMLInputElement).files?.[0];
                 if (!file) {
-                    log("Please input midi file before submit");
+                    log("Please input midi file before submit configurations");
 
                     return;
                 }
@@ -594,7 +788,7 @@ export default function App() {
                 break;
             }
 
-            case "submitAboutMore": {
+            case "about-more": {
                 openModal();
 
                 break;
@@ -611,12 +805,13 @@ export default function App() {
                 <p className="block mb-2 text-sm text-gray-500 dark:text-gray-400 w-full" id="file_input_help">MIDI files only (.mid, .midi)</p>
 
                 <input
+                    type="file"
                     className="w-full px-2 py-2 text-sm"
                     aria-describedby="file_input_help"
                     accept=".mid,.midi"
                     id="midi-input"
-                    onInput={async function (e) {
-                        const file = (e.target as HTMLInputElement).files?.[0];
+                    onInput={async function (event) {
+                        const file = (event.target as HTMLInputElement).files?.[0];
                         if (file) {
                             let result = window.goIwm.tracks(await readFileAsBase64(file));
                             if (typeof result !== "string" || !result.startsWith(TRACKS_NORMAL_PREFIX)) {
@@ -631,7 +826,6 @@ export default function App() {
                             log(result);
                         }
                     } as React.ChangeEventHandler<HTMLInputElement>}
-                    type="file"
                 />
             </div>
 
@@ -645,7 +839,7 @@ export default function App() {
                 <button className="btn btn-primary me-2" style={{ width: 75, height: 33, padding: "1px 0rem 0px 0px" }} onClick={() => {
                     const name = prompt("Input configuration name to delete");
                     if (!name) {
-                        log(`Configuration ${name} is not valid`);
+                        log(`Configuration "${name}" not valid`);
 
                         return;
                     }
@@ -658,7 +852,7 @@ export default function App() {
                 <button className="btn btn-danger me-2" style={{ width: 82, height: 33, padding: "1px 0rem 0px 0px" }} onClick={() => {
                     const name = prompt("Input configuration name to delete");
                     if (!name) {
-                        log(`Configuration ${name} is not valid`);
+                        log(`Configuration "${name}" not valid`);
 
                         return;
                     }
@@ -669,7 +863,7 @@ export default function App() {
                 </button>
 
                 <select
-                    className="form-select me-2"
+                    className="form-select me-2 configuration-select"
                     onChange={(e) => loadTrackConfig(e.target.value)}
                 >
                     <option value={TRACK_CONFIG_SELECTION_DEFAULT_NAME}>Select Config to Load</option>
@@ -684,7 +878,7 @@ export default function App() {
                 () => {
                     const jsonTrackConfigs = JSON.stringify(trackConfigs);
 
-                    downloadJson(`export_${cyrb53(jsonTrackConfigs)}.json`, jsonTrackConfigs);
+                    downloadText(`export_${cyrb53(jsonTrackConfigs)}.json`, jsonTrackConfigs);
                 }
             }>export</div> with JSON</span>
 
@@ -747,8 +941,10 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
+                                                <Tooltip className="configuration-tooltip">
                                                     Track. You can view track list by log (you need to input midi file).
+                                                    <br />
+                                                    If track is logged like "Track: x, name: ..." you can input x here.
                                                     <br />
                                                     Type: <span style={{ color: "yellow" }}>Integer</span>.
                                                 </Tooltip>
@@ -770,31 +966,76 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`Track-${track.id}`}
                                         name={"Track" satisfies DotNestedTrackConfigKeys}
                                         value={track.Track}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
                                 <div className="col">
                                     <label htmlFor={`Instrumental-${track.id}`} className="form-label">Instrumental</label>
 
-                                    <select
-                                        className="form-select"
-                                        aria-label="instrumental"
+                                    <Select
+                                        className="scroller"
+                                        options={INSTRUCTION_SELECT_OPTIONS}
                                         id={`Instrumental-${track.id}`}
-                                        name={"Instrumental" satisfies DotNestedTrackConfigKeys}
-                                        value={track.Instrumental}
-                                        onChange={(event) => handleInputChange(event, index)}
-                                    >
-                                        <option value=""> -- inst -- </option>
+                                        value={INSTRUCTION_SELECT_OPTIONS.find(option => option.value === track.Instrumental)}
+                                        defaultValue={PIANO_SELECT_OPTION}
+                                        onChange={(newValue) => handleTrackConfigChange(
+                                            {
+                                                target: {
+                                                    name: "Instrumental" satisfies DotNestedTrackConfigKeys,
+                                                    type: "select-one",
+                                                    value: String(newValue?.value),
+                                                } as HTMLSelectElementEventTarget,
+                                            } as unknown as HandleableEvents,
+                                            index,
+                                        )}
+                                        filterOption={(option, input) => {
+                                            // Extract name
+                                            const name = option.data.label.props.children[0].trim();
 
-                                        {INSTRUMENTALS.map((track, index) => (
-                                            <option value={index} key={index}>{track}</option>
-                                        ))}
-                                    </select>
+                                            return name.toLowerCase().includes(input.toLowerCase());
+                                        }}
+                                        styles={{
+                                            control: (base) => ({
+                                                ...base,
+
+                                                width: "16rem",
+                                                height: "2rem",
+                                                minHeight: "2rem",
+                                                borderColor: "#cccccc",
+                                                fontFamily: "Courier New, Courier, monospace",
+                                                cursor: "pointer",
+                                            }),
+                                            container: (base) => ({
+                                                ...base,
+
+                                                color: "black",
+                                            }),
+                                            valueContainer: (base) => ({
+                                                ...base,
+
+                                                padding: "0 0.6rem",
+                                            }),
+                                            indicatorSeparator: props => ({
+                                                display: "none",
+                                            }),
+                                            indicatorsContainer: (base, props) => ({
+                                                ...base,
+
+                                                height: "2rem",
+                                            }),
+                                            option: (base) => ({
+                                                ...base,
+
+                                                cursor: "pointer",
+                                            }),
+                                        }}
+                                        placeholder="Type something..."
+                                    />
                                 </div>
                             </div>
 
@@ -806,7 +1047,7 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
+                                                <Tooltip className="configuration-tooltip">
                                                     Pitch table value. Mainly controls when changing the pitch.
                                                     <br />
                                                     Type: <span style={{ color: "yellow" }}>Integer</span>.
@@ -829,11 +1070,11 @@ export default function App() {
 
                                     <input
                                         type="text"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`BaseNote-${track.id}`}
                                         name={"BaseNote" satisfies DotNestedTrackConfigKeys}
                                         value={track.BaseNote}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
@@ -844,7 +1085,7 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
+                                                <Tooltip className="configuration-tooltip">
                                                     Maximum pitch value.
                                                     <br />
                                                     Type: <span style={{ color: "yellow" }}>Integer</span>.
@@ -867,11 +1108,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`MaxNote-${track.id}`}
                                         name={"MaxNote" satisfies DotNestedTrackConfigKeys}
                                         value={track.MaxNote}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -890,8 +1131,8 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
-                                                    Volume offset added to original volume. If volume constant is on, will use this value as a fixed value.
+                                                <Tooltip className="configuration-tooltip">
+                                                    Volume offset added to original volume. If volume constant is on, will use this value as volume constant.
                                                     <br />
                                                     Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value.
                                                     <br />
@@ -915,11 +1156,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`Offsets.Volume-${track.id}`}
                                         name={"Offsets.Volume" satisfies DotNestedTrackConfigKeys}
                                         value={track.Offsets.Volume}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                                 <div className="col">
@@ -927,11 +1168,11 @@ export default function App() {
 
                                     <input
                                         type="checkbox"
-                                        className="form-check-input"
+                                        className="form-check-input configuration-checkbox"
                                         id={`Offsets.VolumeConstant-${track.id}`}
                                         name={"Offsets.VolumeConstant" satisfies DotNestedTrackConfigKeys}
                                         checked={track.Offsets.VolumeConstant}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -944,10 +1185,10 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
-                                                    Pitch offset added to original pitch. If pitch constant is on, use this value as a fixed value.
+                                                <Tooltip className="configuration-tooltip">
+                                                    Pitch offset added to original pitch. If pitch constant is on, will use this value as pitch constant.
                                                     <br />
-                                                    Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value.
+                                                    Dont forgot that you can use <span style={{ color: "cyan" }}>minus</span> value.
                                                     <br />
                                                     Type: <span style={{ color: "green" }}>Float</span>.
                                                 </Tooltip>
@@ -969,23 +1210,24 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`Offsets.Pitch-${track.id}`}
                                         name={"Offsets.Pitch" satisfies DotNestedTrackConfigKeys}
                                         value={track.Offsets.Pitch}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
                                 <div className="col">
                                     <label className="form-check-label" htmlFor={`Offsets.PitchConstant-${track.id}`}>Pitch Constant</label>
+
                                     <input
                                         type="checkbox"
-                                        className="form-check-input"
+                                        className="form-check-input configuration-checkbox"
                                         id={`Offsets.PitchConstant-${track.id}`}
                                         name={"Offsets.PitchConstant" satisfies DotNestedTrackConfigKeys}
                                         checked={track.Offsets.PitchConstant}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -1002,11 +1244,11 @@ export default function App() {
 
                                     <input
                                         type="checkbox"
-                                        className="form-check-input"
+                                        className="form-check-input configuration-checkbox"
                                         id={`Loop.Enable-${track.id}`}
                                         name={"Loop.Enable" satisfies DotNestedTrackConfigKeys}
                                         checked={track.Loop.Enable}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
@@ -1017,10 +1259,10 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
+                                                <Tooltip className="configuration-tooltip">
                                                     Offset frames added to the original loop frames.
                                                     <br />
-                                                    Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value.
+                                                    Dont forgot that you can use <span style={{ color: "cyan" }}>minus</span> value.
                                                     <br />
                                                     Type: <span style={{ color: "yellow" }}>Integer</span>.
                                                 </Tooltip>
@@ -1042,11 +1284,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`Loop.LoopOffset-${track.id}`}
                                         name={"Loop.LoopOffset" satisfies DotNestedTrackConfigKeys}
                                         value={track.Loop.LoopOffset}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -1061,7 +1303,7 @@ export default function App() {
                                         <OverlayTrigger
                                             placement="top"
                                             overlay={
-                                                <Tooltip className="custom-tooltip">
+                                                <Tooltip className="configuration-tooltip">
                                                     Frames speed.
                                                     <br />
                                                     Type: <span style={{ color: "green" }}>Float</span>.
@@ -1083,11 +1325,11 @@ export default function App() {
                                     <input
                                         type="number"
                                         step="0.01"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`Speed-${track.id}`}
                                         name={"Speed" satisfies DotNestedTrackConfigKeys}
                                         value={track.Speed}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
@@ -1096,11 +1338,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`StartAt-${track.id}`}
                                         name={"StartAt" satisfies DotNestedTrackConfigKeys}
                                         value={track.StartAt}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -1111,11 +1353,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`StripBefore-${track.id}`}
                                         name={"StripBefore" satisfies DotNestedTrackConfigKeys}
                                         value={track.StripBefore}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
 
@@ -1124,11 +1366,11 @@ export default function App() {
 
                                     <input
                                         type="number"
-                                        className="form-control"
+                                        className="form-control configuration-string-inputter"
                                         id={`StripAfter-${track.id}`}
                                         name={"StripAfter" satisfies DotNestedTrackConfigKeys}
                                         value={track.StripAfter}
-                                        onChange={(event) => handleInputChange(event, index)}
+                                        onChange={(event) => handleTrackConfigChange(event, index)}
                                     />
                                 </div>
                             </div>
@@ -1137,8 +1379,8 @@ export default function App() {
                 ))}
 
                 <div className="d-flex align-items-center justify-content-between">
-                    <input type="submit" value="Submit config" id="submitConfig" />
-                    <input type="submit" value="About more" id="submitAboutMore" />
+                    <input type="submit" className="configuration-submit" value="Submit config" id="submit-config" />
+                    <input type="submit" className="configuration-submit" value="About more" id="about-more" />
                 </div>
             </form>
 
@@ -1247,20 +1489,13 @@ export default function App() {
                         <div>
                             <h5>Base Note</h5>
                             <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
-                            <i>The frequency for any MIDI note number is calculated as:</i>
-                            <TeX math="f_{n} = f_{0} \cdot 2^{\frac{n-69}{12}}," block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="f_{n}" /> is the frequency of the note</i><br />
-                            <i>• <TeX math="f_{0}" /> is the reference frequency (A4 = 440 Hz)</i><br />
-                            <br />
                             <i>In the implementation, relative pitch ratios are calculated using:</i>
                             <TeX math="\text{PitchRatio}_{t,n} = 2^{\frac{n-\text{BaseNote}_{t}}{12}}." block />
                             <i>where:</i>
                             <br />
                             <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
                             <i>• <TeX math="\text{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
+                            <i>• <TeX math="n" /> is pitch index</i><br />
                             <br />
                             <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
                                 This value is evaluted as string on submittion. You can type value like this: &quot;61-10&quot;.
@@ -1274,11 +1509,13 @@ export default function App() {
                             <h5>Max Note</h5>
                             <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
                             <i>The decreasing value is calculated as follows:</i>
-                            <TeX math="\text{PitchAdjustment}_{t} = 7 \left\lceil\frac{\text{Note}_{t_{max}} - \text{MaxNote}_{t}}{7}\right\rceil." block />
+                            <TeX math="\text{PitchAdjustment}_{t} = 7 \left\lceil\frac{\left( \text{Notes}_{t} \right)_{\text{PitchMax}} - \text{MaxNote}_{t}}{7}\right\rceil." block />
                             <i>where:</i>
                             <br />
                             <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{Note}_{t_{max}}" /> is the maximum of all pitches in <TeX math="\text{Note}_{t}" /></i>
+                            <i>• <TeX math="\left( \text{Notes}_{t} \right)_{\text{PitchMax}} = \displaystyle\max_{P \: \in \: \{\left( \text{Notes}_{t, n} \right)_{\text{Pitch}} \: \mid \: n \: \in \: \{0, \ \cdots, \#\text{Notes}\}} P" /></i><br />
+                            <i>• <TeX math="\left( \text{Notes}_{t, n} \right)_{\text{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config <TeX math="\text{Notes}" /></i><br />
+                            <i>• <TeX math="\#\text{Notes}" /> is total config count (max of <TeX math="t" />)</i>
                         </div>
 
                         <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
@@ -1293,8 +1530,8 @@ export default function App() {
     v_{t,n} &= \operatorname{clamp} \left( V_{n_{\text{norm}}} + \text{VelocityOffset}_{t}, v_{\min}, v_{\max} \right), \\[0.5em]
     \text{where} \quad 
     v_{\min} &= \frac{1}{20}, \quad v_{\max} = 1, \\[1em]
-    V_{n}&\colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\
-    V_{n_{\text{norm}}} &= v_{\min} + \left( \left( \frac{V_{n}}{127} \right)^2 (v_{\max} - v_{\min}) \right).
+    V&\colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\
+    V_{n_{\text{norm}}} &= v_{\min} + \left( \left( \frac{V(n)}{127} \right)^2 (v_{\max} - v_{\min}) \right).
 \end{aligned}
 " block />
                             <i>where:</i>
@@ -1314,7 +1551,7 @@ export default function App() {
                             <h5>Pitch Offset</h5>
                             <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
                             <i>The final pitch is calculated as:</i>
-                            <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \left( \text{PitchRatio}_{t,n} + \text{PitchOffset}_{t}, \text{Pitch}_{\min}, \text{Pitch}_{\max} \right)" block />
+                            <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \lbrack \text{PitchRatio}_{t,\operatorname{max} \{ \left( \text{Notes}_{t, n} \right)_{\text{Pitch}} - \text{PitchAdjustment}_{t}, 0\}} + \text{PitchOffset}_{t}, \text{Pitch}_{\min}, \text{Pitch}_{\max} \rbrack." block />
                             <i>where:</i>
                             <br />
                             <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
@@ -1334,7 +1571,7 @@ export default function App() {
                             <i>• Enable: Toggles looping on/off</i><br />
                             <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
                             <i>The final loop length is calculated as:</i>
-                            <TeX math="\text{LoopFrames}_{t} = \text{MaxFrames} + \text{LoopOffset}_{t}" block />
+                            <TeX math="\text{LoopFrames}_{t} = \text{MaxFrames} + \text{LoopOffset}_{t}." block />
                             <i>where:</i>
                             <br />
                             <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
@@ -1349,7 +1586,7 @@ export default function App() {
                             <h5>Speed</h5>
                             <i>Adjusts the playback speed of the track.</i><br />
                             <i>The frame offset for each note is calculated as:</i>
-                            <TeX math="\text{Frames}_{t,n} = \text{Tick}_{t,n} \cdot \text{Fps} \cdot (2-\text{FramesSpeed}_{t}) + \text{FramesOffset}_{t} + 1" block />
+                            <TeX math="\text{Frames}_{t,n} = \text{Tick}_{t,n} \cdot \text{Fps} \cdot (2-\text{FramesSpeed}_{t}) + \text{FramesOffset}_{t} + 1." block />
                             <i>where:</i>
                             <br />
                             <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />

@@ -81,6 +81,7 @@ func generatePitchTable(standard int) []float64 {
 	pitchTable := make([]float64, 128)
 
 	a := 1.0
+
 	for i := standard; i < 128; i++ {
 		pitchTable[i] = a
 
@@ -88,6 +89,7 @@ func generatePitchTable(standard int) []float64 {
 	}
 
 	a = 1.0
+
 	for i := standard - 1; i >= 0; i-- {
 		a /= pitchMultiple
 
@@ -413,6 +415,7 @@ var instrumentals = map[string]int{
 	"Cat Meow":                36,
 	"Toll Bell":               37,
 	"Robot":                   38,
+	"Damage":                  39,
 }
 
 // InstrumentalFromName returns instrumental from name.
