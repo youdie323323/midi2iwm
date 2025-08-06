@@ -36,7 +36,7 @@ type TrackConfig struct {
 	Track        int          `json:"Track"`
 	Instrumental int          `json:"Instrumental"`
 	BaseNote     int          `json:"BaseNote"`
-	MaxNote      int          `json:"MaxNote"`
+	MaxNote      uint8        `json:"MaxNote"`
 	Offsets      TrackOffsets `json:"Offsets"`
 	Loop         LoopConfig   `json:"Loop"`
 	Speed        float64      `json:"Speed"`
@@ -47,20 +47,19 @@ type TrackConfig struct {
 
 type TrackNotes struct {
 	Notes []Note
+
 	*TrackConfig
 }
 
 const (
-	MIN_VELOCITY = 0.05
-	MAX_VELOCITY = 1.0
+	minVecloity = 0.05
+	maxVecloity = 1.0
 )
 
 const (
-	STABLE_STANDARD int = 61
-	STABLE_HIGHEST  int = 73
+	stableStandard int = 61
+	stableHighest  int = 73
 )
-
-const MAX_FRAMES = 99999
 
 func GetMidiTracks(f io.Reader) (*smf.SMF, smf.MetricTicks, error) {
 	ff, err := smf.ReadFrom(f)
@@ -78,90 +77,93 @@ func GetMidiTracks(f io.Reader) (*smf.SMF, smf.MetricTicks, error) {
 
 var pitchMultiple = math.Pow(2, 1.0/12)
 
-func getPitchTable(standard int) []float64 {
+func generatePitchTable(standard int) []float64 {
 	pitchTable := make([]float64, 128)
 
 	a := 1.0
 	for i := standard; i < 128; i++ {
 		pitchTable[i] = a
+
 		a *= pitchMultiple
 	}
 
 	a = 1.0
 	for i := standard - 1; i >= 0; i-- {
 		a /= pitchMultiple
+
 		pitchTable[i] = a
 	}
 
 	return pitchTable
 }
 
-// getHighestPitch get the max key (pitch) from the notes
-// which is denoted as Note_{i_{max}}.
-func getHighestPitch(n TrackNotes) int {
-	return int(slices.MaxFunc(n.Notes, func(a Note, b Note) int {
+// calculateHighestNote calculates the max pitch of the notes.
+func calculateHighestNote(n TrackNotes) Note {
+	return slices.MaxFunc(n.Notes, func(a Note, b Note) int {
 		return cmp.Compare(a.key, b.key)
-	}).key)
+	})
 }
 
-// normalizeVelocity resize standard midi velocity to IWM velocity.
-func normalizeVelocity(velocity int) float64 {
-	return MIN_VELOCITY + (math.Pow(float64(velocity)/127.0, 2) * (MAX_VELOCITY - MIN_VELOCITY))
+// normalizeVelocity normalizes midi velocity to IWM velocity.
+func normalizeVelocity(velocity uint8) float64 {
+	return minVecloity + (math.Pow(float64(velocity)/127.0, 2) * (maxVecloity - minVecloity))
 }
 
 type TempoChange struct {
-    absTicks uint64
-    bpm      float64
+	absTicks uint64
+	bpm      float64
 }
 
 func ticksToSeconds(absTicks uint64, tempoChanges []TempoChange, timeFormat smf.MetricTicks) float64 {
-    if len(tempoChanges) == 0 {
-        return 0
-    }
+	if len(tempoChanges) == 0 {
+		return 0
+	}
 
-    var seconds float64
-    var lastTicks uint64
-    var currentBPM = tempoChanges[0].bpm
+	var seconds float64
+	var lastTicks uint64
+	currentBPM := tempoChanges[0].bpm
 
-    for _, change := range tempoChanges {
-        if change.absTicks > absTicks {
-            break
-        }
-        
-        deltaTicks := change.absTicks - lastTicks
-        seconds += (60.0 / currentBPM) * float64(deltaTicks) / float64(timeFormat)
-        
-        lastTicks = change.absTicks
-        currentBPM = change.bpm
-    }
+	for _, change := range tempoChanges {
+		if change.absTicks > absTicks {
+			break
+		}
 
-    remainingTicks := absTicks - lastTicks
-    seconds += (60.0 / currentBPM) * float64(remainingTicks) / float64(timeFormat)
+		deltaTicks := change.absTicks - lastTicks
+		seconds += (60.0 / currentBPM) * float64(deltaTicks) / float64(timeFormat)
 
-    return seconds
+		lastTicks = change.absTicks
+		currentBPM = change.bpm
+	}
+
+	remainingTicks := absTicks - lastTicks
+	seconds += (60.0 / currentBPM) * float64(remainingTicks) / float64(timeFormat)
+
+	return seconds
 }
 
 func getTempoChanges(smf *smf.SMF) []TempoChange {
-    var changes []TempoChange
-    var absTicks uint64
+	var changes []TempoChange
+	var absTicks uint64
 
-    changes = append(changes, TempoChange{0, 120})
+	// Init changes with 120 bpm
+	changes = append(changes, TempoChange{0, 120})
 
-    for _, track := range smf.Tracks {
-        for _, event := range track {
-            absTicks += uint64(event.Delta)
-            var bpm float64
-            if event.Message.GetMetaTempo(&bpm) {
-                changes = append(changes, TempoChange{absTicks, bpm})
-            }
-        }
-    }
+	for _, track := range smf.Tracks {
+		for _, event := range track {
+			absTicks += uint64(event.Delta)
 
-    slices.SortFunc(changes, func(a, b TempoChange) int {
-        return cmp.Compare(a.absTicks, b.absTicks)
-    })
+			var bpm float64
+			if event.Message.GetMetaTempo(&bpm) {
+				changes = append(changes, TempoChange{absTicks, bpm})
+			}
+		}
+	}
 
-    return changes
+	slices.SortFunc(changes, func(a, b TempoChange) int {
+		return cmp.Compare(a.absTicks, b.absTicks)
+	})
+
+	return changes
 }
 
 var mu sync.Mutex
@@ -171,9 +173,12 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 
 	for _, cfg := range tc {
 		var absTicks uint64
+
 		var channel, velocity, key uint8
+
 		var activeNotes []Note
 		var processedNotes []Note
+
 		activeNotesMap := make(map[uint64]map[uint8]bool)
 
 		for _, event := range ff.Tracks[cfg.Track] {
@@ -191,6 +196,7 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 						velocity: velocity,
 						key:      key,
 					})
+
 					activeNotesMap[absTicks][key] = true
 				}
 
@@ -198,7 +204,8 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 				for i, note := range activeNotes {
 					if note.key == key {
 						processedNotes = append(processedNotes, note)
-						activeNotes = append(activeNotes[:i], activeNotes[i+1:]...)
+						activeNotes = slices.Delete(activeNotes, i, i+1)
+
 						break
 					}
 				}
@@ -214,7 +221,7 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 	}
 
 	tempoChanges := getTempoChanges(ff)
-    timeFormat := ff.TimeFormat.(smf.MetricTicks)
+	timeFormat := ff.TimeFormat.(smf.MetricTicks)
 
 	var events [][]*Event
 
@@ -223,8 +230,9 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 	for _, tn := range trackNotesList {
 		for _, note := range tn.Notes {
 			seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
-            offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
-			if offset > MAX_FRAMES {
+
+			offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
+			if offset > MaxEventFrames {
 				break
 			}
 
@@ -244,197 +252,176 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 		}
 	}
 
-	parallelize(len(trackNotesList), func(i int) {
-		tn := trackNotesList[i]
+	parallelize(
+		len(trackNotesList),
+		func(i int) {
+			tn := trackNotesList[i]
 
-		pitchAdjustment := 0
-		for i := getHighestPitch(tn); i > tn.MaxNote; i -= 7 {
-			pitchAdjustment += 7
-		}
-
-		pitchTable := getPitchTable(tn.BaseNote)
-
-		var trackEvents map[int]*Event = make(map[int]*Event, len(tn.Notes))
-
-		for _, note := range tn.Notes {
-			seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
-            offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
-			if offset > MAX_FRAMES {
-				break
+			pitchAdjustment := 0
+			for i := calculateHighestNote(tn).key; i > tn.MaxNote; i -= 7 {
+				pitchAdjustment += 7
 			}
 
-			if offset < 0 {
-				continue
-			}
+			pitchTable := generatePitchTable(tn.BaseNote)
 
-			if tn.StripBefore != 0 && tn.StripBefore > offset {
-				continue
-			}
+			var trackEvents map[int]*Event = make(map[int]*Event, len(tn.Notes))
 
-			if tn.StripAfter != 0 && tn.StripAfter < offset {
-				break
-			}
+			for _, note := range tn.Notes {
+				seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
 
-			pitchIndex := int(note.key) - pitchAdjustment
-			if pitchIndex < 0 {
-				pitchIndex = 0
-			}
+				offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
+				if offset > MaxEventFrames {
+					break
+				}
 
-			pitch := pitchTable[pitchIndex] + tn.Offsets.Pitch
-			if tn.Offsets.PitchConstant {
-				pitch = tn.Offsets.Pitch
-			}
-			pitch = max(0.05, min(3.0, pitch))
+				if offset < 0 {
+					continue
+				}
 
-			volume := normalizeVelocity(int(note.velocity)) + tn.Offsets.Volume
-			if tn.Offsets.VolumeConstant {
-				volume = tn.Offsets.Volume
-			}
-			volume = max(MIN_VELOCITY, min(MAX_VELOCITY, volume))
+				if tn.StripBefore != 0 && tn.StripBefore > offset {
+					continue
+				}
 
-			if _, ok := trackEvents[offset]; !ok {
-				loopFrames := MAX_FRAMES
-				if tn.Loop.Enable {
-					loopFrames = maxOffset + tn.Loop.LoopOffset
-					if loopFrames < 0 {
-						continue
+				if tn.StripAfter != 0 && tn.StripAfter < offset {
+					break
+				}
+
+				pitchIndex := max(int(note.key)-pitchAdjustment, 0)
+
+				var pitch float64
+
+				if tn.Offsets.PitchConstant {
+					pitch = tn.Offsets.Pitch
+				} else {
+					pitch = pitchTable[pitchIndex] + tn.Offsets.Pitch
+				}
+
+				pitch = max(0.05, min(3.0, pitch))
+
+				var volume float64
+
+				if tn.Offsets.VolumeConstant {
+					volume = tn.Offsets.Volume
+				} else {
+					volume = normalizeVelocity(note.velocity) + tn.Offsets.Volume
+				}
+
+				volume = max(minVecloity, min(maxVecloity, volume))
+
+				if _, ok := trackEvents[offset]; !ok {
+					loopFrames := MaxEventFrames
+					if tn.Loop.Enable {
+						loopFrames = maxOffset + tn.Loop.LoopOffset
+						if loopFrames < 0 {
+							continue
+						}
 					}
-				}
 
-				trackEvents[offset] = &Event{
-					EventID: 17,
-					Param: ParamByMap(map[ParamKey]any{
-						"offset": offset,
-						"frames": loopFrames,
-					}),
-					Events: []*EventBody{
-						{
-							EventID: 104,
-							Param: ParamByMap(map[ParamKey]any{
-								"volume": volume,
-								"pitch":  pitch,
-								"sound":  tn.Instrumental,
-							}),
+					trackEvents[offset] = &Event{
+						EventID: 17,
+						Parameters: ParametersByMap(map[string]any{
+							"offset": offset,
+							"frames": loopFrames,
+						}),
+						Events: []*EventBody{
+							{
+								EventID: 104,
+								Parameters: ParametersByMap(map[string]any{
+									"volume": volume,
+									"pitch":  pitch,
+									"sound":  tn.Instrumental,
+								}),
+							},
 						},
-					},
+					}
+				} else {
+					trackEvents[offset].Events = append(trackEvents[offset].Events, &EventBody{
+						EventID: 104,
+						Parameters: ParametersByMap(map[string]any{
+							"volume": volume,
+							"pitch":  pitch,
+							"sound":  tn.Instrumental,
+						}),
+					})
 				}
-			} else {
-				trackEvents[offset].Events = append(trackEvents[offset].Events, &EventBody{
-					EventID: 104,
-					Param: ParamByMap(map[ParamKey]any{
-						"volume": volume,
-						"pitch":  pitch,
-						"sound":  tn.Instrumental,
-					}),
-				})
 			}
-		}
 
-		mu.Lock()
-		events = append(events, slices.Collect(maps.Values(trackEvents)))
-		mu.Unlock()
-	})
+			mu.Lock()
+
+			events = append(events, slices.Collect(maps.Values(trackEvents)))
+
+			mu.Unlock()
+		},
+	)
 
 	return events, nil
 }
 
-func parallelize(n int, f func(int)) {
+func parallelize(n int, callback func(int)) {
 	var wg sync.WaitGroup
 
 	for i := range n {
 		wg.Add(1)
+
 		go func(i int) {
 			defer wg.Done()
-			f(i)
+
+			callback(i)
 		}(i)
 	}
 
 	wg.Wait()
 }
 
-func GetInstrumental(name string) int {
-	switch name {
-	case "Duck":
-		return 0
-	case "Glass Break":
-		return 1
-	case "Bubble":
-		return 2
-	case "Light Switch":
-		return 3
-	case "Ring Bell":
-		return 4
-	case "Exclamation":
-		return 5
-	case "Spring":
-		return 6
-	case "Horn":
-		return 7
-	case "OK":
-		return 8
-	case "Glass Break 2":
-		return 9
-	case "Punch":
-		return 10
-	case "Laser Gun":
-		return 11
-	case "Woosh":
-		return 12
-	case "Whistle":
-		return 13
-	case "Magic":
-		return 14
-	case "Ninja":
-		return 15
-	case "Clapping":
-		return 16
-	case "Drum Roll":
-		return 17
-	case "Piano":
-		return 18
-	case "Bass":
-		return 19
-	case "Party Noisemaker":
-		return 20
-	case "Hoot":
-		return 21
-	case "Laughter":
-		return 22
-	case "Suspense":
-		return 23
-	case "Wood Scraper":
-		return 24
-	case "Drum":
-		return 25
-	case "No-no":
-		return 26
-	case "Glass Bottle":
-		return 27
-	case "Woodimba":
-		return 28
-	case "Metallic Hit":
-		return 29
-	case "Gun":
-		return 30
-	case "Electric Charge":
-		return 31
-	case "Laser Blast (Foam Icon)":
-		return 32
-	case "Heartbeat":
-		return 33
-	case "Rubber Chicken":
-		return 34
-	case "Dog Bark":
-		return 35
-	case "Cat Meow":
-		return 36
-	case "Toll Bell":
-		return 37
-	case "Robot":
-		return 38
-	default:
-		return 18
+var instrumentals = map[string]int{
+	"Duck":                    0,
+	"Glass Break":             1,
+	"Bubble":                  2,
+	"Light Switch":            3,
+	"Ring Bell":               4,
+	"Exclamation":             5,
+	"Spring":                  6,
+	"Horn":                    7,
+	"OK":                      8,
+	"Glass Break 2":           9,
+	"Punch":                   10,
+	"Laser Gun":               11,
+	"Woosh":                   12,
+	"Whistle":                 13,
+	"Magic":                   14,
+	"Ninja":                   15,
+	"Clapping":                16,
+	"Drum Roll":               17,
+	"Piano":                   18,
+	"Bass":                    19,
+	"Party Noisemaker":        20,
+	"Hoot":                    21,
+	"Laughter":                22,
+	"Suspense":                23,
+	"Wood Scraper":            24,
+	"Drum":                    25,
+	"No-no":                   26,
+	"Glass Bottle":            27,
+	"Woodimba":                28,
+	"Metallic Hit":            29,
+	"Gun":                     30,
+	"Electric Charge":         31,
+	"Laser Blast (Foam Icon)": 32,
+	"Heartbeat":               33,
+	"Rubber Chicken":          34,
+	"Dog Bark":                35,
+	"Cat Meow":                36,
+	"Toll Bell":               37,
+	"Robot":                   38,
+}
+
+// InstrumentalFromName returns instrumental from name.
+func InstrumentalFromName(name string) int {
+	if val, ok := instrumentals[name]; ok {
+		return val
 	}
+
+	return 18 // default value
 }
 
 func SmfString(s *smf.SMF) string {
@@ -442,8 +429,9 @@ func SmfString(s *smf.SMF) string {
 
 	for i, track := range s.Tracks {
 		noteCount := 0
+
 		var channel, key, velocity uint8
-		
+
 		var name string
 
 		for _, event := range track {

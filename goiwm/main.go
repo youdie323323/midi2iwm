@@ -11,15 +11,15 @@ import (
 )
 
 func main() {
-	js.Global().Set("goiwmModule", js.ValueOf(map[string]any{
-		"getTracks": js.FuncOf(getTracks),
-		"midiToIwm": js.FuncOf(midiToIwm),
+	js.Global().Set("goIwm", js.ValueOf(map[string]any{
+		"tracks":             js.FuncOf(tracks),
+		"midiToEventObjects": js.FuncOf(midiToEventObjects),
 	}))
 
 	select {}
 }
 
-func getTracks(this js.Value, p []js.Value) any {
+func tracks(this js.Value, p []js.Value) any {
 	data, err := base64.StdEncoding.DecodeString(p[0].String())
 	if err != nil {
 		return err.Error()
@@ -30,22 +30,26 @@ func getTracks(this js.Value, p []js.Value) any {
 		return err.Error()
 	}
 
-	return "vas:" + SmfString(tracks)
+	return "NOT_AN_ERROR:" + SmfString(tracks)
 }
 
-func midiToIwm(this js.Value, p []js.Value) any {
-	data, err := base64.StdEncoding.DecodeString(p[0].String())
+func midiToEventObjects(this js.Value, p []js.Value) any {
+	encodedMidi := p[0].String()
+	encodedTrackConfigs := p[1].String()
+
+	data, err := base64.StdEncoding.DecodeString(encodedMidi)
 	if err != nil {
 		return err.Error()
 	}
-	
+
 	tracks, _, err := GetMidiTracks(bytes.NewReader(data))
 	if err != nil {
 		return err.Error()
 	}
 
 	var c []*TrackConfig
-	err = json.Unmarshal([]byte(p[1].String()), &c)
+
+	err = json.Unmarshal([]byte(encodedTrackConfigs), &c)
 	if err != nil {
 		return err.Error()
 	}
@@ -56,9 +60,12 @@ func midiToIwm(this js.Value, p []js.Value) any {
 	}
 
 	var objects []*Object
+
 	for _, v := range e {
-		object := NewObject(1, 1, Block(1), make([]*Param, 0), nil, nil)
+		object := NewObject(1, 1, Block(1), make([]*Parameter, 0), nil, nil)
+
 		object.Event = append(object.Event, v...)
+
 		objects = append(objects, object)
 	}
 
