@@ -1464,10 +1464,7 @@ export default function App() {
                     {/* Track */}
                     <div>
                         <h5>Track</h5>
-                        <i>Specifies which MIDI track number to process from the input file.</i><br />
-                        <i>• The number of the track you want to play, as indicated in the log</i><br />
-                        <i>• Track numbers start from 0</i><br />
-                        <i>• Only tracks containing note events are counted</i>
+                        <i>Specifies which MIDI track to process from the input file.</i><br />
                     </div>
 
                     <hr style={{
@@ -1622,4 +1619,5 @@ export default function App() {
             />
         </div>
     );
+
 }
