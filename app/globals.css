@@ -131,7 +131,8 @@ input::-webkit-inner-spin-button {
 
 /* Hide the scrollbar */
 html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+body::-webkit-scrollbar,
+#about-more-modal-container::-webkit-scrollbar {
     display: none;
 }
 

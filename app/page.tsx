@@ -1384,148 +1384,147 @@ export default function App() {
                 </div>
             </form>
 
-            <div>
-                <Modal
-                    isOpen={modalIsOpen}
-                    onRequestClose={closeModal}
-                    closeTimeoutMS={100}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                closeTimeoutMS={100}
+                style={{
+                    overlay: {
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    },
+                    content: {
+                        top: "50%",
+                        left: "50%",
+                        right: "auto",
+                        bottom: "auto",
+                        marginRight: "-50%",
+                        transform: "translate(-50%, -50%)",
+                        backgroundColor: "#000000",
+                        width: "900px",
+                        height: "600px",
+                        overflow: "hidden",
+                    },
+                }}
+                contentLabel="About More Modal"
+            >
+                <h5
                     style={{
-                        overlay: {
-                            backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                            top: "50%",
-                            left: "50%",
-                            right: "auto",
-                            bottom: "auto",
-                            marginRight: "-50%",
-                            transform: "translate(-50%, -50%)",
-                            backgroundColor: "#000000",
-                            width: "900px",
-                            height: "600px",
-                            overflow: "hidden",
-                        },
+                        position: "absolute",
+                        top: "15px",
+                        left: "18px",
                     }}
-                    contentLabel="About More Modal"
                 >
-                    <h5
-                        style={{
-                            position: "absolute",
-                            top: "15px",
-                            left: "18px",
-                        }}
-                    >
-                        About more
-                    </h5>
+                    About more
+                </h5>
 
-                    <button
-                        onClick={closeModal}
-                        style={{
-                            position: "absolute",
-                            right: "15px",
-                            top: "15px",
-                        }}
-                    >
-                        <i className="fa-solid fa-xmark" />
-                    </button>
+                <button
+                    onClick={closeModal}
+                    style={{
+                        position: "absolute",
+                        right: "15px",
+                        top: "15px",
+                    }}
+                >
+                    <i className="fa-solid fa-xmark" />
+                </button>
 
-                    {/* Scrollable div */}
-                    <div style={{
-                        marginTop: "30px",
-                        height: "calc(100% - 30px)",
-                        overflowY: "auto",
-                    }}>
+                {/* Scrollable div */}
+                <div id="about-more-modal-container" style={{
+                    marginTop: "30px",
+                    height: "calc(100% - 30px)",
+                    overflowY: "auto",
+                }}>
+                    <div>
+                        <h4>Useful Informations</h4>
+
                         <div>
-                            <h4>Useful Informations</h4>
-
-                            <div>
-                                <i>• This tool is created for game named &quot;I Wanna Maker&quot; on steam. This tool makes the midi playable in I Wanna Maker using sound play events.</i>
-                            </div>
-
-                            <div>
-                                <i>• The site </i>
-                                <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
-                                <i> can easily show & edit midi file.</i><br />
-                            </div>
-
-                            <div>
-                                <i>• Example video: </i>
-                                <a href="https://youtu.be/1fFJa8grDLM?si=uBFsZHyR0hyZLGh-" target="_blank" style={{ color: "blue" }}>youtu.be/1fFJa8grDLM</a>
-                            </div>
+                            <i>• This tool is created for game named &quot;I Wanna Maker&quot; on steam. This tool makes the midi playable in I Wanna Maker using sound play events.</i>
                         </div>
 
-                        <hr style={{
-                            margin: "20px 0",
-                            border: "none",
-                            borderTop: "2px solid #ffffff"
-                        }} />
-
-                        <h4>Config Informations</h4>
-
-                        {/* Track */}
                         <div>
-                            <h5>Track</h5>
-                            <i>Specifies which MIDI track number to process from the input file.</i><br />
-                            <i>• The number of the track you want to play, as indicated in the log</i><br />
-                            <i>• Track numbers start from 0</i><br />
-                            <i>• Only tracks containing note events are counted</i>
+                            <i>• The site </i>
+                            <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
+                            <i> can easily show & edit midi file.</i><br />
                         </div>
 
-                        <hr style={{
-                            margin: "20px 0",
-                            border: "none",
-                            borderTop: "1px solid #ffffff"
-                        }} />
-
-                        {/* Instrumental */}
                         <div>
-                            <h5>Instrumental</h5>
-                            <i>Defines the sound ID to be used when playing notes from this track.</i><br />
+                            <i>• Example video: </i>
+                            <a href="https://youtu.be/1fFJa8grDLM?si=uBFsZHyR0hyZLGh-" target="_blank" style={{ color: "blue" }}>youtu.be/1fFJa8grDLM</a>
                         </div>
+                    </div>
 
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    <hr style={{
+                        margin: "20px 0",
+                        border: "none",
+                        borderTop: "2px solid #ffffff"
+                    }} />
 
-                        {/* Base Note */}
-                        <div>
-                            <h5>Base Note</h5>
-                            <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
-                            <i>In the implementation, relative pitch ratios are calculated using:</i>
-                            <TeX math="\text{PitchRatio}_{t,n} = 2^{\frac{n-\text{BaseNote}_{t}}{12}}." block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
-                            <i>• <TeX math="n" /> is pitch index</i><br />
-                            <br />
-                            <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                                This value is evaluted as string on submittion. You can type value like this: &quot;61-10&quot;.
-                            </i>
-                        </div>
+                    <h4>Config Informations</h4>
 
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {/* Track */}
+                    <div>
+                        <h5>Track</h5>
+                        <i>Specifies which MIDI track number to process from the input file.</i><br />
+                        <i>• The number of the track you want to play, as indicated in the log</i><br />
+                        <i>• Track numbers start from 0</i><br />
+                        <i>• Only tracks containing note events are counted</i>
+                    </div>
 
-                        {/* Max Note */}
-                        <div>
-                            <h5>Max Note</h5>
-                            <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
-                            <i>The decreasing value is calculated as follows:</i>
-                            <TeX math="\text{PitchAdjustment}_{t} = 7 \left\lceil\frac{\left( \text{Notes}_{t} \right)_{\text{PitchMax}} - \text{MaxNote}_{t}}{7}\right\rceil." block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\left( \text{Notes}_{t} \right)_{\text{PitchMax}} = \displaystyle\max_{P \: \in \: \{\left( \text{Notes}_{t, n} \right)_{\text{Pitch}} \: \mid \: n \: \in \: \{0, \ \cdots, \#\text{Notes}\}} P" /></i><br />
-                            <i>• <TeX math="\left( \text{Notes}_{t, n} \right)_{\text{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config <TeX math="\text{Notes}" /></i><br />
-                            <i>• <TeX math="\#\text{Notes}" /> is total config count (max of <TeX math="t" />)</i>
-                        </div>
+                    <hr style={{
+                        margin: "20px 0",
+                        border: "none",
+                        borderTop: "1px solid #ffffff"
+                    }} />
 
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {/* Instrumental */}
+                    <div>
+                        <h5>Instrumental</h5>
+                        <i>Defines the sound ID to be used when playing notes from this track.</i><br />
+                    </div>
 
-                        {/* Volume Offset */}
-                        <div>
-                            <h5>Volume Offset</h5>
-                            <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
-                            <i>The final volume is calculated as:</i>
-                            <TeX math="
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Base Note */}
+                    <div>
+                        <h5>Base Note</h5>
+                        <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
+                        <i>In the implementation, relative pitch ratios are calculated using:</i>
+                        <TeX math="\text{PitchRatio}_{t,n} = 2^{\frac{n-\text{BaseNote}_{t}}{12}}." block />
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
+                        <i>• <TeX math="n" /> is pitch index</i><br />
+                        <br />
+                        <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
+                            This value is evaluted as string on submittion. You can type value like this: &quot;61-10&quot;.
+                        </i>
+                    </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Max Note */}
+                    <div>
+                        <h5>Max Note</h5>
+                        <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
+                        <i>The decreasing value is calculated as follows:</i>
+                        <TeX math="\text{PitchAdjustment}_{t} = 7 \left\lceil\frac{\left( \text{Notes}_{t} \right)_{\text{PitchMax}} - \text{MaxNote}_{t}}{7}\right\rceil." block />
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\left( \text{Notes}_{t} \right)_{\text{PitchMax}} = \displaystyle\max_{P \: \in \: \{\left( \text{Notes}_{t, n} \right)_{\text{Pitch}} \: \mid \: n \: \in \: \{0, \ \cdots, \#\text{Notes}\}} P" /></i><br />
+                        <i>• <TeX math="\left( \text{Notes}_{t, n} \right)_{\text{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config <TeX math="\text{Notes}" /></i><br />
+                        <i>• <TeX math="\#\text{Notes}" /> is total config count (max of <TeX math="t" />)</i>
+                    </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Volume Offset */}
+                    <div>
+                        <h5>Volume Offset</h5>
+                        <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
+                        <i>The final volume is calculated as:</i>
+                        <TeX math="
 \begin{aligned}
     v_{t,n} &= \operatorname{clamp} \left( V_{n_{\text{norm}}} + \text{VelocityOffset}_{t}, v_{\min}, v_{\max} \right), \\[0.5em]
     \text{where} \quad 
@@ -1534,86 +1533,85 @@ export default function App() {
     V_{n_{\text{norm}}} &= v_{\min} + \left( \left( \frac{V(n)}{127} \right)^2 (v_{\max} - v_{\min}) \right).
 \end{aligned}
 " block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{VelocityOffset}_{t}" /> is a velocity offset</i>
-                            <br /><br />
-                            <i>When Volume Constant is true:</i><br />
-                            <i>• The offset value is used directly as the volume</i>
-                        </div>
-
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
-
-                        {/* Pitch Offset */}
-                        <div>
-                            <h5>Pitch Offset</h5>
-                            <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
-                            <i>The final pitch is calculated as:</i>
-                            <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \lbrack \text{PitchRatio}_{t,\operatorname{max} \{ \left( \text{Notes}_{t, n} \right)_{\text{Pitch}} - \text{PitchAdjustment}_{t}, 0\}} + \text{PitchOffset}_{t}, \text{Pitch}_{\min}, \text{Pitch}_{\max} \rbrack." block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{PitchOffset}_{t}" /> is a pitch offset</i>
-                            <br /><br />
-                            <i>When Pitch Constant is true:</i><br />
-                            <i>• The offset value is used directly as the pitch</i>
-                        </div>
-
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
-
-                        {/* Loop */}
-                        <div>
-                            <h5>Loop Configuration</h5>
-                            <i>Controls the looping behavior of the track:</i><br />
-                            <i>• Enable: Toggles looping on/off</i><br />
-                            <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
-                            <i>The final loop length is calculated as:</i>
-                            <TeX math="\text{LoopFrames}_{t} = \text{MaxFrames} + \text{LoopOffset}_{t}." block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{LoopOffset}_{t}" /> is a loop offset</i><br />
-                            <i>• <TeX math="\text{MaxFrames}" /> is the highest frames in the all of tracks</i>
-                        </div>
-
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
-
-                        {/* Speed */}
-                        <div>
-                            <h5>Speed</h5>
-                            <i>Adjusts the playback speed of the track.</i><br />
-                            <i>The frame offset for each note is calculated as:</i>
-                            <TeX math="\text{Frames}_{t,n} = \text{Tick}_{t,n} \cdot \text{Fps} \cdot (2-\text{FramesSpeed}_{t}) + \text{FramesOffset}_{t} + 1." block />
-                            <i>where:</i>
-                            <br />
-                            <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                            <i>• <TeX math="\text{FramesOffset}_{t}" /> is a frames offset</i><br />
-                            <i>• <TeX math="\text{FramesSpeed}_{t}" /> is a frames speed</i><br />
-                            <i>• <TeX math="\text{Tick}_{t,n}" /> is the μs tempo</i><br />
-                            <i>• <TeX math="\text{Fps}" /> is the game fps (always 50)</i>
-                            <br /><br />
-                            <i>• <TeX math="\text{FramesSpeed}_{t} \gt 1" />: Notes plays faster than original</i><br />
-                            <i>• <TeX math="\text{FramesSpeed}_{t} \lt 1" />: Notes plays slower than original</i><br />
-                            <i>• <TeX math="\text{FramesSpeed}_{t} = 1" />: Notes plays at original tempo</i>
-                        </div>
-
-                        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
-
-                        {/* Strip Before/After */}
-                        <div>
-                            <h5>Strip Before/After</h5>
-                            <i>Filters out notes based on their frame offsets:</i><br />
-                            <i>• Strip Before: Removes notes before the specified frame number</i><br />
-                            <i>• Strip After: Removes notes after the specified frame number</i><br />
-                            <i>When either value is 0, no stripping is performed for that boundary</i>
-                        </div>
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{VelocityOffset}_{t}" /> is a velocity offset</i>
+                        <br /><br />
+                        <i>When Volume Constant is true:</i><br />
+                        <i>• The offset value is used directly as the volume</i>
                     </div>
-                </Modal>
-            </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Pitch Offset */}
+                    <div>
+                        <h5>Pitch Offset</h5>
+                        <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
+                        <i>The final pitch is calculated as:</i>
+                        <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \lbrack \text{PitchRatio}_{t,\operatorname{max} \{ \left( \text{Notes}_{t, n} \right)_{\text{Pitch}} - \text{PitchAdjustment}_{t}, 0\}} + \text{PitchOffset}_{t}, \text{Pitch}_{\min}, \text{Pitch}_{\max} \rbrack." block />
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{PitchOffset}_{t}" /> is a pitch offset</i>
+                        <br /><br />
+                        <i>When Pitch Constant is true:</i><br />
+                        <i>• The offset value is used directly as the pitch</i>
+                    </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Loop */}
+                    <div>
+                        <h5>Loop Configuration</h5>
+                        <i>Controls the looping behavior of the track:</i><br />
+                        <i>• Enable: Toggles looping on/off</i><br />
+                        <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
+                        <i>The final loop length is calculated as:</i>
+                        <TeX math="\text{LoopFrames}_{t} = \text{MaxFrames} + \text{LoopOffset}_{t}." block />
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{LoopOffset}_{t}" /> is a loop offset</i><br />
+                        <i>• <TeX math="\text{MaxFrames}" /> is the highest frames in the all of tracks</i>
+                    </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Speed */}
+                    <div>
+                        <h5>Speed</h5>
+                        <i>Adjusts the playback speed of the track.</i><br />
+                        <i>The frame offset for each note is calculated as:</i>
+                        <TeX math="\text{Frames}_{t,n} = \text{Tick}_{t,n} \cdot \text{Fps} \cdot (2-\text{FramesSpeed}_{t}) + \text{FramesOffset}_{t} + 1." block />
+                        <i>where:</i>
+                        <br />
+                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{FramesOffset}_{t}" /> is a frames offset</i><br />
+                        <i>• <TeX math="\text{FramesSpeed}_{t}" /> is a frames speed</i><br />
+                        <i>• <TeX math="\text{Tick}_{t,n}" /> is the μs tempo</i><br />
+                        <i>• <TeX math="\text{Fps}" /> is the game fps (always 50)</i>
+                        <br /><br />
+                        <i>• <TeX math="\text{FramesSpeed}_{t} \gt 1" />: Notes plays faster than original</i><br />
+                        <i>• <TeX math="\text{FramesSpeed}_{t} \lt 1" />: Notes plays slower than original</i><br />
+                        <i>• <TeX math="\text{FramesSpeed}_{t} = 1" />: Notes plays at original tempo</i>
+                    </div>
+
+                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+
+                    {/* Strip Before/After */}
+                    <div>
+                        <h5>Strip Before/After</h5>
+                        <i>Filters out notes based on their frame offsets:</i><br />
+                        <i>• Strip Before: Removes notes before the specified frame number</i><br />
+                        <i>• Strip After: Removes notes after the specified frame number</i><br />
+                        <i>When either value is 0, no stripping is performed for that boundary</i>
+                    </div>
+                </div>
+            </Modal>
 
             <input
                 type="file"
