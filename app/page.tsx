@@ -158,7 +158,7 @@ interface TrackConfig {
     Instrumental: number;
     /**
      * @remarks
-     * This value is string since evaluted on submittion.
+     * This value is string since evaluted in submittion.
      * TODO: this is unsafe.
      */
     BaseNote: string;
@@ -189,13 +189,14 @@ const TRACK_CONFIG_KEYS: Array<keyof TrackConfig> =
 
 const InstructionSelectLabel = (name: string, icon: StaticImageData) => {
     return (
-        <div className="flex justify-between items-center w-full h-4">
-            {name} <img style={{ objectFit: "fill", width: 24, height: 24 }} src={icon.src} />
+        <div className="relative flex items-center w-full h-4">
+            {name}
+            <img style={{ objectFit: "fill", width: 24, height: 24, position: "absolute", right: -4 }} src={icon.src} />
         </div>
     );
 };
 
-const PIANO_SELECT_OPTION = {
+const INSTRUCTION_PIANO_SELECT_OPTION = {
     value: 18,
     label: InstructionSelectLabel("Piano", pianoIcon),
 };
@@ -273,7 +274,7 @@ const INSTRUCTION_SELECT_OPTIONS = [
         value: 17,
         label: InstructionSelectLabel("Drum Roll", drumRollIcon),
     },
-    PIANO_SELECT_OPTION,
+    INSTRUCTION_PIANO_SELECT_OPTION,
     {
         value: 19,
         label: InstructionSelectLabel("Bass", bassIcon),
@@ -378,7 +379,7 @@ const INTERNAL_CONFIG_FLOAT_KEYS: Array<DotNestedTrackConfigKeys> =
 const makeDefaultTrackConfig = (id: number): TrackConfig => ({
     id: id,
     Track: 0,
-    Instrumental: PIANO_SELECT_OPTION.value,  // Default is piano
+    Instrumental: INSTRUCTION_PIANO_SELECT_OPTION.value,  // Default is piano
     BaseNote: "61",
     MaxNote: 73,
     Offsets: {
@@ -424,6 +425,7 @@ const ABOUT_MORE_KATEX_MACROS = {
         "\\loopfrm": "\\mathfrak{L}_{t}",
 
         "\\frm": "\\mathfrak{F}_{t,n}",
+        "\\maxfrm": "\\mathrm{max}_{\\mathfrak{F}}",
     },
 } as const satisfies KatexOptions;
 
@@ -1005,7 +1007,8 @@ export default function App() {
                                         options={INSTRUCTION_SELECT_OPTIONS}
                                         id={`Instrumental-${track.id}`}
                                         value={INSTRUCTION_SELECT_OPTIONS.find(option => option.value === track.Instrumental)}
-                                        defaultValue={PIANO_SELECT_OPTION}
+                                        defaultValue={INSTRUCTION_PIANO_SELECT_OPTION}
+                                        placeholder="Type something..."
                                         onChange={(newValue) => handleTrackConfigChange(
                                             {
                                                 target: {
@@ -1013,7 +1016,7 @@ export default function App() {
                                                     type: "select-one",
                                                     value: String(newValue?.value),
                                                 } as HTMLSelectElementEventTarget,
-                                            } as unknown as HandleableEvents,
+                                            } as HandleableEvents,
                                             index,
                                         )}
                                         filterOption={(option, input) => {
@@ -1032,6 +1035,11 @@ export default function App() {
                                                 borderColor: "#cccccc",
                                                 fontFamily: "Courier New, Courier, monospace",
                                                 cursor: "pointer",
+                                            }),
+                                            input: (base) => ({
+                                                ...base,
+
+                                                fontWeight: "600",
                                             }),
                                             container: (base) => ({
                                                 ...base,
@@ -1057,7 +1065,6 @@ export default function App() {
                                                 cursor: "pointer",
                                             }),
                                         }}
-                                        placeholder="Type something..."
                                     />
                                 </div>
                             </div>
@@ -1517,7 +1524,7 @@ export default function App() {
                         <i>• <TeX math="\mathrm{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
                         <br />
                         <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
-                            This value is evaluted as string on submittion. You can type value like this: &quot;61-10&quot;.
+                            This value is evaluted as string in submittion. You can type value like this: &quot;61-10&quot;.
                         </i>
                     </div>
 
@@ -1546,7 +1553,7 @@ export default function App() {
                         <i>The final volume is calculated as:</i>
                         <TeX math="
 \mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
-V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\[0.5em]
+V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \mid x \in \mathbb{N} \land 0 \leq x \leq 127\}, \\[0.5em]
 V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
 \vel = \operatorname{clamp} \left( V_{n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right). \\
                         " block settings={ABOUT_MORE_KATEX_MACROS} />
@@ -1589,7 +1596,7 @@ V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \righ
                         <i>The final loop length is calculated as:</i>
                         <TeX math="\loopfrm =
 \begin{cases}
-    \mathrm{MaxFrames} + \mathrm{LoopOffset}_{t} & \mathrm{if} \;\: \mathrm{LoopEnabled}_{t} \\
+    \maxfrm + \mathrm{LoopOffset}_{t} & \mathrm{if} \;\: \mathrm{LoopEnabled}_{t} \\
     \mathrm{FramesLimit} & \mathrm{otherwise}
 \end{cases}" block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
@@ -1598,8 +1605,8 @@ V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \righ
                         <i>• <TeX math="D_{t} \overset{\mathrm{def}}{=} \{\top, \bot\}, \; \mathrm{LoopEnabled}_{t} \in D_{t}" /> whether enables loop specified in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\mathrm{LoopOffset}_{t}" /> is a loop offset specified in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\mathrm{FramesLimit} = 99999" /> is max usable frames in game</i><br />
-                        <i>• <TeX math="\mathrm{MaxFrames} = \displaystyle\max_{f \: \in \: \{\frm \: \mid \: t \: \in \: \{1, \ \cdots, \notestrcrd \}, \; n \: \in \: \{1, \ \cdots, \notescrd \}} f" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
-                        <i>• <TeX math="\notestrcrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total config count (max of <TeX math="t" />)</i>
+                        <i>• <TeX math="\maxfrm = \displaystyle\max_{f \: \in \: \{\frm \: \mid \: t \: \in \: \{1, \ \cdots, \notestrcrd \}, \; n \: \in \: \{1, \ \cdots, \notescrd \}} f" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
+                        <i>• <TeX math="\notestrcrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total config amount (max of <TeX math="t" />)</i>
                     </div>
 
                     <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
