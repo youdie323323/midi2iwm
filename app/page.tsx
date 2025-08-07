@@ -9,6 +9,7 @@ import "katex/dist/katex.min.css";
 import TeX from "@matejmazur/react-katex";
 import Select from "react-select";
 import { StaticImageData } from "next/image";
+import { KatexOptions } from "katex";
 
 import duckIcon from "../public/icons/duck.png";
 import glassBreakIcon from "../public/icons/glass-break.png";
@@ -403,6 +404,28 @@ const STORAGE_TRACK_CONFIG_KEY_PREFIX = "trackConfig_" as const;
 const prefixTrackConfigName = (configName: string) => STORAGE_TRACK_CONFIG_KEY_PREFIX + configName;
 
 const TRACK_CONFIG_SELECTION_DEFAULT_NAME = "VIEW_PLACEHOLDER_OFFSET" as const;
+
+const ABOUT_MORE_KATEX_MACROS = {
+    macros: {
+        "\\notes": "\\notestr_{t}",
+        "\\notescrd": "\\# \\left( \\notes \\right)",
+
+        "\\notestr": "\\mathcal{N}",
+        "\\notestrcrd": "\\# \\notestr",
+
+        "\\pitch": "p_{\\tiny \\notestr_{t,n}}",
+        "\\pitchf": "\\mathfrak{P}_{t,n}",
+        "\\pitchratio": "\\mathfrak{R}_{\\pitch}",
+        "\\pitchadj": "\\mathfrak{A}_{t}",
+        "\\pitchmax": "\\mathrm{max}_{p \\tiny _ {\\notes}}",
+
+        "\\vel": "\\mathfrak{V}_{t,n}",
+
+        "\\loopfrm": "\\mathfrak{L}_{t}",
+
+        "\\frm": "\\mathfrak{F}_{t,n}",
+    },
+} as const satisfies KatexOptions;
 
 Modal.setAppElement("body");
 
@@ -1486,11 +1509,11 @@ export default function App() {
                         <h5>Base Note</h5>
                         <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
                         <i>In the implementation, relative pitch ratios are calculated using:</i>
-                        <TeX math="\mathrm{PitchRatio}_{t,k} = 2^{\frac{k-\mathrm{BaseNote}_{t}}{12}}." block />
+                        <TeX math="\pitchratio = 2^{\frac{\operatorname{max} (\pitch \; - \; \pitchadj, 0)-\mathrm{BaseNote}_{t}}{12}}." block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="k" /> is pitch index</i><br />
+                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\mathrm{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
                         <br />
                         <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
@@ -1505,13 +1528,13 @@ export default function App() {
                         <h5>Max Note</h5>
                         <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
                         <i>The decreasing value is calculated as follows:</i>
-                        <TeX math="\mathrm{PitchAdjustment}_{t} = 7 \left\lceil\frac{\left( \mathrm{Notes}_{t} \right)_{\mathrm{PitchMax}} - \mathrm{MaxNote}_{t}}{7}\right\rceil." block />
+                        <TeX math="\pitchadj = 7 \left\lceil\frac{\pitchmax - \mathrm{MaxNote}_{t}}{7}\right\rceil." block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\left( \mathrm{Notes}_{t} \right)_{\mathrm{PitchMax}} = \displaystyle\max_{\mathcal{P} \: \in \: \{\left( \mathrm{Notes}_{t, n} \right)_{\mathrm{Pitch}} \: \mid \: n \: \in \: \{1, \ \cdots, \# \left( \mathrm{Notes}_{t} \right) \}} \mathcal{P}" /></i><br />
-                        <i>• <TeX math="\left( \mathrm{Notes}_{t, n} \right)_{\mathrm{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="\mathrm{Notes}_{t}" /></i><br />
-                        <i>• <TeX math="\#(\mathrm{Notes}_{t})" /> is total note count in <TeX math="\mathrm{Notes}_{t}" /></i>
+                        <i>• <TeX math="\pitchmax = \displaystyle\max_{p \: \in \: \{\pitch \: \mid \: n \: \in \: \{1, \ \cdots, \notescrd \}} p" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
+                        <i>• <TeX math="\pitch" settings={ABOUT_MORE_KATEX_MACROS} /> is pitch of <TeX math="n^{th}" /> note in <TeX math="\notes" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
+                        <i>• <TeX math="\notescrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total note count in <TeX math="\notes" settings={ABOUT_MORE_KATEX_MACROS} /></i>
                     </div>
 
                     <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
@@ -1522,11 +1545,11 @@ export default function App() {
                         <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
                         <i>The final volume is calculated as:</i>
                         <TeX math="
-v_{\mathrm{min}} = \frac{1}{20}, v_{\mathrm{max}} = 1, \\[0.5em]
+\mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
 V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\[0.5em]
-(V_{n})_{\mathrm{Norm}} = v_{\mathrm{min}} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (v_{\mathrm{max}} - v_{\mathrm{min}}) \right\rbrace, \\[0.5em]
-v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\mathrm{Norm}} + \mathrm{VelocityOffset}_{t}, v_{\mathrm{min}}, v_{\mathrm{max}} \right). \\
-                        " block />
+V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
+\vel = \operatorname{clamp} \left( V_{n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right). \\
+                        " block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
@@ -1544,7 +1567,7 @@ v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\mathrm{Norm}} + \mathrm{Velocity
                         <h5>Pitch Offset</h5>
                         <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
                         <i>The final pitch is calculated as:</i>
-                        <TeX math="\mathrm{Pitch}_{t,n} = \operatorname{clamp} \left( \mathrm{PitchRatio}_{t,\operatorname{max} \left( \left( \mathrm{Notes}_{t, n} \right)_{\mathrm{Pitch}} - \mathrm{PitchAdjustment}_{t}, 0 \right) } + \mathrm{PitchOffset}_{t}, \frac{1}{20}, 3 \right)." block />
+                        <TeX math="\pitchf = \operatorname{clamp} \left( \pitchratio + \mathrm{PitchOffset}_{t}, \frac{1}{20}, 3 \right)." block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
@@ -1564,19 +1587,19 @@ v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\mathrm{Norm}} + \mathrm{Velocity
                         <i>• Enable: Toggles looping on/off</i><br />
                         <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
                         <i>The final loop length is calculated as:</i>
-                        <TeX math="\mathrm{LoopFrames}_{t} =
+                        <TeX math="\loopfrm =
 \begin{cases}
     \mathrm{MaxFrames} + \mathrm{LoopOffset}_{t} & \mathrm{if} \;\: \mathrm{LoopEnabled}_{t} \\
     \mathrm{FramesLimit} & \mathrm{otherwise}
-\end{cases}" block />
+\end{cases}" block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="D_{t} \overset{\mathrm{def}}{=} \{\top, \bot\}, \; \mathrm{LoopEnabled}_{t} \in D_{t}" /> whether enables loop specified in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\mathrm{LoopOffset}_{t}" /> is a loop offset specified in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\mathrm{FramesLimit} = 99999" /> is max usable frames in game</i><br />
-                        <i>• <TeX math="\mathrm{MaxFrames} = \displaystyle\max_{F \: \in \: \{\mathrm{Frames}_{t, n} \: \mid \: t \: \in \: \{1, \ \cdots, \# \left( \mathrm{Notes} \right) \}, \; n \: \in \: \{1, \ \cdots, \# \left( \mathrm{Notes}_{t} \right) \}} F" /></i><br />
-                        <i>• <TeX math="\#(\mathrm{Notes})" /> is total config count (max of <TeX math="t" />)</i>
+                        <i>• <TeX math="\mathrm{MaxFrames} = \displaystyle\max_{f \: \in \: \{\frm \: \mid \: t \: \in \: \{1, \ \cdots, \notestrcrd \}, \; n \: \in \: \{1, \ \cdots, \notescrd \}} f" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
+                        <i>• <TeX math="\notestrcrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total config count (max of <TeX math="t" />)</i>
                     </div>
 
                     <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
@@ -1586,7 +1609,7 @@ v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\mathrm{Norm}} + \mathrm{Velocity
                         <h5>Speed</h5>
                         <i>Adjusts the playback speed of the track.</i><br />
                         <i>The frame offset for each note is calculated as:</i>
-                        <TeX math="\mathrm{Frames}_{t,n} = \mathrm{Tick}_{t,n} \cdot \mathrm{Fps} \cdot (2-\mathrm{FramesSpeed}_{t}) + \mathrm{FramesOffset}_{t} + 1." block />
+                        <TeX math="\frm = \mathrm{Tick}_{t,n} \cdot \mathrm{Fps} \cdot (2-\mathrm{FramesSpeed}_{t}) + \mathrm{FramesOffset}_{t} + 1." block settings={ABOUT_MORE_KATEX_MACROS} />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
