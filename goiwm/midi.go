@@ -27,28 +27,28 @@ type TrackOffsets struct {
 	PitchConstant  bool    `json:"PitchConstant"`
 }
 
-type LoopConfig struct {
+type TrackLoopConfig struct {
 	Enable     bool `json:"Enable"`
 	LoopOffset int  `json:"LoopOffset"`
 }
 
 type TrackConfig struct {
-	Track        int          `json:"Track"`
-	Instrumental int          `json:"Instrumental"`
-	BaseNote     int          `json:"BaseNote"`
-	MaxNote      uint8        `json:"MaxNote"`
-	Offsets      TrackOffsets `json:"Offsets"`
-	Loop         LoopConfig   `json:"Loop"`
-	Speed        float64      `json:"Speed"`
-	StripAfter   int          `json:"StripAfter"`
-	StripBefore  int          `json:"StripBefore"`
-	StartAt      int          `json:"StartAt"`
+	Track        int             `json:"Track"`
+	Instrumental int             `json:"Instrumental"`
+	BaseNote     int             `json:"BaseNote"`
+	MaxNote      uint8           `json:"MaxNote"`
+	Offsets      TrackOffsets    `json:"Offsets"`
+	Loop         TrackLoopConfig `json:"Loop"`
+	Speed        float64         `json:"Speed"`
+	StripAfter   int             `json:"StripAfter"`
+	StripBefore  int             `json:"StripBefore"`
+	StartAt      int             `json:"StartAt"`
 }
 
-type TrackNotes struct {
-	Notes []Note
-
+type NotesWithTrackConfig struct {
 	*TrackConfig
+
+	Notes []Note
 }
 
 const (
@@ -100,7 +100,7 @@ func generatePitchTable(standard int) []float64 {
 }
 
 // calculateHighestNote calculates the max pitch of the notes.
-func calculateHighestNote(n TrackNotes) Note {
+func calculateHighestNote(n NotesWithTrackConfig) Note {
 	return slices.MaxFunc(n.Notes, func(a Note, b Note) int {
 		return cmp.Compare(a.key, b.key)
 	})
@@ -123,6 +123,7 @@ func ticksToSeconds(absTicks uint64, tempoChanges []TempoChange, timeFormat smf.
 
 	var seconds float64
 	var lastTicks uint64
+	
 	currentBPM := tempoChanges[0].bpm
 
 	for _, change := range tempoChanges {
@@ -143,7 +144,7 @@ func ticksToSeconds(absTicks uint64, tempoChanges []TempoChange, timeFormat smf.
 	return seconds
 }
 
-func getTempoChanges(smf *smf.SMF) []TempoChange {
+func collectTempoChanges(smf *smf.SMF) []TempoChange {
 	var changes []TempoChange
 	var absTicks uint64
 
@@ -170,10 +171,10 @@ func getTempoChanges(smf *smf.SMF) []TempoChange {
 
 var mu sync.Mutex
 
-func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
-	var trackNotesList []TrackNotes
+func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, error) {
+	var trackNotesList []NotesWithTrackConfig
 
-	for _, cfg := range tc {
+	for _, cfg := range trackConfigs {
 		var absTicks uint64
 
 		var channel, velocity, key uint8
@@ -215,14 +216,14 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 		}
 
 		if len(processedNotes) > 0 {
-			trackNotesList = append(trackNotesList, TrackNotes{
+			trackNotesList = append(trackNotesList, NotesWithTrackConfig{
 				Notes:       processedNotes,
 				TrackConfig: cfg,
 			})
 		}
 	}
 
-	tempoChanges := getTempoChanges(ff)
+	tempoChanges := collectTempoChanges(ff)
 	timeFormat := ff.TimeFormat.(smf.MetricTicks)
 
 	var events [][]*Event

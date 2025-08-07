@@ -1464,7 +1464,10 @@ export default function App() {
                     {/* Track */}
                     <div>
                         <h5>Track</h5>
-                        <i>Specifies which MIDI track to process from the input file.</i><br />
+                        <i>Specifies which MIDI track number to process from the input file.</i><br />
+                        <i>• The number of the track you want to play, as indicated in the log</i><br />
+                        <i>• Track numbers start from 0</i><br />
+                        <i>• Only tracks containing note events are counted</i>
                     </div>
 
                     <hr style={{
@@ -1509,9 +1512,9 @@ export default function App() {
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\left( \text{Notes}_{t} \right)_{\text{PitchMax}} = \displaystyle\max_{P \: \in \: \{\left( \text{Notes}_{t, n} \right)_{\text{Pitch}} \: \mid \: n \: \in \: \{0, \ \cdots, \#\text{Notes}\}} P" /></i><br />
-                        <i>• <TeX math="\left( \text{Notes}_{t, n} \right)_{\text{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config <TeX math="\text{Notes}" /></i><br />
-                        <i>• <TeX math="\#\text{Notes}" /> is total config count (max of <TeX math="t" />)</i>
+                        <i>• <TeX math="\left( \text{Notes}_{t} \right)_{\text{PitchMax}} = \displaystyle\max_{\mathcal{P} \: \in \: \{\left( \text{Notes}_{t, n} \right)_{\text{Pitch}} \: \mid \: n \: \in \: \{1, \ \cdots, \# \left( \text{Notes}_{t} \right) \}} \mathcal{P}" /></i><br />
+                        <i>• <TeX math="\left( \text{Notes}_{t, n} \right)_{\text{Pitch}}" /> is pitch of <TeX math="n^{th}" /> note in <TeX math="\text{Notes}_{t}" /></i><br />
+                        <i>• <TeX math="\#(\text{Notes}_{t})" /> is total note count in <TeX math="\text{Notes}_{t}" /></i>
                     </div>
 
                     <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
@@ -1522,19 +1525,15 @@ export default function App() {
                         <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
                         <i>The final volume is calculated as:</i>
                         <TeX math="
-\begin{aligned}
-    v_{t,n} &= \operatorname{clamp} \left( V_{n_{\text{norm}}} + \text{VelocityOffset}_{t}, v_{\min}, v_{\max} \right), \\[0.5em]
-    \text{where} \quad 
-    v_{\min} &= \frac{1}{20}, \quad v_{\max} = 1, \\[1em]
-    V&\colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\
-    V_{n_{\text{norm}}} &= v_{\min} + \left( \left( \frac{V(n)}{127} \right)^2 (v_{\max} - v_{\min}) \right).
-\end{aligned}
-" block />
+V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}. \\
+(V_{n})_{\text{norm}} = v_{\min} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (v_{\max} - v_{\min}) \right\rbrace, \\
+v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\text{norm}} + \text{VelocityOffset}_{t}, \frac{1}{20}, 1 \right), \\
+                        " block />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\text{VelocityOffset}_{t}" /> is a velocity offset</i>
+                        <i>• <TeX math="\text{VelocityOffset}_{t}" /> is a velocity offset specified in <TeX math="t^{th}" /> config</i>
                         <br /><br />
                         <i>When Volume Constant is true:</i><br />
                         <i>• The offset value is used directly as the volume</i>
@@ -1547,12 +1546,12 @@ export default function App() {
                         <h5>Pitch Offset</h5>
                         <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
                         <i>The final pitch is calculated as:</i>
-                        <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \lbrack \text{PitchRatio}_{t,\operatorname{max} \{ \left( \text{Notes}_{t, n} \right)_{\text{Pitch}} - \text{PitchAdjustment}_{t}, 0\}} + \text{PitchOffset}_{t}, \text{Pitch}_{\min}, \text{Pitch}_{\max} \rbrack." block />
+                        <TeX math="\text{Pitch}_{t,n} = \operatorname{clamp} \left( \text{PitchRatio}_{t,\operatorname{max} \left( \left( \text{Notes}_{t, n} \right)_{\text{Pitch}} - \text{PitchAdjustment}_{t}, 0 \right) } + \text{PitchOffset}_{t}, \frac{1}{20}, 3 \right)." block />
                         <i>where:</i>
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\text{PitchOffset}_{t}" /> is a pitch offset</i>
+                        <i>• <TeX math="\text{PitchOffset}_{t}" /> is a pitch offset specified in <TeX math="t^{th}" /> config</i>
                         <br /><br />
                         <i>When Pitch Constant is true:</i><br />
                         <i>• The offset value is used directly as the pitch</i>
@@ -1572,7 +1571,8 @@ export default function App() {
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\text{LoopOffset}_{t}" /> is a loop offset</i><br />
-                        <i>• <TeX math="\text{MaxFrames}" /> is the highest frames in the all of tracks</i>
+                        <i>• <TeX math="\text{MaxFrames} = \displaystyle\max_{\mathcal{F} \: \in \: \{\text{Frames}_{t, n} \: \mid \: t \: \in \: \{1, \ \cdots, \# \left( \text{Notes} \right) \}, \; n \: \in \: \{1, \ \cdots, \# \left( \text{Notes}_{t} \right) \}} \mathcal{F}" /></i><br />
+                        <i>• <TeX math="\#(\text{Notes})" /> is total config count (max of <TeX math="t" />)</i>
                     </div>
 
                     <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
@@ -1587,10 +1587,10 @@ export default function App() {
                         <br />
                         <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\text{FramesOffset}_{t}" /> is a frames offset</i><br />
-                        <i>• <TeX math="\text{FramesSpeed}_{t}" /> is a frames speed</i><br />
+                        <i>• <TeX math="\text{FramesOffset}_{t}" /> is a frames offset specified in <TeX math="t^{th}" /> config</i><br />
+                        <i>• <TeX math="\text{FramesSpeed}_{t}" /> is a frames speed specified in <TeX math="t^{th}" /> config</i><br />
                         <i>• <TeX math="\text{Tick}_{t,n}" /> is the μs tempo</i><br />
-                        <i>• <TeX math="\text{Fps}" /> is the game fps (always 50)</i>
+                        <i>• <TeX math="\text{Fps}" /> is the game fps (always <TeX math="50" />)</i>
                         <br /><br />
                         <i>• <TeX math="\text{FramesSpeed}_{t} \gt 1" />: Notes plays faster than original</i><br />
                         <i>• <TeX math="\text{FramesSpeed}_{t} \lt 1" />: Notes plays slower than original</i><br />
@@ -1619,5 +1619,4 @@ export default function App() {
             />
         </div>
     );
-
 }
