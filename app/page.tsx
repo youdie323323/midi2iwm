@@ -1465,9 +1465,6 @@ export default function App() {
                     <div>
                         <h5>Track</h5>
                         <i>Specifies which MIDI track number to process from the input file.</i><br />
-                        <i>• The number of the track you want to play, as indicated in the log</i><br />
-                        <i>• Track numbers start from 0</i><br />
-                        <i>• Only tracks containing note events are counted</i>
                     </div>
 
                     <hr style={{
@@ -1525,9 +1522,10 @@ export default function App() {
                         <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
                         <i>The final volume is calculated as:</i>
                         <TeX math="
-V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}. \\
-(V_{n})_{\text{norm}} = v_{\min} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (v_{\max} - v_{\min}) \right\rbrace, \\
-v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\text{norm}} + \text{VelocityOffset}_{t}, \frac{1}{20}, 1 \right), \\
+v_{\text{min}} = \frac{1}{20}, v_{\text{max}} = 1, \\[0.5em]
+V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \in \mathbb{N} \mid 0 \leq x \leq 127\}, \\[0.5em]
+(V_{n})_{\text{norm}} = v_{\text{min}} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (v_{\text{max}} - v_{\text{min}}) \right\rbrace, \\[0.5em]
+v_{t,n} = \operatorname{clamp} \left( (V_{n})_{\text{norm}} + \text{VelocityOffset}_{t}, v_{\text{min}}, v_{\text{max}} \right). \\
                         " block />
                         <i>where:</i>
                         <br />
