@@ -408,26 +408,80 @@ const TRACK_CONFIG_SELECTION_DEFAULT_NAME = "VIEW_PLACEHOLDER_OFFSET" as const;
 
 const ABOUT_MORE_KATEX_MACROS = {
     macros: {
-        "\\notes": "\\notestr_{t}",
-        "\\notescrd": "\\# \\left( \\notes \\right)",
+        [String.raw`\th`]: String.raw`\mathrm{th}`,
 
-        "\\notestr": "\\mathcal{N}",
-        "\\notestrcrd": "\\# \\notestr",
+        [String.raw`\notes`]: String.raw`\notestr_{t}`,
+        [String.raw`\notescrd`]: String.raw`\# \left( \notes \right)`,
+        [String.raw`\notesindcs`]: String.raw`\{1, \; \cdots, \notescrd \}`,
 
-        "\\pitch": "p_{\\tiny \\notestr_{t,n}}",
-        "\\pitchf": "\\mathfrak{P}_{t,n}",
-        "\\pitchratio": "\\mathfrak{R}_{\\pitch}",
-        "\\pitchadj": "\\mathfrak{A}_{t}",
-        "\\pitchmax": "\\mathrm{max}_{p \\tiny _ {\\notes}}",
+        [String.raw`\notestr`]: String.raw`\mathcal{N}`,
+        [String.raw`\notestrcrd`]: String.raw`\# \notestr`,
+        [String.raw`\notestrindcs`]: String.raw`\{1, \; \cdots, \notestrcrd \}`,
 
-        "\\vel": "\\mathfrak{V}_{t,n}",
+        [String.raw`\pitch`]: String.raw`p_{\tiny \notestr_{t,n}}`,
+        [String.raw`\pitchf`]: String.raw`\mathfrak{P}_{t,n}`,
+        [String.raw`\pitchratio`]: String.raw`\mathfrak{R}_{\pitch}`,
+        [String.raw`\pitchadj`]: String.raw`\mathfrak{A}_{t}`,
+        [String.raw`\pitchmax`]: String.raw`\mathrm{max}_{p \tiny _ {\notes}}`,
 
-        "\\loopfrm": "\\mathfrak{L}_{t}",
+        [String.raw`\vel`]: String.raw`\mathfrak{V}_{t,n}`,
 
-        "\\frm": "\\mathfrak{F}_{t,n}",
-        "\\maxfrm": "\\mathrm{max}_{\\mathfrak{F}}",
+        [String.raw`\loopfrm`]: String.raw`\mathfrak{L}_{t}`,
+
+        [String.raw`\frm`]: String.raw`\mathfrak{F}_{t,n}`,
+        [String.raw`\maxfrm`]: String.raw`\mathrm{max}_{\mathfrak{F}}`,
     },
 } as const satisfies KatexOptions;
+
+const AboutMoreBlockTex = (math: string) => {
+    return (
+        <TeX math={math} block settings={ABOUT_MORE_KATEX_MACROS} />
+    );
+};
+
+const AboutMoreTex = (math: string) => {
+    return (
+        <TeX math={math} settings={ABOUT_MORE_KATEX_MACROS} />
+    );
+};
+
+const AboutMoreTTex = AboutMoreTex("t");
+const AboutMoreNTex = AboutMoreTex("n");
+
+const AboutMoreTThTex = AboutMoreTex(String.raw`t^{\th}`);
+const AboutMoreNThTex = AboutMoreTex(String.raw`n^{\th}`);
+
+const AboutMoreSingleTThWhere =
+    <>
+        <i>where {AboutMoreTTex} for representing {AboutMoreTThTex} config</i>
+    </>;
+
+const AboutMoreTThNThWhere =
+    <>
+        <i>• {AboutMoreTTex} for representing {AboutMoreTThTex} config</i><br />
+        <i>• {AboutMoreNTex} for representing {AboutMoreNThTex} note in {AboutMoreTThTex} config</i>
+    </>;
+
+const AboutMoreContinuableTThNThWhere =
+    <>
+        {AboutMoreTThNThWhere}
+        <br />
+    </>;
+
+const AboutMoreSpecifiedInTThConfig =
+    <>
+        specified in {AboutMoreTThTex} config
+    </>;
+
+const AboutMoreConfigDescriptionTargetSeparator =
+    <>
+        <hr style={{ margin: "20px 0", border: "none", borderTop: "3px solid #ffffff" }} />
+    </>;
+
+const AboutMoreConfigDescriptionSeparator =
+    <>
+        <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+    </>;
 
 Modal.setAppElement("body");
 
@@ -1483,11 +1537,7 @@ export default function App() {
                         </div>
                     </div>
 
-                    <hr style={{
-                        margin: "20px 0",
-                        border: "none",
-                        borderTop: "2px solid #ffffff"
-                    }} />
+                    {AboutMoreConfigDescriptionTargetSeparator}
 
                     <h4>Config Informations</h4>
 
@@ -1497,11 +1547,7 @@ export default function App() {
                         <i>Specifies which MIDI track number to process from the input file.</i><br />
                     </div>
 
-                    <hr style={{
-                        margin: "20px 0",
-                        border: "none",
-                        borderTop: "1px solid #ffffff"
-                    }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Instrumental */}
                     <div>
@@ -1509,19 +1555,19 @@ export default function App() {
                         <i>Defines the sound ID to be used when playing notes from this track.</i><br />
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Base Note */}
                     <div>
                         <h5>Base Note</h5>
                         <i>Base Note represents the reference MIDI note number used to calculate pitch frequencies.</i><br />
                         <i>In the implementation, relative pitch ratios are calculated using:</i>
-                        <TeX math="\pitchratio = 2^{\frac{\operatorname{max} (\pitch \; - \; \pitchadj, 0)-\mathrm{BaseNote}_{t}}{12}}." block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
-                        <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{BaseNote}_{t}" /> serves as the reference point (ratio = 1.0)</i><br />
+                        {AboutMoreBlockTex(String.raw`
+                        \pitchratio = 2^{\frac{\operatorname{max} (\pitch \; - \; \pitchadj, 0)-\mathrm{BaseNote}_{t}}{12}}.
+                        `)}
+                        <i>where:</i><br />
+                        {AboutMoreContinuableTThNThWhere}
+                        <i>• {AboutMoreTex(String.raw`\mathrm{BaseNote}_{t}`)} serves as the reference point (ratio = 1.0)</i><br />
                         <br />
                         <i style={{ textDecoration: "underline", textUnderlineOffset: "4px" }}>
                             This value is evaluted as string in submittion. You can type value like this: &quot;61-10&quot;.
@@ -1535,57 +1581,57 @@ export default function App() {
                         <h5>Max Note</h5>
                         <i>Max Note is a value used to calculate the amount by which to decrease the index keys of the pitch table.</i><br />
                         <i>The decreasing value is calculated as follows:</i>
-                        <TeX math="\pitchadj = 7 \left\lceil\frac{\pitchmax - \mathrm{MaxNote}_{t}}{7}\right\rceil." block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
-                        <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\pitchmax = \displaystyle\max_{p \: \in \: \{\pitch \: \mid \: n \: \in \: \{1, \ \cdots, \notescrd \}} p" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
-                        <i>• <TeX math="\pitch" settings={ABOUT_MORE_KATEX_MACROS} /> is pitch of <TeX math="n^{th}" /> note in <TeX math="\notes" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
-                        <i>• <TeX math="\notescrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total note count in <TeX math="\notes" settings={ABOUT_MORE_KATEX_MACROS} /></i>
+                        {AboutMoreBlockTex(String.raw`
+                        \pitchadj = 7 \left\lceil\frac{\pitchmax - \mathrm{MaxNote}_{t}}{7}\right\rceil.
+                        `)}
+                        {AboutMoreSingleTThWhere}
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Volume Offset */}
                     <div>
                         <h5>Volume Offset</h5>
                         <i>Adjusts the volume of notes in the track by adding an offset to the normalized velocity.</i><br />
                         <i>The final volume is calculated as:</i>
-                        <TeX math="
-\mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
-V \colon \mathbb{N} \ni \mathcal{J} \longrightarrow \mathcal{V} \in \{x \mid x \in \mathbb{N} \land 0 \leq x \leq 127\}, \\[0.5em]
-V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \right)^2 (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
-\vel = \operatorname{clamp} \left( V_{n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right). \\
-                        " block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
+                        {AboutMoreBlockTex(String.raw`
+                        \mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
+                        \mathrm{min}_{v} = 0, \mathrm{max}_{v} = 2^{7} - 1, \\[0.5em]
+                        v \colon \notesindcs \longrightarrow \{x \mid \mathbb{N} \ni x \land \mathrm{min}_{v} \leq x \leq \mathrm{max}_{v}\}, \\[0.5em]
+                        V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{v(n)}{\mathrm{max}_{v}} \right)^{L} (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
+                        \vel = \operatorname{clamp} \left( V_{n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right).
+                        `)}
+                        <i>where:</i><br />
+                        {AboutMoreContinuableTThNThWhere}
+                        <i>• {AboutMoreTex(String.raw`\mathrm{VelocityOffset}_{t}`)} is a velocity offset {AboutMoreSpecifiedInTThConfig}</i><br />
+                        <i>• {AboutMoreTex(String.raw`L = 2`)} is a linearity parameter</i><br />
                         <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{VelocityOffset}_{t}" /> is a velocity offset specified in <TeX math="t^{th}" /> config</i>
-                        <br /><br />
                         <i>When Volume Constant is true:</i><br />
                         <i>• The offset value is used directly as the volume</i>
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Pitch Offset */}
                     <div>
                         <h5>Pitch Offset</h5>
                         <i>Adjusts the pitch of notes in the track by adding an offset to the calculated pitch ratio.</i><br />
                         <i>The final pitch is calculated as:</i>
-                        <TeX math="\pitchf = \operatorname{clamp} \left( \pitchratio + \mathrm{PitchOffset}_{t}, \frac{1}{20}, 3 \right)." block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
-                        <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{PitchOffset}_{t}" /> is a pitch offset specified in <TeX math="t^{th}" /> config</i>
+                        {AboutMoreBlockTex(String.raw`
+                        \pitchmax = \displaystyle\max_{p \: \in \: \{\pitch \: \mid \: n \: \in \: \notesindcs} p, \\[0.5em]
+                        \pitchf = \operatorname{clamp} \left( \pitchratio + \mathrm{PitchOffset}_{t}, \frac{1}{20}, 3 \right).
+                        `)}
+                        <i>where:</i><br />
+                        {AboutMoreContinuableTThNThWhere}
+                        <i>• {AboutMoreTex(String.raw`\pitch`)} is pitch of {AboutMoreNThTex} note in {AboutMoreTex(String.raw`\notes`)}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\notescrd`)} is total note count of {AboutMoreTex(String.raw`\notes`)}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{PitchOffset}_{t}`)} is a pitch offset {AboutMoreSpecifiedInTThConfig}</i>
                         <br /><br />
                         <i>When Pitch Constant is true:</i><br />
                         <i>• The offset value is used directly as the pitch</i>
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Loop */}
                     <div>
@@ -1594,44 +1640,45 @@ V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{V(n)}{127} \righ
                         <i>• Enable: Toggles looping on/off</i><br />
                         <i>• Loop Offset: Adjusts the loop end point by adding frames to the calculated loop length</i><br />
                         <i>The final loop length is calculated as:</i>
-                        <TeX math="\loopfrm =
-\begin{cases}
-    \maxfrm + \mathrm{LoopOffset}_{t} & \mathrm{if} \;\: \mathrm{LoopEnabled}_{t} \\
-    \mathrm{FramesLimit} & \mathrm{otherwise}
-\end{cases}" block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
-                        <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="D_{t} \overset{\mathrm{def}}{=} \{\top, \bot\}, \; \mathrm{LoopEnabled}_{t} \in D_{t}" /> whether enables loop specified in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{LoopOffset}_{t}" /> is a loop offset specified in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{FramesLimit} = 99999" /> is max usable frames in game</i><br />
-                        <i>• <TeX math="\maxfrm = \displaystyle\max_{f \: \in \: \{\frm \: \mid \: t \: \in \: \{1, \ \cdots, \notestrcrd \}, \; n \: \in \: \{1, \ \cdots, \notescrd \}} f" settings={ABOUT_MORE_KATEX_MACROS} /></i><br />
-                        <i>• <TeX math="\notestrcrd" settings={ABOUT_MORE_KATEX_MACROS} /> is total config amount (max of <TeX math="t" />)</i>
+                        {AboutMoreBlockTex(String.raw`
+                        \loopfrm =
+                            \begin{cases}
+                                \maxfrm + \mathrm{LoopOffset}_{t} & \mathrm{if} \; \mathrm{LoopEnabled}_{t} \\
+                                \mathrm{FramesLimit} & \mathrm{otherwise}
+                            \end{cases}
+                        `)}
+                        <i>where:</i><br />
+                        <i>• {AboutMoreTTex} for representing {AboutMoreTThTex} config</i><br />
+                        <i>• {AboutMoreTex(String.raw`D_{t} \overset{\mathrm{def}}{=} \{\top, \bot\}, \; \mathrm{LoopEnabled}_{t} \in D_{t}`)} whether enables loop {AboutMoreSpecifiedInTThConfig}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{LoopOffset}_{t}`)} is a loop offset {AboutMoreSpecifiedInTThConfig}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesLimit} = 99999`)} is max usable frames in game</i><br />
+                        <i>• {AboutMoreTex(String.raw`\notestrcrd`)} is total config amount (max of {AboutMoreTTex})</i>
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Speed */}
                     <div>
                         <h5>Speed</h5>
                         <i>Adjusts the playback speed of the track.</i><br />
                         <i>The frame offset for each note is calculated as:</i>
-                        <TeX math="\frm = \mathrm{Tick}_{t,n} \cdot \mathrm{Fps} \cdot (2-\mathrm{FramesSpeed}_{t}) + \mathrm{FramesOffset}_{t} + 1." block settings={ABOUT_MORE_KATEX_MACROS} />
-                        <i>where:</i>
+                        {AboutMoreBlockTex(String.raw`
+                        \frm = \mathrm{Tick}_{t,n} \cdot \mathrm{Fps} \cdot (2-\mathrm{FramesSpeed}_{t}) + \mathrm{FramesOffset}_{t} + 1, \\[0.5em]
+                        \maxfrm = \displaystyle\max_{f \: \in \: \{\frm \: \mid \: t \: \in \: \notestrindcs, \; n \: \in \: \notesindcs} f.
+                        `)}
+                        <i>where:</i><br />
+                        {AboutMoreContinuableTThNThWhere}
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesOffset}_{t}`)} is a frames offset {AboutMoreSpecifiedInTThConfig}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesSpeed}_{t}`)} is a frames speed {AboutMoreSpecifiedInTThConfig}</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{Tick}_{t,n}`)} is the μs tempo</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{Fps} = 50`)} is a average of game fps</i><br />
                         <br />
-                        <i>• <TeX math="t" /> for representing <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="n" /> for representing <TeX math="n^{th}" /> note in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{FramesOffset}_{t}" /> is a frames offset specified in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{FramesSpeed}_{t}" /> is a frames speed specified in <TeX math="t^{th}" /> config</i><br />
-                        <i>• <TeX math="\mathrm{Tick}_{t,n}" /> is the μs tempo</i><br />
-                        <i>• <TeX math="\mathrm{Fps} = 50" /> is the game fps</i>
-                        <br /><br />
-                        <i>• <TeX math="\mathrm{FramesSpeed}_{t} \gt 1" />: Notes plays faster than original</i><br />
-                        <i>• <TeX math="\mathrm{FramesSpeed}_{t} \lt 1" />: Notes plays slower than original</i><br />
-                        <i>• <TeX math="\mathrm{FramesSpeed}_{t} = 1" />: Notes plays at original tempo</i>
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesSpeed}_{t} \gt 1`)}: Notes plays faster than original</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesSpeed}_{t} \lt 1`)}: Notes plays slower than original</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathrm{FramesSpeed}_{t} = 1`)}: Notes plays at original tempo</i>
                     </div>
 
-                    <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
+                    {AboutMoreConfigDescriptionSeparator}
 
                     {/* Strip Before/After */}
                     <div>

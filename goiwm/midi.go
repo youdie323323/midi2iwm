@@ -15,7 +15,7 @@ import (
 )
 
 type Note struct {
-	absTicks uint64
+	ticks    uint64
 	velocity uint8
 	key      uint8
 }
@@ -50,11 +50,6 @@ type NotesWithTrackConfig struct {
 
 	Notes []Note
 }
-
-const (
-	minVecloity = 0.05
-	maxVecloity = 1.0
-)
 
 const (
 	stableStandard int = 61
@@ -106,9 +101,16 @@ func calculateHighestNote(n NotesWithTrackConfig) Note {
 	})
 }
 
+const maxUint7 = 1<<7 - 1
+
+const (
+	minVecloity = 0.05
+	maxVecloity = 1.0
+)
+
 // normalizeVelocity normalizes midi velocity to IWM velocity.
 func normalizeVelocity(velocity uint8) float64 {
-	return minVecloity + (math.Pow(float64(velocity)/127.0, 2) * (maxVecloity - minVecloity))
+	return minVecloity + (math.Pow(float64(velocity)/float64(maxUint7), 2.0) * (maxVecloity - minVecloity))
 }
 
 type TempoChange struct {
@@ -123,7 +125,7 @@ func ticksToSeconds(absTicks uint64, tempoChanges []TempoChange, timeFormat smf.
 
 	var seconds float64
 	var lastTicks uint64
-	
+
 	currentBPM := tempoChanges[0].bpm
 
 	for _, change := range tempoChanges {
@@ -175,7 +177,7 @@ func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, e
 	var trackNotesList []NotesWithTrackConfig
 
 	for _, cfg := range trackConfigs {
-		var absTicks uint64
+		var ticks uint64
 
 		var channel, velocity, key uint8
 
@@ -185,22 +187,22 @@ func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, e
 		activeNotesMap := make(map[uint64]map[uint8]bool)
 
 		for _, event := range ff.Tracks[cfg.Track] {
-			absTicks += uint64(event.Delta)
+			ticks += uint64(event.Delta)
 
 			switch {
 			case event.Message.GetNoteStart(&channel, &key, &velocity):
-				if activeNotesMap[absTicks] == nil {
-					activeNotesMap[absTicks] = make(map[uint8]bool)
+				if activeNotesMap[ticks] == nil {
+					activeNotesMap[ticks] = make(map[uint8]bool)
 				}
 
-				if !activeNotesMap[absTicks][key] {
+				if !activeNotesMap[ticks][key] {
 					activeNotes = append(activeNotes, Note{
-						absTicks: absTicks,
+						ticks:    ticks,
 						velocity: velocity,
 						key:      key,
 					})
 
-					activeNotesMap[absTicks][key] = true
+					activeNotesMap[ticks][key] = true
 				}
 
 			case event.Message.GetNoteEnd(&channel, &key):
@@ -232,7 +234,7 @@ func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, e
 
 	for _, tn := range trackNotesList {
 		for _, note := range tn.Notes {
-			seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
+			seconds := ticksToSeconds(note.ticks, tempoChanges, timeFormat)
 
 			offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
 			if offset > MaxEventFrames {
@@ -270,7 +272,7 @@ func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, e
 			var trackEvents map[int]*Event = make(map[int]*Event, len(tn.Notes))
 
 			for _, note := range tn.Notes {
-				seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
+				seconds := ticksToSeconds(note.ticks, tempoChanges, timeFormat)
 
 				offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
 				if offset > MaxEventFrames {
@@ -360,10 +362,10 @@ func GenerateMidiEvents(ff *smf.SMF, trackConfigs []*TrackConfig) ([][]*Event, e
 	return events, nil
 }
 
-func parallelize(n int, callback func(int)) {
+func parallelize(end int, callback func(int)) {
 	var wg sync.WaitGroup
 
-	for i := range n {
+	for i := range end {
 		wg.Add(1)
 
 		go func(i int) {
