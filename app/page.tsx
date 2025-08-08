@@ -1597,14 +1597,17 @@ export default function App() {
                         {AboutMoreBlockTex(String.raw`
                         \mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
                         \mathrm{min}_{v} = 0, \mathrm{max}_{v} = 2^{7} - 1, \\[0.5em]
-                        v \colon \notesindcs \longrightarrow \{x \mid \mathbb{N} \ni x \land \mathrm{min}_{v} \leq x \leq \mathrm{max}_{v}\}, \\[0.5em]
-                        V_{n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{v(n)}{\mathrm{max}_{v}} \right)^{L} (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
-                        \vel = \operatorname{clamp} \left( V_{n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right).
+                        v : \notestrindcs \to \mathcal{B}(\notesindcs, \{ x \mid \mathbb{N} \ni x \wedge \mathrm{min}_v \leq x \leq \mathrm{max}_v\}), \\[0.5em]
+                        V_{t,n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{v(t)(n)}{\mathrm{max}_{v}} \right)^{L} (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
+                        \vel = \operatorname{clamp} \left( V_{t,n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right).
                         `)}
                         <i>where:</i><br />
                         {AboutMoreContinuableTThNThWhere}
                         <i>• {AboutMoreTex(String.raw`\mathrm{VelocityOffset}_{t}`)} is a velocity offset {AboutMoreSpecifiedInTThConfig}</i><br />
-                        <i>• {AboutMoreTex(String.raw`L = 2`)} is a linearity parameter</i><br />
+                        <i>• {AboutMoreTex(String.raw`L = 2`)} is a velocity linearity parameter</i><br />
+                        <i>• {AboutMoreTex(String.raw`\mathcal{B}(A, B) \overset{\mathrm{def}}{=} \left\{f \mid f : A \to B, \; \left(\forall a_1, a_2 \in A, f(a_1) = f(a_2) \Rightarrow a_1 = a_2 \right) \wedge \left(\forall b \in B, \exists a \in A \;\: \text{s.t.} \; f(a) = b\right) \right\}`)}<br />
+                        Therefore, {AboutMoreTex(String.raw`\mathcal{B}(A, B)`)} returning all of the bijections for {AboutMoreTex(String.raw`A \to B`)}.
+                        </i><br />
                         <br />
                         <i>When Volume Constant is true:</i><br />
                         <i>• The offset value is used directly as the volume</i>
