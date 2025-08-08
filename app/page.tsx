@@ -1596,9 +1596,8 @@ export default function App() {
                         <i>The final volume is calculated as:</i>
                         {AboutMoreBlockTex(String.raw`
                         \mathrm{min}_{\mathfrak{V}} = \frac{1}{20}, \mathrm{max}_{\mathfrak{V}} = 1, \\[0.5em]
-                        \mathrm{min}_{v} = 0, \mathrm{max}_{v} = 2^{7} - 1, \mathrm{r}_{v} = \{ x \mid \mathbb{N} \ni x \wedge \mathrm{min}_v \leq x \leq \mathrm{max}_v\} \\[0.5em]
-                        o : \notestr \to \mathrm{r}_{v}, \\[0.5em]
-                        v : \notestrindcs \ni t \mapsto o(\notes) \in \mathcal{B}(\notesindcs, \mathrm{r}_{v}), \\[0.5em]
+                        \mathrm{min}_{v} = 0, \mathrm{max}_{v} = 2^{7} - 1 \\[0.5em]
+                        v : \notestrindcs \ni t \mapsto \{\notesindcs \to \{ x \mid \mathbb{N} \ni x \wedge \mathrm{min}_v \leq x \leq \mathrm{max}_v\}\}, \\[0.5em]
                         V_{t,n} = \mathrm{min}_{\mathfrak{V}} + \left\lbrace \left( \frac{v(t)(n)}{\mathrm{max}_{v}} \right)^{L} (\mathrm{max}_{\mathfrak{V}} - \mathrm{min}_{\mathfrak{V}}) \right\rbrace, \\[0.5em]
                         \vel = \operatorname{clamp} \left( V_{t,n} + \mathrm{VelocityOffset}_{t}, \mathrm{min}_{\mathfrak{V}}, \mathrm{max}_{\mathfrak{V}} \right).
                         `)}
