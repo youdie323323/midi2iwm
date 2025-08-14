@@ -57,7 +57,7 @@ declare global {
     interface Window {
         goIwm: { // Define methods between wasm
             tracks(encodedMidi: string): `${typeof TRACKS_NORMAL_PREFIX}${string}` | string;
-            midiToEventObjects(encodedMidi: string, encodedTrackConfigs: string): string;
+            midiToIwmObjects(encodedMidi: string, encodedTrackConfigs: string): string;
         },
     }
 }
@@ -483,6 +483,55 @@ const AboutMoreConfigDescriptionSeparator =
         <hr style={{ margin: "20px 0", border: "none", borderTop: "1px solid #ffffff" }} />
     </>;
 
+const enum InstructionConfigHintLiteralType {
+    INTEGER,
+    INTEGER_EVALUTED_STRING,
+    FLOAT,
+    BOOLEAN,
+}
+
+const instructionConfigHintLiteralTypeToElement = (literalType: InstructionConfigHintLiteralType): JSX.Element => {
+    switch (literalType) {
+        case InstructionConfigHintLiteralType.INTEGER:
+            return <>Type: <span style={{ color: "#0056B3" }}>Integer</span>.</>;
+
+        case InstructionConfigHintLiteralType.INTEGER_EVALUTED_STRING:
+            return <>Type: <span style={{ color: "#0056B3" }}>Integer</span> (evaluated from string).</>;
+
+        case InstructionConfigHintLiteralType.FLOAT:
+            return <>Type: <span style={{ color: "#FD7E14" }}>Float</span>.</>;
+
+        case InstructionConfigHintLiteralType.BOOLEAN:
+            return <>Type: <span style={{ color: "#28A745" }}>Boolean</span>.</>;
+    }
+};
+
+const InstructionConfigHint = (description: JSX.Element, literalType?: InstructionConfigHintLiteralType) =>
+    <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip className="configuration-tooltip">
+            {description}
+
+            {
+                literalType !== undefined && literalType !== null
+                    ? instructionConfigHintLiteralTypeToElement(literalType)
+                    : <></>
+            }
+        </Tooltip>}
+    >
+        <span
+            style={{
+                width: "24px",
+                height: "24px",
+                fontSize: "14px",
+                cursor: "pointer",
+                transform: "translate(8px, 4px)",
+            }}
+        >
+            <i className="fas fa-info-circle" />
+        </span>
+    </OverlayTrigger>;
+
 Modal.setAppElement("body");
 
 export default function App() {
@@ -558,7 +607,7 @@ export default function App() {
     }, []);
 
     useLayoutEffect(() => {
-        log("Webassembly setup");
+        log("WebAssembly setup");
     }, []);
 
     useEffect(() => {
@@ -829,7 +878,7 @@ export default function App() {
                     return;
                 }
 
-                const result = window.goIwm.midiToEventObjects(
+                const result = window.goIwm.midiToIwmObjects(
                     await readFileAsBase64(file),
                     JSON.stringify(
                         // Evalute all BaseNote
@@ -881,7 +930,7 @@ export default function App() {
     return (
         <div className="container">
             <div className="text-center mt-2">
-                <p className="block mb-2 text-sm text-gray-500 dark:text-gray-400 w-full" id="file_input_help">MIDI files only (.mid, .midi)</p>
+                <p className="block mb-2 text-sm text-gray-500 dark:text-gray-400 w-full" id="file_input_help">MIDI file only (.mid, .midi)</p>
 
                 <input
                     type="file"
@@ -945,7 +994,7 @@ export default function App() {
                     className="form-select me-2 configuration-select"
                     onChange={(e) => loadTrackConfig(e.target.value)}
                 >
-                    <option value={TRACK_CONFIG_SELECTION_DEFAULT_NAME}>Select Config to Load</option>
+                    <option value={TRACK_CONFIG_SELECTION_DEFAULT_NAME}>Select Config To Load</option>
 
                     {trackConfigNames.map(name => (
                         <option key={name} value={name}>{name}</option>
@@ -1017,30 +1066,15 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`Track-${track.id}`} className="form-label">Track</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Track. You can view track list by log (you need to input midi file).
-                                                    <br />
-                                                    If track is logged like &quot;Track: x, name: ...&quot; you can input x here.
-                                                    <br />
-                                                    Type: <span style={{ color: "yellow" }}>Integer</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Specifies the MIDI track number to read notes from.<br />
+                                                Tracks are numbered starting from 0. You can view available tracks in the log after importing a MIDI file.<br />
+                                                If the log shows <span style={{ color: "cyan" }}>"Track: x, name: ..."</span> enter <span style={{ color: "cyan" }}>x</span> here.<br />
+                                                Only notes from this track will be processed.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
                                     </div>
 
                                     <input
@@ -1128,28 +1162,14 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`BaseNote-${track.id}`} className="form-label">Base Note</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Pitch table value. Mainly controls when changing the pitch.
-                                                    <br />
-                                                    Type: <span style={{ color: "yellow" }}>Integer</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                The reference MIDI note number for pitch calculation.<br />
+                                                A pitch table is generated where this note has a playback ratio of 1.0, and others are adjusted in semitone steps.<br />
+                                                This can be entered as a numeric expression like <span style={{ color: "cyan" }}>"61-10"</span>.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER_EVALUTED_STRING,
+                                        )}
                                     </div>
 
                                     <input
@@ -1166,28 +1186,14 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`MaxNote-${track.id}`} className="form-label">Max Note</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Maximum pitch value.
-                                                    <br />
-                                                    Type: <span style={{ color: "yellow" }}>Integer</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Sets the maximum allowed pitch for this track.<br />
+                                                If the highest note exceeds this, notes are shifted down in 7-semitone steps until within range.<br />
+                                                Prevents overly high, unrealistic pitch values.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
                                     </div>
 
                                     <input
@@ -1212,30 +1218,14 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`Offsets.Volume-${track.id}`} className="form-label">Volume</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Volume offset added to original volume. If volume constant is on, will use this value as volume constant.
-                                                    <br />
-                                                    Dont forgot that can use <span style={{ color: "cyan" }}>minus</span> value.
-                                                    <br />
-                                                    Type: <span style={{ color: "green" }}>Float</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Adjusts note loudness by adding this offset to each note’s normalized velocity.<br />
+                                                Negative values make it quieter, positive values louder.<br />
+                                                If Volume Constant is enabled, this value is used.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.FLOAT,
+                                        )}
                                     </div>
 
                                     <input
@@ -1248,7 +1238,18 @@ export default function App() {
                                     />
                                 </div>
                                 <div className="col">
-                                    <label className="form-check-label" htmlFor={`Offsets.VolumeConstant-${track.id}`}>Volume Constant</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label className="form-check-label" htmlFor={`Offsets.VolumeConstant-${track.id}`}>Volume Constant</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                When enabled, all notes are played at the same fixed volume.<br />
+                                                A value is taken from the Volume Offset field.<br />
+                                                Ignores original MIDI velocity dynamics.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.BOOLEAN,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="checkbox"
@@ -1266,30 +1267,14 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`Offsets.Pitch-${track.id}`} className="form-label">Pitch</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Pitch offset added to original pitch. If pitch constant is on, will use this value as pitch constant.
-                                                    <br />
-                                                    Dont forgot that you can use <span style={{ color: "cyan" }}>minus</span> value.
-                                                    <br />
-                                                    Type: <span style={{ color: "green" }}>Float</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Shifts note pitch up or down after the pitch ratio is calculated from Base Note.<br />
+                                                Positive values raise pitch, negative values lower it.<br />
+                                                If Pitch Constant is enabled, this value is used.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.FLOAT,
+                                        )}
                                     </div>
 
                                     <input
@@ -1303,7 +1288,18 @@ export default function App() {
                                 </div>
 
                                 <div className="col">
-                                    <label className="form-check-label" htmlFor={`Offsets.PitchConstant-${track.id}`}>Pitch Constant</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label className="form-check-label" htmlFor={`Offsets.PitchConstant-${track.id}`}>Pitch Constant</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                When enabled, all notes are played at the same fixed pitch.<br />
+                                                A value is taken from the Pitch Offset field.<br />
+                                                Ignores original MIDI pitch values.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.BOOLEAN,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="checkbox"
@@ -1324,7 +1320,18 @@ export default function App() {
                             </h4>
                             <div className="row mb-3">
                                 <div className="col">
-                                    <label className="form-check-label" htmlFor={`Loop.Enable-${track.id}`}>Enable Loop</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label className="form-check-label" htmlFor={`Loop.Enable-${track.id}`}>Enable Loop</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                Enables looping for this track in I Wanna Maker.<br />
+                                                Loop length is calculated from the last note’s frame offset plus Loop Offset.<br />
+                                                If disabled, the loop length is set to the game’s maximum (99999 frames).<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.BOOLEAN,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="checkbox"
@@ -1340,30 +1347,14 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`Loop.LoopOffset-${track.id}`} className="form-label">Loop Offset</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Offset frames added to the original loop frames.
-                                                    <br />
-                                                    Dont forgot that you can use <span style={{ color: "cyan" }}>minus</span> value.
-                                                    <br />
-                                                    Type: <span style={{ color: "yellow" }}>Integer</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            >
-                                                <i className="fas fa-info-circle" />
-                                            </span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Adjusts loop length by adding (or subtracting) frames from the calculated endpoint.<br />
+                                                Can be negative to shorten the loop.<br />
+                                                Ignored if looping is disabled.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
                                     </div>
 
                                     <input
@@ -1384,26 +1375,13 @@ export default function App() {
                                     <div className="d-flex justify-content-between">
                                         <label htmlFor={`Speed-${track.id}`} className="form-label">Speed</label>
 
-                                        <OverlayTrigger
-                                            placement="top"
-                                            overlay={
-                                                <Tooltip className="configuration-tooltip">
-                                                    Frames speed.
-                                                    <br />
-                                                    Type: <span style={{ color: "green" }}>Float</span>.
-                                                </Tooltip>
-                                            }
-                                        >
-                                            <span
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    fontSize: "14px",
-                                                    cursor: "pointer",
-                                                    transform: "translate(8px, 4px)",
-                                                }}
-                                            ><i className="fas fa-info-circle"></i></span>
-                                        </OverlayTrigger>
+                                        {InstructionConfigHint(
+                                            <>
+                                                Playback speed multiplier.<br />
+                                                &gt; 1 plays faster, &lt; 1 slower.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.FLOAT,
+                                        )}
                                     </div>
 
                                     <input
@@ -1418,7 +1396,17 @@ export default function App() {
                                 </div>
 
                                 <div className="col">
-                                    <label htmlFor={`StartAt-${track.id}`} className="form-label">Start At</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label htmlFor={`StartAt-${track.id}`} className="form-label">Start At</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                Shifts all notes forward in time by adding this many frames to their offsets.<br />
+                                                Useful for separating Instrumental for same track.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="number"
@@ -1433,7 +1421,17 @@ export default function App() {
 
                             <div className="row mb-3">
                                 <div className="col">
-                                    <label htmlFor={`StripBefore-${track.id}`} className="form-label">Strip Before</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label htmlFor={`StripBefore-${track.id}`} className="form-label">Strip Before</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                Removes all notes occurring before this frame offset.<br />
+                                                Use to skip intros or unwanted early notes.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="number"
@@ -1446,7 +1444,17 @@ export default function App() {
                                 </div>
 
                                 <div className="col">
-                                    <label htmlFor={`StripAfter-${track.id}`} className="form-label">Strip After</label>
+                                    <div className="d-flex justify-content-between">
+                                        <label htmlFor={`StripAfter-${track.id}`} className="form-label">Strip After</label>
+
+                                        {InstructionConfigHint(
+                                            <>
+                                                Removes all notes occurring after this frame offset.<br />
+                                                Use to cut off endings or long tails.<br />
+                                            </>,
+                                            InstructionConfigHintLiteralType.INTEGER,
+                                        )}
+                                    </div>
 
                                     <input
                                         type="number"
@@ -1463,8 +1471,8 @@ export default function App() {
                 ))}
 
                 <div className="d-flex align-items-center justify-content-between">
-                    <input type="submit" className="configuration-submit" value="Submit config" id="submit-config" />
-                    <input type="submit" className="configuration-submit" value="About more" id="about-more" />
+                    <input type="submit" className="configuration-submit" value="Submit Config" id="submit-config" />
+                    <input type="submit" className="configuration-submit" value="About More" id="about-more" />
                 </div>
             </form>
 

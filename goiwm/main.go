@@ -12,8 +12,8 @@ import (
 
 func main() {
 	js.Global().Set("goIwm", js.ValueOf(map[string]any{
-		"tracks":             js.FuncOf(tracks),
-		"midiToEventObjects": js.FuncOf(midiToEventObjects),
+		"tracks":           js.FuncOf(tracks),
+		"midiToIwmObjects": js.FuncOf(midiToIwmObjects),
 	}))
 
 	select {}
@@ -33,7 +33,7 @@ func tracks(this js.Value, p []js.Value) any {
 	return "NOT_AN_ERROR:" + SmfString(tracks)
 }
 
-func midiToEventObjects(this js.Value, p []js.Value) any {
+func midiToIwmObjects(this js.Value, p []js.Value) any {
 	encodedMidi := p[0].String()
 	encodedTrackConfigs := p[1].String()
 

@@ -62,8 +62,23 @@ body {
 /* Configuration */
 
 .configuration-tooltip {
-    border: 2px solid grey;
+    border: 3px solid grey;
     border-radius: 4px;
+
+    min-width: 375px;
+}
+
+.tooltip-inner {
+    font-family: Courier New, Courier, monospace !important;
+    font-size: 1.1rem;
+
+    line-height: 1.3 !important;
+
+    min-width: 375px;
+}
+
+.tooltip.show {
+    opacity: 1 !important;
 }
 
 .configuration-select {
