@@ -1070,7 +1070,7 @@ export default function App() {
                                             <>
                                                 Specifies the MIDI track number to read notes from.<br />
                                                 Tracks are numbered starting from 0. You can view available tracks in the log after importing a MIDI file.<br />
-                                                If the log shows <span style={{ color: "cyan" }}>"Track: x, name: ..."</span> enter <span style={{ color: "cyan" }}>x</span> here.<br />
+                                                If the log shows <span style={{ color: "cyan" }}>&quot;Track: x, name: ...&quot;</span> enter <span style={{ color: "cyan" }}>x</span> here.<br />
                                                 Only notes from this track will be processed.<br />
                                             </>,
                                             InstructionConfigHintLiteralType.INTEGER,
@@ -1166,7 +1166,7 @@ export default function App() {
                                             <>
                                                 The reference MIDI note number for pitch calculation.<br />
                                                 A pitch table is generated where this note has a playback ratio of 1.0, and others are adjusted in semitone steps.<br />
-                                                This can be entered as a numeric expression like <span style={{ color: "cyan" }}>"61-10"</span>.<br />
+                                                This can be entered as a numeric expression like <span style={{ color: "cyan" }}>&quot;61-10&quot;</span>.<br />
                                             </>,
                                             InstructionConfigHintLiteralType.INTEGER_EVALUTED_STRING,
                                         )}
