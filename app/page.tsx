@@ -1325,7 +1325,7 @@ export default function App() {
 
                                         {InstructionConfigHint(
                                             <>
-                                                Enables looping for this track in I Wanna Maker.<br />
+                                                Enables looping for this track.<br />
                                                 Loop length is calculated from the last note’s frame offset plus Loop Offset.<br />
                                                 If disabled, the loop length is set to the game’s maximum (99999 frames).<br />
                                             </>,
@@ -1708,4 +1708,5 @@ export default function App() {
             />
         </div>
     );
+
 }
