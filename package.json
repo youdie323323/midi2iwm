@@ -17,7 +17,7 @@
     "katex": "^0.16.18",
     "midi-player-js": "^2.0.16",
     "native-json-editor": "^0.3.0",
-    "next": "15.0.1",
+    "next": "15.0.7",
     "react": "^18",
     "react-bootstrap": "^2.10.5",
     "react-dom": "^18",
