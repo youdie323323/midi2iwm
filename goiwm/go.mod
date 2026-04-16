@@ -1,7 +1,7 @@
 module iwm
 
-go 1.23.0
+go 1.24.2
 
-require gitlab.com/gomidi/midi/v2 v2.2.19
+toolchain go1.24.3
 
-require github.com/jinzhu/copier v0.4.0
+require gitlab.com/gomidi/midi/v2 v2.3.6

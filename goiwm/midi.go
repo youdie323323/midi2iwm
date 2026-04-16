@@ -15,54 +15,48 @@ import (
 )
 
 type Note struct {
-	absTicks uint64
+	ticks    uint64
 	velocity uint8
 	key      uint8
 }
 
 type TrackOffsets struct {
-	Volume         float64 `json:"Volume"`
-	VolumeConstant bool    `json:"VolumeConstant"`
-	Pitch          float64 `json:"Pitch"`
-	PitchConstant  bool    `json:"PitchConstant"`
+	Volume         float64 `json:"volume"`
+	VolumeConstant bool    `json:"volumeConstant"`
+	Pitch          float64 `json:"pitch"`
+	PitchConstant  bool    `json:"pitchConstant"`
 }
 
-type LoopConfig struct {
-	Enable     bool `json:"Enable"`
-	LoopOffset int  `json:"LoopOffset"`
+type TrackLoopConfig struct {
+	Enable bool `json:"enable"`
+	Offset int  `json:"offset"`
 }
 
 type TrackConfig struct {
-	Track        int          `json:"Track"`
-	Instrumental int          `json:"Instrumental"`
-	BaseNote     int          `json:"BaseNote"`
-	MaxNote      int          `json:"MaxNote"`
-	Offsets      TrackOffsets `json:"Offsets"`
-	Loop         LoopConfig   `json:"Loop"`
-	Speed        float64      `json:"Speed"`
-	StripAfter   int          `json:"StripAfter"`
-	StripBefore  int          `json:"StripBefore"`
-	StartAt      int          `json:"StartAt"`
+	Track        int             `json:"track"`
+	Instrumental int             `json:"instrumental"`
+	BaseNote     int             `json:"baseNote"`
+	MaxNote      uint8           `json:"maxNote"`
+	Offsets      TrackOffsets    `json:"offsets"`
+	Loop         TrackLoopConfig `json:"loop"`
+	Speed        float64         `json:"speed"`
+	StripAfter   int             `json:"stripAfter"`
+	StripBefore  int             `json:"stripBefore"`
+	StartAt      int             `json:"startAt"`
+	DrumSplit    []struct {
+		Key          uint8        `json:"key"`
+		Instrumental int          `json:"instrumental"`
+		Offsets      TrackOffsets `json:"offsets"`
+	} `json:"drumSplit"`
 }
 
-type TrackNotes struct {
+type NotesWithTrackConfig struct {
+	TrackConfig
+
 	Notes []Note
-	*TrackConfig
 }
 
-const (
-	MIN_VELOCITY = 0.05
-	MAX_VELOCITY = 1.0
-)
-
-const (
-	STABLE_STANDARD int = 61
-	STABLE_HIGHEST  int = 73
-)
-
-const MAX_FRAMES = 99999
-
-func GetMidiTracks(f io.Reader) (*smf.SMF, smf.MetricTicks, error) {
+func ReadMidiInformations(f io.Reader) (*smf.SMF, smf.MetricTicks, error) {
 	ff, err := smf.ReadFrom(f)
 	if err != nil {
 		return nil, smf.MetricTicks(0), err
@@ -78,153 +72,200 @@ func GetMidiTracks(f io.Reader) (*smf.SMF, smf.MetricTicks, error) {
 
 var pitchMultiple = math.Pow(2, 1.0/12)
 
-func getPitchTable(standard int) []float64 {
+func calculatePitchTable(standard int) []float64 {
 	pitchTable := make([]float64, 128)
 
 	a := 1.0
+
 	for i := standard; i < 128; i++ {
 		pitchTable[i] = a
+
 		a *= pitchMultiple
 	}
 
 	a = 1.0
+
 	for i := standard - 1; i >= 0; i-- {
 		a /= pitchMultiple
+
 		pitchTable[i] = a
 	}
 
 	return pitchTable
 }
 
-// getHighestPitch get the max key (pitch) from the notes
-// which is denoted as Note_{i_{max}}.
-func getHighestPitch(n TrackNotes) int {
-	return int(slices.MaxFunc(n.Notes, func(a Note, b Note) int {
+// calculateHighestNote calculates the max pitch of the notes.
+func calculateHighestNote(n NotesWithTrackConfig) Note {
+	return slices.MaxFunc(n.Notes, func(a Note, b Note) int {
 		return cmp.Compare(a.key, b.key)
-	}).key)
+	})
 }
 
-// normalizeVelocity resize standard midi velocity to IWM velocity.
-func normalizeVelocity(velocity int) float64 {
-	return MIN_VELOCITY + (math.Pow(float64(velocity)/127.0, 2) * (MAX_VELOCITY - MIN_VELOCITY))
+const maxUint7 = 1<<7 - 1
+
+const (
+	minVecloity = 0.05
+	maxVecloity = 1.0
+)
+
+// normalizeVelocity normalizes midi velocity to IWM velocity.
+func normalizeVelocity(velocity uint8) float64 {
+	return minVecloity + (math.Pow(float64(velocity)/float64(maxUint7), 2.0) * (maxVecloity - minVecloity))
 }
 
 type TempoChange struct {
-    absTicks uint64
-    bpm      float64
+	absTicks uint64
+	bpm      float64
 }
 
 func ticksToSeconds(absTicks uint64, tempoChanges []TempoChange, timeFormat smf.MetricTicks) float64 {
-    if len(tempoChanges) == 0 {
-        return 0
-    }
+	if len(tempoChanges) == 0 {
+		return 0
+	}
 
-    var seconds float64
-    var lastTicks uint64
-    var currentBPM = tempoChanges[0].bpm
+	var seconds float64
+	var lastTicks uint64
 
-    for _, change := range tempoChanges {
-        if change.absTicks > absTicks {
-            break
-        }
-        
-        deltaTicks := change.absTicks - lastTicks
-        seconds += (60.0 / currentBPM) * float64(deltaTicks) / float64(timeFormat)
-        
-        lastTicks = change.absTicks
-        currentBPM = change.bpm
-    }
+	bpm := tempoChanges[0].bpm
 
-    remainingTicks := absTicks - lastTicks
-    seconds += (60.0 / currentBPM) * float64(remainingTicks) / float64(timeFormat)
+	for _, change := range tempoChanges {
+		if change.absTicks > absTicks {
+			break
+		}
 
-    return seconds
+		deltaTicks := change.absTicks - lastTicks
+		seconds += (60.0 / bpm) * float64(deltaTicks) / float64(timeFormat)
+
+		lastTicks = change.absTicks
+		bpm = change.bpm
+	}
+
+	remainingTicks := absTicks - lastTicks
+	seconds += (60.0 / bpm) * float64(remainingTicks) / float64(timeFormat)
+
+	return seconds
 }
 
-func getTempoChanges(smf *smf.SMF) []TempoChange {
-    var changes []TempoChange
-    var absTicks uint64
+func collectTempoChanges(ff *smf.SMF) []TempoChange {
+	var changes []TempoChange
 
-    changes = append(changes, TempoChange{0, 120})
+	var absTicks uint64
 
-    for _, track := range smf.Tracks {
-        for _, event := range track {
-            absTicks += uint64(event.Delta)
-            var bpm float64
-            if event.Message.GetMetaTempo(&bpm) {
-                changes = append(changes, TempoChange{absTicks, bpm})
-            }
-        }
-    }
+	// Init changes with 120 bpm
+	changes = append(changes, TempoChange{0, 120})
 
-    slices.SortFunc(changes, func(a, b TempoChange) int {
-        return cmp.Compare(a.absTicks, b.absTicks)
-    })
+	for _, track := range ff.Tracks {
+		for _, event := range track {
+			absTicks += uint64(event.Delta)
 
-    return changes
+			var bpm float64
+
+			if event.Message.GetMetaTempo(&bpm) {
+				changes = append(changes, TempoChange{absTicks, bpm})
+			}
+		}
+	}
+
+	slices.SortFunc(changes, func(a, b TempoChange) int {
+		return cmp.Compare(a.absTicks, b.absTicks)
+	})
+
+	return changes
 }
 
 var mu sync.Mutex
 
-func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
-	var trackNotesList []TrackNotes
+func EventsFromMidiSMF(ff *smf.SMF, trackConfigs []TrackConfig) ([][]*Event, error) {
+	var notesWithTrackConfigs []NotesWithTrackConfig
 
-	for _, cfg := range tc {
-		var absTicks uint64
-		var channel, velocity, key uint8
+	for _, trackConfig := range trackConfigs {
+		var ticks uint64
+
+		var channel, key, velocity uint8
+
 		var activeNotes []Note
 		var processedNotes []Note
+
 		activeNotesMap := make(map[uint64]map[uint8]bool)
 
-		for _, event := range ff.Tracks[cfg.Track] {
-			absTicks += uint64(event.Delta)
+		for _, track := range ff.Tracks[trackConfig.Track] {
+			ticks += uint64(track.Delta)
 
 			switch {
-			case event.Message.GetNoteStart(&channel, &key, &velocity):
-				if activeNotesMap[absTicks] == nil {
-					activeNotesMap[absTicks] = make(map[uint8]bool)
+			case track.Message.GetNoteStart(&channel, &key, &velocity):
+				if activeNotesMap[ticks] == nil {
+					activeNotesMap[ticks] = make(map[uint8]bool)
 				}
 
-				if !activeNotesMap[absTicks][key] {
+				if !activeNotesMap[ticks][key] {
 					activeNotes = append(activeNotes, Note{
-						absTicks: absTicks,
+						ticks:    ticks,
 						velocity: velocity,
 						key:      key,
 					})
-					activeNotesMap[absTicks][key] = true
+
+					activeNotesMap[ticks][key] = true
 				}
 
-			case event.Message.GetNoteEnd(&channel, &key):
+			case track.Message.GetNoteEnd(&channel, &key):
 				for i, note := range activeNotes {
 					if note.key == key {
+						activeNotes = slices.Delete(activeNotes, i, i+1)
 						processedNotes = append(processedNotes, note)
-						activeNotes = append(activeNotes[:i], activeNotes[i+1:]...)
+
 						break
 					}
 				}
 			}
 		}
 
-		if len(processedNotes) > 0 {
-			trackNotesList = append(trackNotesList, TrackNotes{
+		if len(processedNotes) == 0 {
+			continue
+		}
+
+		if len(trackConfig.DrumSplit) > 0 {
+			for _, mapping := range trackConfig.DrumSplit {
+				var filteredNotes []Note
+
+				for _, note := range processedNotes {
+					if note.key == mapping.Key {
+						filteredNotes = append(filteredNotes, note)
+					}
+				}
+
+				if len(filteredNotes) > 0 {
+					subTrackConfig := trackConfig
+
+					subTrackConfig.Instrumental = mapping.Instrumental
+					subTrackConfig.Offsets = mapping.Offsets
+
+					notesWithTrackConfigs = append(notesWithTrackConfigs, NotesWithTrackConfig{
+						TrackConfig: subTrackConfig,
+						Notes:       filteredNotes,
+					})
+				}
+			}
+		} else {
+			notesWithTrackConfigs = append(notesWithTrackConfigs, NotesWithTrackConfig{
+				TrackConfig: trackConfig,
 				Notes:       processedNotes,
-				TrackConfig: cfg,
 			})
 		}
 	}
 
-	tempoChanges := getTempoChanges(ff)
-    timeFormat := ff.TimeFormat.(smf.MetricTicks)
+	tempoChanges := collectTempoChanges(ff)
+	timeFormat := ff.TimeFormat.(smf.MetricTicks)
 
 	var events [][]*Event
 
 	maxOffset := -1
 
-	for _, tn := range trackNotesList {
+	for _, tn := range notesWithTrackConfigs {
 		for _, note := range tn.Notes {
-			seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
-            offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
-			if offset > MAX_FRAMES {
+			seconds := ticksToSeconds(note.ticks, tempoChanges, timeFormat)
+
+			offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
+			if offset > MaxEventFrames {
 				break
 			}
 
@@ -244,197 +285,176 @@ func GenerateMidiEvents(ff *smf.SMF, tc []*TrackConfig) ([][]*Event, error) {
 		}
 	}
 
-	parallelize(len(trackNotesList), func(i int) {
-		tn := trackNotesList[i]
+	parallelize(
+		len(notesWithTrackConfigs),
+		func(i int) {
+			tn := notesWithTrackConfigs[i]
 
-		pitchAdjustment := 0
-		for i := getHighestPitch(tn); i > tn.MaxNote; i -= 7 {
-			pitchAdjustment += 7
-		}
+			var pitchAdjustment int
 
-		pitchTable := getPitchTable(tn.BaseNote)
-
-		var trackEvents map[int]*Event = make(map[int]*Event, len(tn.Notes))
-
-		for _, note := range tn.Notes {
-			seconds := ticksToSeconds(note.absTicks, tempoChanges, timeFormat)
-            offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
-			if offset > MAX_FRAMES {
-				break
+			for i := calculateHighestNote(tn).key; i > tn.MaxNote; i -= 7 {
+				pitchAdjustment += 7
 			}
 
-			if offset < 0 {
-				continue
-			}
+			pitchTable := calculatePitchTable(tn.BaseNote)
 
-			if tn.StripBefore != 0 && tn.StripBefore > offset {
-				continue
-			}
+			var trackEvents map[int]*Event = make(map[int]*Event, len(tn.Notes))
 
-			if tn.StripAfter != 0 && tn.StripAfter < offset {
-				break
-			}
+			for _, note := range tn.Notes {
+				seconds := ticksToSeconds(note.ticks, tempoChanges, timeFormat)
 
-			pitchIndex := int(note.key) - pitchAdjustment
-			if pitchIndex < 0 {
-				pitchIndex = 0
-			}
+				offset := int(seconds*50*(2-tn.Speed)) + tn.StartAt + 1
+				if offset > MaxEventFrames {
+					break
+				}
 
-			pitch := pitchTable[pitchIndex] + tn.Offsets.Pitch
-			if tn.Offsets.PitchConstant {
-				pitch = tn.Offsets.Pitch
-			}
-			pitch = max(0.05, min(3.0, pitch))
+				if offset < 0 {
+					continue
+				}
 
-			volume := normalizeVelocity(int(note.velocity)) + tn.Offsets.Volume
-			if tn.Offsets.VolumeConstant {
-				volume = tn.Offsets.Volume
-			}
-			volume = max(MIN_VELOCITY, min(MAX_VELOCITY, volume))
+				if tn.StripBefore != 0 && tn.StripBefore > offset {
+					continue
+				}
 
-			if _, ok := trackEvents[offset]; !ok {
-				loopFrames := MAX_FRAMES
-				if tn.Loop.Enable {
-					loopFrames = maxOffset + tn.Loop.LoopOffset
-					if loopFrames < 0 {
-						continue
+				if tn.StripAfter != 0 && tn.StripAfter < offset {
+					break
+				}
+
+				pitchIndex := max(int(note.key)-pitchAdjustment, 0)
+
+				var pitch float64
+
+				if tn.Offsets.PitchConstant {
+					pitch = tn.Offsets.Pitch
+				} else {
+					pitch = pitchTable[pitchIndex] + tn.Offsets.Pitch
+				}
+
+				pitch = max(0.05, min(3.0, pitch))
+
+				var volume float64
+
+				if tn.Offsets.VolumeConstant {
+					volume = tn.Offsets.Volume
+				} else {
+					volume = normalizeVelocity(note.velocity) + tn.Offsets.Volume
+				}
+
+				volume = max(minVecloity, min(maxVecloity, volume))
+
+				if _, ok := trackEvents[offset]; !ok {
+					loopFrames := MaxEventFrames
+					if tn.Loop.Enable {
+						loopFrames = maxOffset + tn.Loop.Offset
+						if loopFrames < 0 {
+							continue
+						}
 					}
-				}
 
-				trackEvents[offset] = &Event{
-					EventID: 17,
-					Param: ParamByMap(map[ParamKey]any{
-						"offset": offset,
-						"frames": loopFrames,
-					}),
-					Events: []*EventBody{
-						{
-							EventID: 104,
-							Param: ParamByMap(map[ParamKey]any{
-								"volume": volume,
-								"pitch":  pitch,
-								"sound":  tn.Instrumental,
-							}),
+					trackEvents[offset] = &Event{
+						EventID: 17,
+						Parameters: ParametersByMap(map[string]any{
+							"offset": offset,
+							"frames": loopFrames,
+						}),
+						Events: []*EventBody{
+							{
+								EventID: 104,
+								Parameters: ParametersByMap(map[string]any{
+									"volume": volume,
+									"pitch":  pitch,
+									"sound":  tn.Instrumental,
+								}),
+							},
 						},
-					},
+					}
+				} else {
+					trackEvents[offset].Events = append(trackEvents[offset].Events, &EventBody{
+						EventID: 104,
+						Parameters: ParametersByMap(map[string]any{
+							"volume": volume,
+							"pitch":  pitch,
+							"sound":  tn.Instrumental,
+						}),
+					})
 				}
-			} else {
-				trackEvents[offset].Events = append(trackEvents[offset].Events, &EventBody{
-					EventID: 104,
-					Param: ParamByMap(map[ParamKey]any{
-						"volume": volume,
-						"pitch":  pitch,
-						"sound":  tn.Instrumental,
-					}),
-				})
 			}
-		}
 
-		mu.Lock()
-		events = append(events, slices.Collect(maps.Values(trackEvents)))
-		mu.Unlock()
-	})
+			mu.Lock()
+
+			events = append(events, slices.Collect(maps.Values(trackEvents)))
+
+			mu.Unlock()
+		},
+	)
 
 	return events, nil
 }
 
-func parallelize(n int, f func(int)) {
+func parallelize(end int, callback func(int)) {
 	var wg sync.WaitGroup
 
-	for i := range n {
+	for i := range end {
 		wg.Add(1)
+
 		go func(i int) {
 			defer wg.Done()
-			f(i)
+
+			callback(i)
 		}(i)
 	}
 
 	wg.Wait()
 }
 
-func GetInstrumental(name string) int {
-	switch name {
-	case "Duck":
-		return 0
-	case "Glass Break":
-		return 1
-	case "Bubble":
-		return 2
-	case "Light Switch":
-		return 3
-	case "Ring Bell":
-		return 4
-	case "Exclamation":
-		return 5
-	case "Spring":
-		return 6
-	case "Horn":
-		return 7
-	case "OK":
-		return 8
-	case "Glass Break 2":
-		return 9
-	case "Punch":
-		return 10
-	case "Laser Gun":
-		return 11
-	case "Woosh":
-		return 12
-	case "Whistle":
-		return 13
-	case "Magic":
-		return 14
-	case "Ninja":
-		return 15
-	case "Clapping":
-		return 16
-	case "Drum Roll":
-		return 17
-	case "Piano":
-		return 18
-	case "Bass":
-		return 19
-	case "Party Noisemaker":
-		return 20
-	case "Hoot":
-		return 21
-	case "Laughter":
-		return 22
-	case "Suspense":
-		return 23
-	case "Wood Scraper":
-		return 24
-	case "Drum":
-		return 25
-	case "No-no":
-		return 26
-	case "Glass Bottle":
-		return 27
-	case "Woodimba":
-		return 28
-	case "Metallic Hit":
-		return 29
-	case "Gun":
-		return 30
-	case "Electric Charge":
-		return 31
-	case "Laser Blast (Foam Icon)":
-		return 32
-	case "Heartbeat":
-		return 33
-	case "Rubber Chicken":
-		return 34
-	case "Dog Bark":
-		return 35
-	case "Cat Meow":
-		return 36
-	case "Toll Bell":
-		return 37
-	case "Robot":
-		return 38
-	default:
-		return 18
-	}
+var gmDrumMap = map[uint8]string{
+	35: "Acoustic Bass Drum",
+	36: "Bass Drum 1",
+	37: "Side Stick",
+	38: "Acoustic Snare",
+	39: "Hand Clap",
+	40: "Electric Snare",
+	41: "Low Floor Tom",
+	42: "Closed Hi Hat",
+	43: "High Floor Tom",
+	44: "Pedal Hi Hat",
+	45: "Low Tom",
+	46: "Open Hi Hat",
+	47: "Low-Mid Tom",
+	48: "Hi Mid Tom",
+	49: "Crash Cymbal 1",
+	50: "High Tom",
+	51: "Ride Cymbal 1",
+	52: "Chinese Cymbal",
+	53: "Ride Bell",
+	54: "Tambourine",
+	55: "Splash Cymbal",
+	56: "Cowbell",
+	57: "Crash Cymbal 2",
+	58: "Vibraslap",
+	59: "Ride Cymbal 2",
+	60: "Hi Bongo",
+	61: "Low Bongo",
+	62: "Mute Hi Conga",
+	63: "Open Hi Conga",
+	64: "Low Conga",
+	65: "High Timbale",
+	66: "Low Timbale",
+	67: "High Agogo",
+	68: "Low Agogo",
+	69: "Cabasa",
+	70: "Maracas",
+	71: "Short Whistle",
+	72: "Long Whistle",
+	73: "Short Guiro",
+	74: "Long Guiro",
+	75: "Claves",
+	76: "Hi Wood Block",
+	77: "Low Wood Block",
+	78: "Mute Cuica",
+	79: "Open Cuica",
+	80: "Mute Triangle",
+	81: "Open Triangle",
 }
 
 func SmfString(s *smf.SMF) string {
@@ -442,13 +462,21 @@ func SmfString(s *smf.SMF) string {
 
 	for i, track := range s.Tracks {
 		noteCount := 0
+
 		var channel, key, velocity uint8
-		
 		var name string
+
+		drumNotes := make(map[uint8]int)
+		isDrumTrack := false
 
 		for _, event := range track {
 			if event.Message.GetNoteStart(&channel, &key, &velocity) {
 				noteCount++
+
+				if channel == 9 {
+					drumNotes[key]++
+					isDrumTrack = true
+				}
 			}
 
 			event.Message.GetMetaTrackName(&name)
@@ -462,7 +490,28 @@ func SmfString(s *smf.SMF) string {
 			name = "unknown"
 		}
 
-		builder.WriteString(fmt.Sprintf("Track: %d, name: %s, notes: %d\n", i, name, noteCount))
+		if isDrumTrack {
+			fmt.Fprintf(&builder, "Track: %d, name: %s, notes: %d (Drum Track)\n", i, name, noteCount)
+
+			var keys []uint8
+
+			for key := range drumNotes {
+				keys = append(keys, key)
+			}
+
+			slices.Sort(keys)
+
+			for _, key := range keys {
+				drumName, ok := gmDrumMap[key]
+				if !ok {
+					drumName = "Unknown Drum"
+				}
+
+				fmt.Fprintf(&builder, "  - Key %d (%s): %d notes\n", key, drumName, drumNotes[key])
+			}
+		} else {
+			fmt.Fprintf(&builder, "Track: %d, name: %s, notes: %d\n", i, name, noteCount)
+		}
 	}
 
 	return builder.String()

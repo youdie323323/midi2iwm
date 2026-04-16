@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-    --scale-element: 1 !important;
-    --scale-font: 1 !important;
-}
-
 body {
     background-color: #000000 !important;
     color: white !important;
@@ -18,66 +13,12 @@ body {
     text-size-adjust: 100% !important;
 }
 
-body:not(input):not(select) {
-    user-select: none !important;
-}
-
-a,
-a:hover,
-a:focus,
-a:active {
-    text-decoration: none;
-    color: white;
-    cursor: pointer !important;
-}
-
 .container {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     min-height: 100vh !important;
-}
-
-.title {
-    font-family: 'Quantico', sans-serif !important;
-}
-
-.card-body {
-    color: black !important;
-}
-
-.card-body h2 {
-    font-weight: bold !important;
-}
-
-.card-body h4 {
-    font-family: 'League Spartan', sans-serif !important;
-}
-
-.featuring {
-    text-align: justify !important;
-}
-
-.featuring p {
-    font-size: 19px !important;
-    color: #dfdfdf !important;
-}
-
-.special p {
-    font-size: 19px !important;
-    color: #dfdfdf !important;
-}
-
-select {
-    height: 2rem !important;
-    width: 16rem !important;
-    padding: 0rem 0.6rem 0 !important;
-}
-
-.custom-tooltip {
-    border: 2px solid grey;
-    border-radius: 4px;
 }
 
 #log-console {
@@ -118,63 +59,58 @@ select {
     cursor: pointer;
 }
 
-select:hover,
-select:focus {
-    cursor: pointer !important;
+/* Configuration */
+
+.configuration-tooltip {
+    border: 3px solid grey;
+    border-radius: 4px;
+
+    min-width: 375px;
 }
 
-.btn-close {
-    width: 0.1em !important;
-    height: 0.2em !important;
-    padding-right: 1em !important;
-}
-
-.nav-link {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding-right: 0.5em !important;
-}
-
-.nav-link.active .btn-close {
-    filter: brightness(0) !important;
-}
-
-@media screen and (max-width: 800px) {
-    .info-card {
-        padding-top: 20px !important;
-    }
-
-    .featuring {
-        padding-top: 20px !important;
-    }
-}
-
-input[type="number"], input[type="text"] {
-    border: 1px solid #cccccc !important;
-    display: flex !important;
+.tooltip-inner {
     font-family: Courier New, Courier, monospace !important;
-    font-size: 1.1rem !important;
-    line-height: 4rem !important;
-    height: 2rem !important;
+    font-size: 1.1rem;
+
+    line-height: 1.3 !important;
+
+    min-width: 375px;
+}
+
+.tooltip.show {
+    opacity: 1 !important;
+}
+
+.configuration-select {
     padding: 0rem 0.6rem 0 !important;
     width: 16rem !important;
+    height: 2rem !important;
 }
 
-input[type="checkbox"] {
+.configuration-string-inputter[type="number"],
+.configuration-string-inputter[type="text"] {
     border: 1px solid #cccccc !important;
     display: flex !important;
     font-family: Courier New, Courier, monospace !important;
-    font-size: 1.1rem !important;
     line-height: 4rem !important;
+    padding: 0rem 0.6rem 0 !important;
+    width: 16rem !important;
     height: 2rem !important;
+}
+
+.configuration-checkbox[type="checkbox"] {
+    border: 1px solid #cccccc !important;
+    display: flex !important;
+    font-family: Courier New, Courier, monospace !important;
+    line-height: 4rem !important;
     padding: 0rem 1.2rem 0 !important;
     width: 16rem !important;
+    height: 2rem !important;
     margin-top: 0.5rem;
     vertical-align: middle;
 }
 
-input[type="submit"] {
+.configuration-submit {
     --scale-element: 1;
     --scale-font: 1;
     font-family: "Courier New", Courier, monospace;
@@ -189,40 +125,16 @@ input[type="submit"] {
     padding: 0px 0.2rem;
 }
 
-input[type="submit"]:hover {
+.configuration-submit:hover {
     background-color: #ff3333;
 }
 
-* {
-    -webkit-tap-highlight-color: rgba(255, 0, 0, 0.08);
-    box-sizing: border-box;
-}
-
+/* Current select/input[type="checkbox"] does not changes cursor style when hovered/focused, so we'll do that voluntary */
+select:hover,
+select:focus,
 input[type="checkbox"]:hover,
 input[type="checkbox"]:focus {
     cursor: pointer !important;
-}
-
-.fade-enter {
-    opacity: 0;
-    transform: translateX(-10px);
-}
-
-.fade-enter-active {
-    opacity: 1;
-    transform: translateX(0);
-    transition: opacity 150ms, transform 150ms;
-}
-
-.fade-exit {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.fade-exit-active {
-    opacity: 0;
-    transform: translateX(-10px);
-    transition: opacity 150ms, transform 150ms;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -232,42 +144,50 @@ input::-webkit-inner-spin-button {
     margin: 0;
 }
 
-/* Firefox */
-input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-
-img {
-    display: block !important;
-    height: auto !important;
-    max-width: 100% !important;
-}
-
-ul {
-    list-style-type: none !important;
-    margin: 0 !important;
-    padding-inline-start: 0 !important;
-}
-
-li {
-    list-style-type: none !important;
-}
-
-@media screen and (min-width: 800px) {
-    .info-card {
-        padding-top: 40px !important;
-    }
-
-    .featuring {
-        padding-top: 40px !important;
-    }
-}
-
 /* Hide the scrollbar */
-::-webkit-scrollbar {
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#about-more-modal-container::-webkit-scrollbar {
     display: none;
 }
+
+.scroller {
+    --scrollbar-color-thumb: black;
+    --scrollbar-color-track: white;
+    --scrollbar-width: thin;
+    --scrollbar-width-legacy: 10px;
+}
+
+/* Modern browsers with `scrollbar-*` support */
+@supports (scrollbar-width: auto) {
+    .scroller {
+        scrollbar-color: var(--scrollbar-color-thumb) var(--scrollbar-color-track);
+        scrollbar-width: var(--scrollbar-width);
+    }
+}
+
+/* Legacy browsers with `::-webkit-scrollbar-*` support */
+@supports selector(::-webkit-scrollbar) {
+    .scroller::-webkit-scrollbar-thumb {
+        background: var(--scrollbar-color-thumb);
+    }
+
+    .scroller::-webkit-scrollbar-track {
+        background: var(--scrollbar-color-track);
+    }
+
+    .scroller::-webkit-scrollbar {
+        max-width: var(--scrollbar-width-legacy);
+        max-height: var(--scrollbar-width-legacy);
+    }
+}
+
+/* Disable user select */
+body:not(input):not(select) {
+    user-select: none !important;
+}
+
+/* React-modal styles */
 
 .ReactModal__Overlay {
     opacity: 0;
@@ -296,4 +216,61 @@ li {
 .ReactModal__Content--before-close {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.5) !important;
+}
+
+/* React-transition-group styles */
+
+.fade-enter {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 150ms, transform 150ms;
+}
+
+.fade-exit {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 150ms, transform 150ms;
+}
+
+/* Configuration tab */
+
+.nav-link {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-right: 0.5em !important;
+}
+
+.btn-close {
+    width: 0.1em !important;
+    height: 0.2em !important;
+    padding-right: 1em !important;
+}
+
+.nav-link.active .btn-close {
+    filter: brightness(0) !important;
+}
+
+/* Boostrap */
+
+.card-body {
+    color: black !important;
+}
+
+.card-body h2 {
+    font-weight: bold !important;
+}
+
+.card-body h4 {
+    font-family: League Spartan, sans-serif !important;
 }

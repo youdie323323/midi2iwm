@@ -1,8 +1,2 @@
-github.com/jinzhu/copier v0.4.0 h1:w3ciUoD19shMCRargcpm0cm91ytaBhDvuRpz1ODO/U8=
-github.com/jinzhu/copier v0.4.0/go.mod h1:DfbEm0FYsaqBcKcFuvmOZb218JkPGtvSHsKg8S8hyyg=
-gitlab.com/gomidi/midi v1.23.7 h1:I6qKoIk9s9dcX+pNf0jC+tziCzJFn82bMpuntRkLeik=
-gitlab.com/gomidi/midi v1.23.7/go.mod h1:3ohtNOhqoSakkuLG/Li1OI6I3J1c2LErnJF5o/VBq1c=
-gitlab.com/gomidi/midi/v2 v2.2.10 h1:u9D+5TM0vkFWF5DcO6xGKG99ERYqksh6wPj2X2Rx5A8=
-gitlab.com/gomidi/midi/v2 v2.2.10/go.mod h1:ENtYaJPOwb2N+y7ihv/L7R4GtWjbknouhIIkMrJ5C0g=
-gitlab.com/gomidi/midi/v2 v2.2.19 h1:/Ktpf21SIOX61gg8PJ7wYLSsD+dOU1e3z3tlO9OS+Zs=
-gitlab.com/gomidi/midi/v2 v2.2.19/go.mod h1:ENtYaJPOwb2N+y7ihv/L7R4GtWjbknouhIIkMrJ5C0g=
+gitlab.com/gomidi/midi/v2 v2.3.6 h1:imqYNzhfYbxwaqrzioePwVQqZXJepm5DSjIXfMpOeQs=
+gitlab.com/gomidi/midi/v2 v2.3.6/go.mod h1:jDpP4O4skYi+7iVwt6Zyp18bd2M4hkjtMuw2cmgKgfw=

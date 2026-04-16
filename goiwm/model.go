@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"math"
+	"slices"
 	"strconv"
 )
 
@@ -14,169 +15,215 @@ type (
 )
 
 type UnderlyingField struct {
-	Type         Block           `xml:"type,attr"`
-	Param        []*Param        `xml:"param,omitempty"`
-	Event        []*Event        `xml:"event,omitempty"`
-	Obj          []*Slot         `xml:"obj,omitempty"`
-	GlobalObject []*GlobalObject `xml:"global_obj,omitempty"`
-	SpriteAngle  *int            `xml:"sprite_angle,attr,omitempty"`
-	Name         *string         `xml:"name,omitempty"`
+	Type          Block           `xml:"type,attr"`
+	Parameters    []*Parameter    `xml:"param,omitempty"`
+	Event         []*Event        `xml:"event,omitempty"`
+	Slots         []*Slot         `xml:"obj,omitempty"`
+	GlobalObjects []*GlobalObject `xml:"global_obj,omitempty"`
+	SpriteAngle   *int            `xml:"sprite_angle,attr,omitempty"`
+	Name          *string         `xml:"name,omitempty"`
 }
 
-type XYField struct {
+type Position struct {
 	X int `xml:"x,attr"`
 	Y int `xml:"y,attr"`
 }
 
 type Object struct {
 	XMLName xml.Name `xml:"object"`
+
 	UnderlyingField
-	XYField
+	Position
 }
 
 type Slot struct {
 	XMLName xml.Name `xml:"obj"`
+
 	UnderlyingField
-	XYField
+	Position
+
 	Number int `xml:"slot,attr"`
 }
 
 type GlobalObject struct {
 	XMLName xml.Name `xml:"global_obj"`
+
 	UnderlyingField
-	SlotDist float64 `xml:"slot_distance,attr"`
-	SlotAng  float64 `xml:"slot_angle,attr"`
+
+	SlotDistance float64 `xml:"slot_distance,attr"`
+	SlotAngle    float64 `xml:"slot_angle,attr"`
 }
 
-type ParamKey string
-
-type Param struct {
+type Parameter struct {
 	XMLName xml.Name `xml:"param"`
-	Key     ParamKey `xml:"key,attr"`
-	Val     any      `xml:"val,attr"`
+
+	Key   string `xml:"key,attr"`
+	Value any    `xml:"val,attr"`
 }
 
-func (p *Param) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	type Alias Param
+func (p *Parameter) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	type Alias Parameter
+
 	param := &struct {
 		*Alias
-		Val string `xml:"val,attr"`
+
+		Value string `xml:"val,attr"`
 	}{
 		Alias: (*Alias)(p),
 	}
 
-	switch v := p.Val.(type) {
+	switch v := p.Value.(type) {
 	case float64:
-		param.Val = strconv.FormatFloat(math.Round(v*10000)/10000, 'f', -1, 64)
+		param.Value = strconv.FormatFloat(math.Round(v*10000)/10000, 'f', -1, 64)
+
 	case int:
-		param.Val = strconv.Itoa(v)
+		param.Value = strconv.Itoa(v)
+
 	case string:
-		param.Val = v
+		param.Value = v
+
 	case bool:
 		c := 0
 		if v {
 			c = 1
 		}
-		param.Val = strconv.Itoa(c)
+
+		param.Value = strconv.Itoa(c)
+
 	default:
-		return fmt.Errorf("unsupported param value type: %T", v)
+		return fmt.Errorf("unsupported parameter value type: %T", v)
 	}
 
 	return e.EncodeElement(param, start)
 }
 
-func (p *Param) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	type Alias Param
+func (p *Parameter) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type Alias Parameter
+
 	param := &struct {
 		*Alias
-		Val string `xml:"val,attr"`
+
+		Value string `xml:"val,attr"`
 	}{
 		Alias: (*Alias)(p),
 	}
+
 	if err := d.DecodeElement(&param, &start); err != nil {
 		return err
 	}
 
-	if v, err := strconv.ParseFloat(param.Val, 64); err == nil {
-		p.Val = v
+	if v, err := strconv.ParseFloat(param.Value, 64); err == nil {
+		p.Value = v
 	} else {
-		p.Val = param.Val
+		p.Value = param.Value
 	}
+
 	return nil
 }
 
 type Event struct {
-	EventID EventListener `xml:"eventIndex,attr"`
-	Param   []*Param      `xml:"param"`
-	Events  []*EventBody  `xml:"event"`
+	EventID    EventListener `xml:"eventIndex,attr"`
+	Parameters []*Parameter  `xml:"param"`
+	Events     []*EventBody  `xml:"event"`
 }
 
 type EventBody struct {
-	EventID EventAction `xml:"eventIndex,attr"`
-	Param   []*Param    `xml:"param"`
+	EventID    EventAction  `xml:"eventIndex,attr"`
+	Parameters []*Parameter `xml:"param"`
 }
 
-// Alright so, i lost original project file, write functions in here
-
-func ToXMLString(s any) (string, error) {
-	buf, err := xml.Marshal(s)
+func ToXMLString(v any) (string, error) {
+	buf, err := xml.Marshal(v)
 	if err != nil {
 		return "", err
 	}
+
 	return string(buf), nil
 }
 
-func NewObject(x int, y int, t Block, p []*Param, n *string, s *int) *Object {
+const CannonMaxSlots = 32
+
+const MaxEventFrames = 99999
+
+func NewObject(x int, y int, t Block, params []*Parameter, name *string, sa *int) *Object {
 	return &Object{
 		UnderlyingField: UnderlyingField{
-			Type:         t,
-			Param:        p,
-			Event:        make([]*Event, 0),
-			Obj:          make([]*Slot, 0, 32),
-			GlobalObject: make([]*GlobalObject, 0),
-			SpriteAngle:  s,
-			Name:         n,
+			Type:          t,
+			Parameters:    params,
+			Event:         make([]*Event, 0),
+			Slots:         make([]*Slot, 0, CannonMaxSlots),
+			GlobalObjects: make([]*GlobalObject, 0),
+			SpriteAngle:   sa,
+			Name:          name,
 		},
-		XYField: XYField{
+		Position: Position{
 			x,
 			y,
 		},
 	}
 }
 
-func ParamByMap[T ~string](m map[T]any) []*Param {
-    p := make([]*Param, 0, len(m))
-    for k, v := range m {
-        p = append(p, &Param{
-            Key: ParamKey(k),
-            Val: v,
-        })
-    }
-    return p
+func ParametersByMap(m map[string]any) []*Parameter {
+	params := make([]*Parameter, 0, len(m))
+
+	for k, v := range m {
+		params = append(params, &Parameter{
+			Key:   k,
+			Value: v,
+		})
+	}
+
+	return params
 }
 
-func NewSlot(obj *Object) *Slot {
-    slot := &Slot{
-        XYField: obj.XYField,
-    }
-    slot.Type = obj.Type
-    slot.Param = append([]*Param{}, obj.Param...)
-    slot.Event = append([]*Event{}, obj.Event...)
-    slot.Obj = append([]*Slot{}, obj.Obj...)
-    slot.GlobalObject = append([]*GlobalObject{}, obj.GlobalObject...)
-    slot.SpriteAngle = obj.SpriteAngle
-    slot.Name = obj.Name
-    return slot
+func FindParameter(params []*Parameter, k string) (param *Parameter, ok bool) {
+	for _, param := range params {
+		if param.Key == k {
+			return param, true
+		}
+	}
+
+	return nil, false
 }
 
-func NewGlobalObject(obj *Object) *GlobalObject {
-    globalObj := &GlobalObject{}
-    globalObj.Type = obj.Type
-    globalObj.Param = append([]*Param{}, obj.Param...)
-    globalObj.Event = append([]*Event{}, obj.Event...)
-    globalObj.Obj = append([]*Slot{}, obj.Obj...)
-    globalObj.GlobalObject = append([]*GlobalObject{}, obj.GlobalObject...)
-    globalObj.SpriteAngle = obj.SpriteAngle
-    globalObj.Name = obj.Name
-    return globalObj
+func FindAndSetParameter(params []*Parameter, k string, v any) bool {
+	for _, param := range params {
+		if param.Key == k {
+			param.Value = v
+
+			return true
+		}
+	}
+
+	return false
+}
+
+func NewSlot(o *Object) *Slot {
+	slot := &Slot{
+		Position: o.Position,
+	}
+
+	slot.Type = o.Type
+	slot.Parameters = slices.Clone(o.Parameters)
+	slot.Event = slices.Clone(o.Event)
+	slot.Slots = slices.Clone(o.Slots)
+	slot.GlobalObjects = slices.Clone(o.GlobalObjects)
+	slot.SpriteAngle = o.SpriteAngle
+	slot.Name = o.Name
+
+	return slot
+}
+
+func NewGlobalObject(o *Object) *GlobalObject {
+	globalObject := new(GlobalObject)
+
+	globalObject.Type = o.Type
+	globalObject.Parameters = slices.Clone(o.Parameters)
+	globalObject.Event = slices.Clone(o.Event)
+	globalObject.Slots = slices.Clone(o.Slots)
+	globalObject.GlobalObjects = slices.Clone(o.GlobalObjects)
+	globalObject.SpriteAngle = o.SpriteAngle
+	globalObject.Name = o.Name
+
+	return globalObject
 }
