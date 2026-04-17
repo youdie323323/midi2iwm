@@ -388,6 +388,7 @@ type DotNestedKeys<T> = {
 }[keyof T];
 
 type DotNestedTrackConfigKeys = DotNestedKeys<TrackConfig>;
+type DotNestedDrumConfigKeys = DotNestedKeys<DrumConfig>;
 
 const INTERNAL_CONFIG_FLOAT_KEYS: Array<DotNestedTrackConfigKeys> =
     ["speed", "offsets.pitch", "offsets.volume"] as const;
@@ -425,6 +426,7 @@ const prefixTrackConfigName = (configName: string) => STORAGE_TRACK_CONFIG_KEY_P
 const TRACK_CONFIG_SELECTION_DEFAULT_NAME = "VIEW_PLACEHOLDER_OFFSET" as const;
 
 const ABOUT_MORE_KATEX_MACROS = {
+    strict: "ignore",
     macros: {
         [String.raw`\th`]: String.raw`\mathrm{th}`,
 
@@ -656,6 +658,19 @@ export default function App() {
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };
     }, [trackConfigsModified]);
+
+    useEffect(() => {
+        if (!drumSplitModalIsOpen)
+            return;
+
+        const selectedTrackConfigIndex = trackConfigs.findIndex(trackConfig => trackConfig.id === selectedTrackConfig.id);
+        if (selectedTrackConfigIndex === -1)
+            return;
+
+        const len = trackConfigs[selectedTrackConfigIndex].drumSplit.length;
+        if (drumSplitModalPageNumber >= len)
+            setDrumSplitModalPageNumber(len > 0 ? len - 1 : 0);
+    }, [trackConfigs, drumSplitModalIsOpen, selectedTrackConfig.id, drumSplitModalPageNumber]);
 
     const saveTrackConfig = (name: string) => {
         const prefixedName = prefixTrackConfigName(name)
@@ -898,7 +913,12 @@ export default function App() {
         newTrackConfigs[index].drumSplit.push({
             key: 36, // Default to Bass Drum
             instrumental: INSTRUCTION_PIANO_SELECT_OPTION.value,
-            offsets: { volume: 0, volumeConstant: false, pitch: 1, pitchConstant: true }
+            offsets: {
+                volume: 0,
+                volumeConstant: false,
+                pitch: 0,
+                pitchConstant: false,
+            }
         });
 
         setTrackConfigs(newTrackConfigs);
@@ -914,17 +934,17 @@ export default function App() {
         setTrackConfigsModified(true);
     };
 
-    const handleDrumConfigChange = (trackIndex: number, drumIndex: number, name: string, value: any) => {
+    const handleDrumConfigChange = (trackIndex: number, drumIndex: number, key: DotNestedDrumConfigKeys, value: any) => {
         const newTrackConfigs = [...trackConfigs];
 
         const drumConfig = newTrackConfigs[trackIndex].drumSplit[drumIndex];
 
-        if (name.includes(".")) {
-            const [propertyKey, innerPropertyKey] = name.split(".");
+        if (key.includes(".")) {
+            const [propertyKey, innerPropertyKey] = key.split(".");
 
             (drumConfig as any)[propertyKey][innerPropertyKey] = value;
         } else
-            (drumConfig as any)[name] = value;
+            (drumConfig as any)[key] = value;
 
         setTrackConfigs(newTrackConfigs);
         setTrackConfigsModified(true);
@@ -1000,6 +1020,12 @@ export default function App() {
         }
     };
 
+    const currentTrackIndex = trackConfigs.findIndex((track) => track.id === selectedTrackConfig.id);
+    const currentDrumSplits: Array<DrumConfig> =
+        currentTrackIndex !== -1
+            ? trackConfigs[currentTrackIndex].drumSplit
+            : [];
+
     return (
         <div className="container">
             <div className="text-center mt-2">
@@ -1069,7 +1095,7 @@ export default function App() {
 
                 <select
                     className="form-select me-2 configuration-select"
-                    onChange={(e) => loadTrackConfig(e.target.value)}
+                    onChange={(event) => loadTrackConfig(event.target.value)}
                 >
                     <option value={TRACK_CONFIG_SELECTION_DEFAULT_NAME}>Select Config To Load</option>
 
@@ -1794,8 +1820,8 @@ export default function App() {
                         marginRight: "-50%",
                         transform: "translate(-50%, -50%)",
                         backgroundColor: "#000000",
-                        width: "720px",
-                        height: "480px",
+                        width: "620px",
+                        height: "380px",
                         overflow: "hidden",
                         paddingTop: "40px",
                     },
@@ -1822,16 +1848,62 @@ export default function App() {
                         Drum Split
                     </div>
 
-                    <div className="relative flex gap-3">
-                        <AnimatedButtonGroup
-                            options={[
-                                { label: `Page 0`, value: 0 },
-                                { label: `Page 1`, value: 1 },
-                            ]}
-                            selected={drumSplitModalPageNumber}
-                            onChange={setDrumSplitModalPageNumber}
-                        />
-                    </div>
+                    {currentDrumSplits.length > 0 && (
+                        <div className="relative flex gap-3">
+                            <AnimatedButtonGroup
+                                options={currentDrumSplits.map((_, i) => ({
+                                    label: (
+                                        <>
+                                            {`Page ${i}`}
+
+                                            <span
+                                                className="remove-tab-x"
+                                                style={{
+                                                    cursor: "pointer",
+                                                    fontSize: "1.1rem",
+                                                    color: "#ffffff",
+                                                    opacity: 0.7,
+                                                }}
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
+
+                                                    let newPageNumber = drumSplitModalPageNumber;
+                                                    if (i < drumSplitModalPageNumber)
+                                                        newPageNumber = drumSplitModalPageNumber - 1
+                                                    else if (i === drumSplitModalPageNumber)
+                                                        newPageNumber = Math.max(0, drumSplitModalPageNumber - 1);
+
+                                                    setDrumSplitModalPageNumber(newPageNumber);
+
+                                                    removeDrumConfig(currentTrackIndex, i);
+                                                }}
+                                                title="Remove This Page"
+                                            >
+                                                <Icon icon="fa6-solid:xmark" />
+                                            </span>
+                                        </>
+                                    ),
+                                    value: i,
+                                }))}
+                                selected={drumSplitModalPageNumber}
+                                onChange={setDrumSplitModalPageNumber}
+                            />
+                        </div>
+                    )}
+
+                    {3 > currentDrumSplits.length && <button
+                        className="general-purpose-input"
+                        onClick={() => {
+                            if (currentTrackIndex !== -1) {
+                                const newIndex = currentDrumSplits.length;
+
+                                addDrumConfig(currentTrackIndex);
+                                setDrumSplitModalPageNumber(newIndex);
+                            }
+                        }}
+                    >
+                        +
+                    </button>}
                 </div>
 
                 <div className="w-full h-px bg-white my-2"></div>
@@ -1846,6 +1918,192 @@ export default function App() {
                 >
                     <Icon icon="fa6-solid:xmark" />
                 </button>
+
+                <div
+                    style={{
+                        padding: "5px",
+                        color: "white",
+                    }}
+                >
+                    {currentDrumSplits.length === 0 ? (
+                        <div style={{ textAlign: "center", color: "#aaa" }}>
+                            <p>No drum split configurations yet.</p>
+                        </div>
+                    ) : (
+                        (() => {
+                            const drumIndex = drumSplitModalPageNumber,
+                                drum = currentDrumSplits[drumIndex];
+
+                            return (
+                                <div>
+                                    <h5 style={{ marginBottom: "10px" }}>
+                                        Drum Split #{drumIndex} Configuration
+                                    </h5>
+
+                                    <div className="row mb-3">
+                                        {/* Key */}
+                                        <div className="col">
+                                            <label className="form-label">Key (MIDI Note)</label>
+
+                                            <input
+                                                type="number"
+                                                className="form-control configuration-string-inputter"
+                                                value={drum.key}
+                                                onChange={(event) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "key",
+                                                    parseInt(event.target.value) || 36
+                                                )}
+                                            />
+                                        </div>
+
+                                        {/* Instrumental */}
+                                        <div className="col">
+                                            <label className="form-label">Instrumental</label>
+
+                                            <Select
+                                                className="scroller"
+                                                options={INSTRUCTION_SELECT_OPTIONS}
+                                                value={INSTRUCTION_SELECT_OPTIONS.find((option) => option.value === drum.instrumental)}
+                                                placeholder="Type something..."
+                                                onChange={(newValue) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "instrumental",
+                                                    newValue?.value ?? 18
+                                                )}
+                                                filterOption={(option, input) => {
+                                                    const name = option.data.label.props.children[0].trim();
+
+                                                    return name.toLowerCase().includes(input.toLowerCase());
+                                                }}
+                                                styles={{
+                                                    control: (base) => ({
+                                                        ...base,
+
+                                                        width: "16rem",
+                                                        height: "2rem",
+                                                        minHeight: "2rem",
+                                                        borderColor: "#cccccc",
+                                                        fontFamily: "Courier New, Courier, monospace",
+                                                        cursor: "pointer",
+                                                    }),
+                                                    input: (base) => ({
+                                                        ...base,
+
+                                                        fontWeight: "600",
+                                                    }),
+                                                    container: (base) => ({
+                                                        ...base,
+
+                                                        color: "black",
+                                                    }),
+                                                    valueContainer: (base) => ({
+                                                        ...base,
+
+                                                        padding: "0 0.6rem",
+                                                    }),
+                                                    indicatorSeparator: () => ({ display: "none" }),
+                                                    indicatorsContainer: (base) => ({
+                                                        ...base,
+
+                                                        height: "2rem",
+                                                    }),
+                                                    option: (base) => ({
+                                                        ...base,
+
+                                                        cursor: "pointer",
+                                                    }),
+                                                    menuList: (base) => ({
+                                                        ...base,
+
+                                                        height: "150px",
+                                                    }),
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Offsets */}
+                                    <h4 style={{ display: "flex", alignItems: "center" }}>
+                                        <Icon icon="tabler:volume" style={{ marginRight: "10px" }} />
+
+                                        Offsets
+                                    </h4>
+
+                                    <div className="row mb-3">
+                                        <div className="col">
+                                            <label className="form-label">Volume</label>
+
+                                            <input
+                                                type="number"
+                                                className="form-control configuration-string-inputter"
+                                                value={drum.offsets.volume}
+                                                onChange={(event) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "offsets.volume",
+                                                    parseFloat(event.target.value) || event.target.value,
+                                                )}
+                                            />
+                                        </div>
+
+                                        <div className="col">
+                                            <label className="form-check-label">Volume Constant</label>
+
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input configuration-checkbox"
+                                                checked={drum.offsets.volumeConstant}
+                                                onChange={(event) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "offsets.volumeConstant",
+                                                    event.target.checked,
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="row mb-3">
+                                        <div className="col">
+                                            <label className="form-label">Pitch</label>
+
+                                            <input
+                                                type="number"
+                                                className="form-control configuration-string-inputter"
+                                                value={drum.offsets.pitch}
+                                                onChange={(event) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "offsets.pitch",
+                                                    parseFloat(event.target.value) || event.target.value,
+                                                )}
+                                            />
+                                        </div>
+
+                                        <div className="col">
+                                            <label className="form-check-label">Pitch Constant</label>
+
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input configuration-checkbox"
+                                                checked={drum.offsets.pitchConstant}
+                                                onChange={(event) => handleDrumConfigChange(
+                                                    currentTrackIndex,
+                                                    drumIndex,
+                                                    "offsets.pitchConstant",
+                                                    event.target.checked,
+                                                )}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()
+                    )}
+                </div>
             </Modal>
 
             <input

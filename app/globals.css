@@ -146,7 +146,7 @@ body {
     cursor: default !important;
 }
 
-.general-purpose-input:not(.general-purpose-input-selected):hover {
+.general-purpose-input:not(.general-purpose-input-selected):hover:not(:has(.remove-tab-x:hover)) {
     color: white !important;
     background-color: #ff3333 !important;
     mix-blend-mode: normal !important;
