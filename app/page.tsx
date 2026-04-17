@@ -224,7 +224,7 @@ const isOldTrackConfig = (config: TrackConfig | OldTrackConfig): config is OldTr
 }
 
 const migrateTrackConfig = (config: TrackConfig | OldTrackConfig): TrackConfig => {
-    if (typeof config === "object" && "Track" in config)
+    if (isOldTrackConfig(config))
         return {
             id: Number(config.id) || 0,
             track: Number(config.Track) || 0,
