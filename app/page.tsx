@@ -150,6 +150,29 @@ function hasAllKeys<T>(obj: any, keys: Array<keyof T>): obj is T {
     return keys.every(key => key in obj);
 }
 
+/** Old TrackConfig (capitalized keys) that may still exist in localStorage or imported JSON */
+interface OldTrackConfig {
+    id: any;
+    Track: number;
+    Instrumental: number;
+    BaseNote: string;
+    MaxNote: number;
+    Offsets: {
+        Volume: number;
+        VolumeConstant: boolean;
+        Pitch: number;
+        PitchConstant: boolean;
+    };
+    Loop: {
+        Enable: boolean;
+        LoopOffset: number;
+    };
+    Speed: number;
+    StripAfter: number;
+    StripBefore: number;
+    StartAt: number;
+}
+
 interface TrackOffsets {
     volume: number;
     volumeConstant: boolean;
@@ -174,7 +197,7 @@ interface TrackConfig {
     instrumental: number;
     /**
      * @remarks
-     * This value is string since evaluted in submittion.
+     * This value is string since is evaluted in submittion.
      * TODO: this is unsafe.
      */
     baseNote: string;
@@ -195,6 +218,38 @@ interface TrackConfig {
  * Unevalutable version of TrackConfig (which means completely same as original struct).
  */
 type RealTrackConfig = Omit<TrackConfig, "baseNote"> & { baseNote: number };
+
+const isOldTrackConfig = (config: TrackConfig | OldTrackConfig): config is OldTrackConfig => {
+    return typeof config === "object" && "Track" in config;
+}
+
+const migrateTrackConfig = (config: TrackConfig | OldTrackConfig): TrackConfig => {
+    if (typeof config === "object" && "Track" in config)
+        return {
+            id: Number(config.id) || 0,
+            track: Number(config.Track) || 0,
+            instrumental: Number(config.Instrumental) || 18,
+            baseNote: String(config.BaseNote ?? "61"),
+            maxNote: Number(config.MaxNote) || 73,
+            offsets: {
+                volume: Number(config.Offsets?.Volume ?? 0),
+                volumeConstant: Boolean(config.Offsets?.VolumeConstant),
+                pitch: Number(config.Offsets?.Pitch ?? 0),
+                pitchConstant: Boolean(config.Offsets?.PitchConstant),
+            },
+            loop: {
+                enable: Boolean(config.Loop?.Enable),
+                offset: Number(config.Loop?.LoopOffset ?? 0),
+            },
+            speed: Number(config.Speed ?? 1),
+            stripAfter: Number(config.StripAfter ?? 3000),
+            stripBefore: Number(config.StripBefore ?? 0),
+            startAt: Number(config.StartAt ?? 0),
+            drumSplit: [],
+        };
+
+    return config;
+};
 
 const TRACK_CONFIG_KEYS: Array<keyof TrackConfig> =
     ["id", "track", "instrumental", "baseNote", "maxNote", "offsets", "loop", "speed", "stripAfter", "stripBefore", "startAt", "drumSplit"] as const;
@@ -605,16 +660,24 @@ export default function App() {
                 }
 
                 const parsed = JSON.parse(fileContent);
+                if (!Array.isArray(parsed)) {
+                    log("Configuration is not valid");
+
+                    return;
+                }
+
+                const migrated = parsed.map(migrateTrackConfig);
+
                 if (!(
-                    Array.isArray(parsed) &&
-                    parsed.some(v => hasAllKeys(v, TRACK_CONFIG_KEYS))
+                    migrated.length > 0 &&
+                    migrated.some(v => hasAllKeys(v, TRACK_CONFIG_KEYS))
                 )) {
                     log("Configuration is not valid");
 
                     return;
                 }
 
-                setTrackConfigs(parsed as Array<TrackConfig>);
+                setTrackConfigs(migrated as Array<TrackConfig>);
             };
 
             reader.readAsText(file);
@@ -732,17 +795,31 @@ export default function App() {
         if (config) {
             const parsedConfig = JSON.parse(config);
 
-            if (parsedConfig.length > 0) {
-                setTrackConfigs(parsedConfig);
-                setSelectedTrackConfig(parsedConfig[0]);
+            if (!Array.isArray(parsedConfig)) {
+                log(`Configuration "${name}" is not a valid array`);
+
+                return;
+            }
+
+            const migratedConfig = parsedConfig.map(migrateTrackConfig);
+
+            if (migratedConfig.length > 0) {
+                setTrackConfigs(migratedConfig);
+                setSelectedTrackConfig(migratedConfig[0]);
 
                 setTrackConfigsModified(false);
 
                 log(`Configuration "${name}" loaded from storage`);
-            }
-        } else {
+
+                if (parsedConfig.length > 0 && isOldTrackConfig(parsedConfig[0])) {
+                    localStorage.setItem(prefixedName, JSON.stringify(migratedConfig));
+
+                    log(`Old configuration "${name}" has been migrated to the new format and saved`);
+                }
+            } else
+                log(`Configuration "${name}" is empty`);
+        } else
             log(`Configuration "${name}" not found in storage`);
-        }
     };
 
     type HandleableEvents = React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>;
@@ -1851,40 +1928,53 @@ export default function App() {
                     {currentDrumSplits.length > 0 && (
                         <div className="relative flex gap-3">
                             <AnimatedButtonGroup
-                                options={currentDrumSplits.map((_, i) => ({
-                                    label: (
-                                        <>
-                                            {`Page ${i}`}
+                                options={currentDrumSplits.map((drum, i) => {
+                                    const selectedOption = INSTRUCTION_SELECT_OPTIONS.find(option => option.value === drum.instrumental);
 
-                                            <span
-                                                className="remove-tab-x"
-                                                style={{
-                                                    cursor: "pointer",
-                                                    fontSize: "1.1rem",
-                                                    color: "#ffffff",
-                                                    opacity: 0.7,
-                                                }}
-                                                onClick={(event) => {
-                                                    event.stopPropagation();
+                                    const iconSrc = selectedOption?.label?.props?.children?.[1]?.props?.src;
 
-                                                    let newPageNumber = drumSplitModalPageNumber;
-                                                    if (i < drumSplitModalPageNumber)
-                                                        newPageNumber = drumSplitModalPageNumber - 1
-                                                    else if (i === drumSplitModalPageNumber)
-                                                        newPageNumber = Math.max(0, drumSplitModalPageNumber - 1);
+                                    return {
+                                        label: (
+                                            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                <span>{`Page ${i}`}</span>
 
-                                                    setDrumSplitModalPageNumber(newPageNumber);
+                                                {iconSrc && (
+                                                    <img
+                                                        src={iconSrc}
+                                                        alt="Instrument"
+                                                        style={{ width: 24, height: 24, objectFit: "contain" }}
+                                                    />
+                                                )}
 
-                                                    removeDrumConfig(currentTrackIndex, i);
-                                                }}
-                                                title="Remove This Page"
-                                            >
-                                                <Icon icon="fa6-solid:xmark" />
-                                            </span>
-                                        </>
-                                    ),
-                                    value: i,
-                                }))}
+                                                <span
+                                                    className="remove-tab-x"
+                                                    style={{
+                                                        cursor: "pointer",
+                                                        fontSize: "1.1rem",
+                                                        color: "#ffffff",
+                                                        opacity: 0.7,
+                                                    }}
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
+
+                                                        let newPageNumber = drumSplitModalPageNumber;
+                                                        if (i < drumSplitModalPageNumber)
+                                                            newPageNumber = drumSplitModalPageNumber - 1;
+                                                        else if (i === drumSplitModalPageNumber)
+                                                            newPageNumber = Math.max(0, drumSplitModalPageNumber - 1);
+
+                                                        setDrumSplitModalPageNumber(newPageNumber);
+                                                        removeDrumConfig(currentTrackIndex, i);
+                                                    }}
+                                                    title="Remove This Page"
+                                                >
+                                                    <Icon icon="fa6-solid:xmark" />
+                                                </span>
+                                            </div>
+                                        ),
+                                        value: i,
+                                    };
+                                })}
                                 selected={drumSplitModalPageNumber}
                                 onChange={setDrumSplitModalPageNumber}
                             />
