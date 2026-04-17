@@ -24,9 +24,8 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
     },
-    "downlevelIteration": true,
     "target": "ES2017"
   },
   "include": [

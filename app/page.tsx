@@ -397,7 +397,7 @@ const makeDefaultTrackConfig = (id: number): TrackConfig => ({
     id: id,
 
     track: 0,
-    instrumental: INSTRUCTION_PIANO_SELECT_OPTION.value,  // Default is piano
+    instrumental: INSTRUCTION_PIANO_SELECT_OPTION.value, // Default is piano
     baseNote: "61",
     maxNote: 73,
     offsets: {
