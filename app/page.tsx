@@ -51,6 +51,7 @@ import catMeowIcon from "../public/icons/cat-meow.png";
 import tollBellIcon from "../public/icons/toll-bell.png";
 import robotIcon from "../public/icons/robot.png";
 import damageIcon from "../public/icons/damage.png";
+import AnimatedButtonGroup from "./Components/AnimatedButtonGroup";
 
 const TRACKS_NORMAL_PREFIX = "NOT_AN_ERROR:" as const;
 
@@ -193,7 +194,7 @@ interface TrackConfig {
 /**
  * Unevalutable version of TrackConfig (which means completely same as original struct).
  */
-type RealTrackConfig = Omit<TrackConfig, "BaseNote"> & { BaseNote: number };
+type RealTrackConfig = Omit<TrackConfig, "baseNote"> & { baseNote: number };
 
 const TRACK_CONFIG_KEYS: Array<keyof TrackConfig> =
     ["id", "track", "instrumental", "baseNote", "maxNote", "offsets", "loop", "speed", "stripAfter", "stripBefore", "startAt", "drumSplit"] as const;
@@ -507,7 +508,7 @@ const enum InstructionConfigHintLiteralType {
     BOOLEAN,
 }
 
-const instructionConfigHintLiteralTypeToElement = (literalType: InstructionConfigHintLiteralType): JSX.Element => {
+const instructionConfigHintLiteralTypeToElement = (literalType: InstructionConfigHintLiteralType): React.JSX.Element => {
     switch (literalType) {
         case InstructionConfigHintLiteralType.INTEGER:
             return <>Type: <span style={{ color: "#0056B3" }}>Integer</span>.</>;
@@ -523,7 +524,7 @@ const instructionConfigHintLiteralTypeToElement = (literalType: InstructionConfi
     }
 };
 
-const InstructionConfigHint = (description: JSX.Element, literalType?: InstructionConfigHintLiteralType) =>
+const InstructionConfigHint = (description: React.JSX.Element, literalType?: InstructionConfigHintLiteralType) =>
     <OverlayTrigger
         placement="top"
         overlay={<Tooltip className="configuration-tooltip">
@@ -560,14 +561,27 @@ export default function App() {
     const trackConfigTabRef = useRef(null);
     const trackConfigImportInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [modalIsOpen, setIsOpen] = useState(false);
+    const [aboutMoreModalIsOpen, setAboutMoreModalIsOpen] = useState(false);
 
-    function openModal() {
-        setIsOpen(true);
+    function openAboutMoreModal() {
+        setAboutMoreModalIsOpen(true);
     }
 
-    function closeModal() {
-        setIsOpen(false);
+    function closeAboutMoreModal() {
+        setAboutMoreModalIsOpen(false);
+    }
+
+    const [drumSplitModalIsOpen, setDrumSplitModalIsOpen] = useState(false);
+    const [drumSplitModalPageNumber, setDrumSplitModalPageNumber] = useState<number>(0);
+
+    function openDrumSplitModal() {
+        setDrumSplitModalIsOpen(true);
+    }
+
+    function closeDrumSplitModal() {
+        setDrumSplitModalIsOpen(false);
+
+        setDrumSplitModalPageNumber(0);
     }
 
     const openTrackConfigImportInput = () => {
@@ -941,7 +955,8 @@ export default function App() {
                                 evalutedBaseNote = Number(eval(c.baseNote));
 
                                 // Fallback to catch behavior
-                                if (isNaN(evalutedBaseNote)) throw "";
+                                if (isNaN(evalutedBaseNote))
+                                    throw "";
                             } catch (e) {
                                 evalutedBaseNote = 61;
                             }
@@ -949,7 +964,7 @@ export default function App() {
                             return {
                                 ...c,
 
-                                BaseNote: evalutedBaseNote,
+                                baseNote: evalutedBaseNote,
                             } satisfies RealTrackConfig;
                         })
                     )
@@ -969,7 +984,13 @@ export default function App() {
             }
 
             case "about-more": {
-                openModal();
+                openAboutMoreModal();
+
+                break;
+            }
+
+            case "drum-split": {
+                openDrumSplitModal();
 
                 break;
             }
@@ -986,7 +1007,11 @@ export default function App() {
 
                 <input
                     type="file"
-                    className="w-full px-2 py-2 text-sm"
+                    className="w-full text-sm 
+                        file:mr-4 file:py-1 file:px-2
+                        file:border file:border-gray-400
+                        file:bg-transparent
+                        hover:file:bg-gray-50 hover:file:text-black"
                     aria-describedby="file_input_help"
                     accept=".mid,.midi"
                     id="midi-input"
@@ -1005,7 +1030,7 @@ export default function App() {
 
                             log(result);
                         }
-                    } as React.ChangeEventHandler<HTMLInputElement>}
+                    }}
                 />
             </div>
 
@@ -1111,6 +1136,8 @@ export default function App() {
                                 <Icon icon="fa6-brands:itunes-note" style={{ marginRight: "10px" }} />
 
                                 Config {track.id + 1}
+
+                                <input type="submit" className="configuration-submit" value="Drum Split" id="drum-split" style={{ marginLeft: "auto" }} />
                             </h4>
 
                             <div className="row mb-3">
@@ -1529,8 +1556,8 @@ export default function App() {
             </form>
 
             <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
+                isOpen={aboutMoreModalIsOpen}
+                onRequestClose={closeAboutMoreModal}
                 closeTimeoutMS={100}
                 style={{
                     overlay: {
@@ -1562,14 +1589,14 @@ export default function App() {
                 </h5>
 
                 <button
-                    onClick={closeModal}
+                    onClick={closeAboutMoreModal}
                     style={{
                         position: "absolute",
                         right: "15px",
                         top: "15px",
                     }}
                 >
-                    <i className="fa-solid fa-xmark" />
+                    <Icon icon="fa6-solid:xmark" />
                 </button>
 
                 {/* Scrollable div */}
@@ -1582,13 +1609,13 @@ export default function App() {
                         <h4>Useful Informations</h4>
 
                         <div>
-                            <i>• This tool is created for game named &quot;I Wanna Maker&quot; on steam. This tool makes the midi playable in I Wanna Maker using sound play events.</i>
+                            <i>• This tool is created for the game named &quot;I Wanna Maker&quot; on steam. This tool makes the midi playable in I Wanna Maker using sound play events.</i>
                         </div>
 
                         <div>
                             <i>• The site </i>
                             <a href="https://signal.vercel.app/edit" target="_blank" style={{ color: "blue" }}>signal.vercel.app</a>
-                            <i> can easily show & edit midi file.</i><br />
+                            <i> can easily show and edit the midi file.</i><br />
                         </div>
 
                         <div>
@@ -1749,6 +1776,76 @@ export default function App() {
                         <i>When either value is 0, no stripping is performed for that boundary</i>
                     </div>
                 </div>
+            </Modal>
+
+            <Modal
+                isOpen={drumSplitModalIsOpen}
+                onRequestClose={closeDrumSplitModal}
+                closeTimeoutMS={100}
+                style={{
+                    overlay: {
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    },
+                    content: {
+                        top: "50%",
+                        left: "50%",
+                        right: "auto",
+                        bottom: "auto",
+                        marginRight: "-50%",
+                        transform: "translate(-50%, -50%)",
+                        backgroundColor: "#000000",
+                        width: "720px",
+                        height: "480px",
+                        overflow: "hidden",
+                        paddingTop: "40px",
+                    },
+                }}
+                contentLabel="Drum Split Modal"
+            >
+                <div
+                    style={{
+                        position: "absolute",
+                        top: "10px",
+                        left: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "20px",
+                    }}
+                >
+                    <div
+                        style={{
+                            color: "white",
+                            fontSize: "1.25rem",
+                            fontWeight: "bold",
+                        }}
+                    >
+                        Drum Split
+                    </div>
+
+                    <div className="relative flex gap-3">
+                        <AnimatedButtonGroup
+                            options={[
+                                { label: `Page 0`, value: 0 },
+                                { label: `Page 1`, value: 1 },
+                            ]}
+                            selected={drumSplitModalPageNumber}
+                            onChange={setDrumSplitModalPageNumber}
+                        />
+                    </div>
+                </div>
+
+                <div className="w-full h-px bg-white my-2"></div>
+
+                <button
+                    onClick={closeDrumSplitModal}
+                    style={{
+                        position: "absolute",
+                        right: "15px",
+                        top: "15px",
+                    }}
+                >
+                    <Icon icon="fa6-solid:xmark" />
+                </button>
             </Modal>
 
             <input

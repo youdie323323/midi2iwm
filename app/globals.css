@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 body {
     background-color: #000000 !important;
@@ -122,11 +120,36 @@ body {
     cursor: pointer;
     text-decoration: none;
     color: rgb(255, 255, 255);
+
+    background-color: #000000 !important;
+    border: none !important;
+    outline: none !important;
+    appearance: none !important;
     padding: 0px 0.2rem;
+    box-sizing: border-box;
 }
 
 .configuration-submit:hover {
-    background-color: #ff3333;
+    background-color: #ff3333 !important;
+}
+
+.general-purpose-input {
+    color: white;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    padding: 0px 0.2rem;
+    background: transparent;
+    mix-blend-mode: difference;
+}
+
+.general-purpose-input-selected {
+    cursor: default !important;
+}
+
+.general-purpose-input:not(.general-purpose-input-selected):hover {
+    color: white !important;
+    background-color: #ff3333 !important;
+    mix-blend-mode: normal !important;
 }
 
 /* Current select/input[type="checkbox"] does not changes cursor style when hovered/focused, so we'll do that voluntary */
