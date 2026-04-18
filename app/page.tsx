@@ -1936,7 +1936,7 @@ export default function App() {
                                     return {
                                         label: (
                                             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                <span>{`Page ${i}`}</span>
+                                                <span>{String(i)}</span>
 
                                                 {iconSrc && (
                                                     <img
@@ -1981,7 +1981,7 @@ export default function App() {
                         </div>
                     )}
 
-                    {3 > currentDrumSplits.length && <button
+                    {5 > currentDrumSplits.length && <button
                         className="general-purpose-input"
                         onClick={() => {
                             if (currentTrackIndex !== -1) {
